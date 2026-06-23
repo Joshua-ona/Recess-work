@@ -103,7 +103,7 @@
                 <div class="panel">
                     <div class="panel-head">
                         <span class="panel-title">Unanswered questions</span>
-                        <a href="{{ route('lecturer.discussions') }}" class="panel-action">Reply to all</a>
+                        <a href="{{ route('lecturer.discussions.index') }}" class="panel-action">Reply to all</a>
                     </div>
                     <div class="panel-body">
                         @forelse($unansweredDiscussions ?? [] as $disc)

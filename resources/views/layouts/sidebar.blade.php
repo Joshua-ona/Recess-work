@@ -39,7 +39,7 @@
         </div>
         <div class="sidebar-section">
             <div class="sidebar-section-label">Management</div>
-            <a href="{{ route('admin.users') }}"
+            <a href="{{ route('admin.users.index') }}"
                class="sidebar-item {{ request()->routeIs('admin.users*') ? 'active' : '' }}">
                 <i class="ti ti-users" aria-hidden="true"></i> Users
                 <span class="sidebar-badge">{{ $userCount ?? 0 }}</span>
@@ -84,7 +84,7 @@
         <div class="sidebar-section">
             <div class="sidebar-section-label">My courses</div>
             @foreach($myCourses ?? [] as $course)
-                <a href="{{ route('lecturer.course', $course->id) }}"
+                <a href="{{ route('lecturer.courses.show', $course->id) }}"
                    class="sidebar-item {{ request()->is('lecturer/courses/'.$course->id.'*') ? 'active' : '' }}">
                     <i class="ti ti-calculator" aria-hidden="true"></i>
                     {{ $course->code }} — {{ Str::limit($course->name, 18) }}
