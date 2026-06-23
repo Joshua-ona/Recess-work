@@ -1,0 +1,170 @@
+{{--
+    Reusable sidebar partial.
+    Props (passed via @include):
+      $role   — 'admin' | 'student' | 'lecturer'
+      $user   — Auth user object
+--}}
+
+<nav class="sidebar" aria-label="Main navigation">
+
+    <div class="sidebar-logo">
+        <div class="sidebar-logo-row">
+            <div class="sidebar-logo-icon" aria-hidden="true">
+                <i class="ti ti-messages"></i>
+            </div>
+            <div>
+                <div class="sidebar-logo-name">EduDiscuss</div>
+                <div class="sidebar-logo-sub">
+                    @if($role === 'admin') Administration
+                    @elseif($role === 'lecturer') Lecturer portal
+                    @else Student portal
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- ── Admin nav ── --}}
+    @if($role === 'admin')
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Overview</div>
+            <a href="{{ route('admin.dashboard') }}"
+               class="sidebar-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                <i class="ti ti-layout-dashboard" aria-hidden="true"></i> Dashboard
+            </a>
+            <a href="{{ route('admin.analytics') }}"
+               class="sidebar-item {{ request()->routeIs('admin.analytics') ? 'active' : '' }}">
+                <i class="ti ti-chart-bar" aria-hidden="true"></i> Analytics
+            </a>
+        </div>
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Management</div>
+            <a href="{{ route('admin.users') }}"
+               class="sidebar-item {{ request()->routeIs('admin.users*') ? 'active' : '' }}">
+                <i class="ti ti-users" aria-hidden="true"></i> Users
+                <span class="sidebar-badge">{{ $userCount ?? 0 }}</span>
+            </a>
+            <a href="{{ route('admin.discussions') }}"
+               class="sidebar-item {{ request()->routeIs('admin.discussions*') ? 'active' : '' }}">
+                <i class="ti ti-messages" aria-hidden="true"></i> Discussions
+            </a>
+            <a href="{{ route('admin.courses') }}"
+               class="sidebar-item {{ request()->routeIs('admin.courses*') ? 'active' : '' }}">
+                <i class="ti ti-books" aria-hidden="true"></i> Courses
+            </a>
+            <a href="{{ route('admin.reports') }}"
+               class="sidebar-item {{ request()->routeIs('admin.reports*') ? 'active' : '' }}">
+                <i class="ti ti-flag" aria-hidden="true"></i> Reports
+                @if(($openReports ?? 0) > 0)
+                    <span class="sidebar-badge">{{ $openReports }}</span>
+                @endif
+            </a>
+        </div>
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">System</div>
+            <a href="{{ route('admin.settings') }}"
+               class="sidebar-item {{ request()->routeIs('admin.settings') ? 'active' : '' }}">
+                <i class="ti ti-settings" aria-hidden="true"></i> Settings
+            </a>
+        </div>
+
+    {{-- ── Lecturer nav ── --}}
+    @elseif($role === 'lecturer')
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Overview</div>
+            <a href="{{ route('lecturer.dashboard') }}"
+               class="sidebar-item {{ request()->routeIs('lecturer.dashboard') ? 'active' : '' }}">
+                <i class="ti ti-layout-dashboard" aria-hidden="true"></i> Dashboard
+            </a>
+            <a href="{{ route('lecturer.engagement') }}"
+               class="sidebar-item {{ request()->routeIs('lecturer.engagement') ? 'active' : '' }}">
+                <i class="ti ti-chart-bar" aria-hidden="true"></i> Engagement
+            </a>
+        </div>
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">My courses</div>
+            @foreach($myCourses ?? [] as $course)
+                <a href="{{ route('lecturer.course', $course->id) }}"
+                   class="sidebar-item {{ request()->is('lecturer/courses/'.$course->id.'*') ? 'active' : '' }}">
+                    <i class="ti ti-calculator" aria-hidden="true"></i>
+                    {{ $course->code }} — {{ Str::limit($course->name, 18) }}
+                </a>
+            @endforeach
+            <a href="{{ route('lecturer.courses.create') }}" class="sidebar-item">
+                <i class="ti ti-plus" aria-hidden="true"></i> Create course
+            </a>
+        </div>
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Tools</div>
+            <a href="{{ route('lecturer.pinned') }}" class="sidebar-item">
+                <i class="ti ti-pin" aria-hidden="true"></i> Pinned threads
+            </a>
+            <a href="{{ route('lecturer.flagged') }}"
+               class="sidebar-item {{ request()->routeIs('lecturer.flagged') ? 'active' : '' }}">
+                <i class="ti ti-flag" aria-hidden="true"></i> Flagged posts
+                @if(($flaggedCount ?? 0) > 0)
+                    <span class="sidebar-badge">{{ $flaggedCount }}</span>
+                @endif
+            </a>
+        </div>
+
+    {{-- ── Student nav ── --}}
+    @else
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">My space</div>
+            <a href="{{ route('student.dashboard') }}"
+               class="sidebar-item {{ request()->routeIs('student.dashboard') ? 'active' : '' }}">
+                <i class="ti ti-home" aria-hidden="true"></i> Home
+            </a>
+            <a href="{{ route('student.discussions.index') }}"
+               class="sidebar-item {{ request()->routeIs('student.discussions.*') ? 'active' : '' }}">
+                <i class="ti ti-messages" aria-hidden="true"></i> My discussions
+                @if(($unreadCount ?? 0) > 0)
+                    <span class="sidebar-badge">{{ $unreadCount }}</span>
+                @endif
+            </a>
+            <a href="{{ route('student.saved') }}" class="sidebar-item">
+                <i class="ti ti-bookmark" aria-hidden="true"></i> Saved posts
+            </a>
+        </div>
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Courses</div>
+            @foreach($enrolledCourses ?? [] as $course)
+                <a href="{{ route('student.course', $course->id) }}"
+                   class="sidebar-item {{ request()->is('student/courses/'.$course->id.'*') ? 'active' : '' }}">
+                    <i class="ti ti-book" aria-hidden="true"></i>
+                    {{ $course->code }} — {{ Str::limit($course->name, 18) }}
+                </a>
+            @endforeach
+            <a href="{{ route('student.courses.browse') }}" class="sidebar-item">
+                <i class="ti ti-plus" aria-hidden="true"></i> Browse all courses
+            </a>
+        </div>
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Account</div>
+            <a href="{{ route('student.profile') }}" class="sidebar-item">
+                <i class="ti ti-user" aria-hidden="true"></i> Profile
+            </a>
+            <a href="{{ route('student.notifications') }}" class="sidebar-item">
+                <i class="ti ti-bell" aria-hidden="true"></i> Notifications
+                @if(($notifCount ?? 0) > 0)
+                    <span class="sidebar-badge">{{ $notifCount }}</span>
+                @endif
+            </a>
+        </div>
+    @endif
+
+    <div class="sidebar-spacer"></div>
+
+    {{-- User footer --}}
+    <div class="sidebar-user">
+        <div class="sidebar-avatar" aria-hidden="true">
+            {{ strtoupper(substr($user->first_name ?? $user->name ?? 'U', 0, 1)) }}{{ strtoupper(substr($user->last_name ?? '', 0, 1)) }}
+        </div>
+        <div>
+            <div class="sidebar-user-name">{{ $user->name ?? ($user->first_name.' '.$user->last_name) }}</div>
+            <div class="sidebar-user-meta">{{ $user->email }}</div>
+        </div>
+    </div>
+
+</nav>
