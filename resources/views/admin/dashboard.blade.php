@@ -1,200 +1,161 @@
-@extends('layouts.app')
-@section('title', 'Admin Dashboard')
+@extends('layouts.admin')
 
-@section('body')
-<div class="dash-wrap">
+@section('title', 'Admin dashboard')
 
-    {{-- Sidebar --}}
-    @include('layouts.sidebar', [
-        'role'        => 'admin',
-        'user'        => auth()->user(),
-        'userCount'   => $userCount   ?? 0,
-        'openReports' => $openReports ?? 0,
-    ])
+@section('content')
 
-    {{-- Main --}}
-    <div class="dash-main">
+    <div class="flex items-center justify-between border-b pb-3 mb-6">
+        <div class="flex items-center gap-3">
+            <span class="font-medium text-lg">Admin dashboard</span>
+            <span class="text-sm text-gray-500">{{ auth()->user()->name }}</span>
+        </div>
+    </div>
 
-        {{-- Header --}}
-        <div class="dash-header">
-            <div>
-                <div class="dash-header-title">Dashboard</div>
-                <div class="dash-header-sub">{{ now()->format('l, j F Y') }}</div>
+    <div class="grid grid-cols-4 gap-4 mb-8">
+        <div class="bg-gray-100 rounded-lg p-4">
+            <p class="text-sm text-gray-500 mb-1">Total members</p>
+            <p class="text-2xl font-medium">{{ $totalMembers }}</p>
+        </div>
+        <div class="bg-gray-100 rounded-lg p-4">
+            <p class="text-sm text-gray-500 mb-1">Active today</p>
+            <p class="text-2xl font-medium">{{ $activeToday }}</p>
+        </div>
+        <div class="bg-gray-100 rounded-lg p-4">
+            <p class="text-sm text-gray-500 mb-1">Pending approvals</p>
+            <p class="text-2xl font-medium text-amber-600">{{ $pendingApprovals->count() }}</p>
+        </div>
+        <div class="bg-gray-100 rounded-lg p-4">
+            <p class="text-sm text-gray-500 mb-1">Blacklisted</p>
+            <p class="text-2xl font-medium text-red-600">{{ $blacklistedCount }}</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-3 gap-6">
+
+        <div class="col-span-2 space-y-6">
+
+            <div class="bg-white border rounded-lg p-5">
+                <p class="font-medium mb-3">Top contributors this month</p>
+                <div class="space-y-2">
+                    @foreach ($topContributors as $c)
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span>{{ $c['name'] }}</span>
+                                <span class="text-gray-500">{{ $c['posts'] }} posts</span>
+                            </div>
+                            <div class="h-1.5 bg-gray-100 rounded">
+                                <div class="h-1.5 bg-green-600 rounded" style="width: {{ min(100, $c['posts'] * 2.5) }}%"></div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+                <p class="text-xs text-gray-400 mt-3">Placeholder data — wire up once the forum/post tables exist.</p>
             </div>
-            <div class="dash-header-actions">
-                <button class="icon-btn" aria-label="Search">
-                    <i class="ti ti-search" aria-hidden="true"></i>
-                </button>
-                <button class="icon-btn" aria-label="Notifications">
-                    <i class="ti ti-bell" aria-hidden="true"></i>
-                </button>
-                <form method="POST" action="{{ route('logout') }}" style="display:inline">
-                    @csrf
-                    <button type="submit" class="icon-btn" aria-label="Log out">
-                        <i class="ti ti-logout" aria-hidden="true"></i>
-                    </button>
-                </form>
+
+            <div class="bg-white border rounded-lg p-5">
+                <p class="font-medium mb-3">Flagged content</p>
+                <div class="divide-y">
+                    @forelse ($flaggedContent as $f)
+                        <div class="flex justify-between items-center py-2">
+                            <div>
+                                <p class="text-sm">{{ $f['title'] }}</p>
+                                <p class="text-xs text-gray-500">{{ $f['meta'] }}</p>
+                            </div>
+                            <button class="text-xs border rounded px-2 py-1">Review</button>
+                        </div>
+                    @empty
+                        <p class="text-sm text-gray-500 py-2">Nothing flagged right now.</p>
+                    @endforelse
+                </div>
             </div>
+
+            <div class="bg-white border rounded-lg p-5">
+                <p class="font-medium mb-3">Upcoming quiz configurations</p>
+                <table class="w-full text-sm">
+                    <tr class="text-gray-500">
+                        <td class="py-1">Quiz</td>
+                        <td>Category</td>
+                        <td class="text-right">Opens</td>
+                    </tr>
+                    @foreach ($upcomingQuizzes as $q)
+                        <tr class="border-t">
+                            <td class="py-2">{{ $q['name'] }}</td>
+                            <td>{{ $q['category'] }}</td>
+                            <td class="text-right">{{ $q['opens'] }}</td>
+                        </tr>
+                    @endforeach
+                </table>
+            </div>
+
         </div>
 
-        <div class="dash-body">
+        <div class="space-y-6">
 
-            {{-- Flash --}}
-            @if(session('success'))
-                <div class="alert alert-success">{{ session('success') }}</div>
-            @endif
-
-            {{-- Stat cards --}}
-            <div class="stat-grid">
-                <div class="stat-card">
-                    <div class="stat-label">
-                        <i class="ti ti-users" style="color:var(--purple-600)" aria-hidden="true"></i>
-                        Total users
-                    </div>
-                    <div class="stat-value">{{ number_format($userCount ?? 0) }}</div>
-                    <div class="stat-change text-pos">↑ {{ $newUsersThisWeek ?? 0 }} this week</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">
-                        <i class="ti ti-messages" style="color:var(--teal-400)" aria-hidden="true"></i>
-                        Discussions
-                    </div>
-                    <div class="stat-value">{{ number_format($discussionCount ?? 0) }}</div>
-                    <div class="stat-change text-pos">↑ {{ $discussionsToday ?? 0 }} today</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">
-                        <i class="ti ti-books" style="color:var(--amber-400)" aria-hidden="true"></i>
-                        Courses
-                    </div>
-                    <div class="stat-value">{{ $courseCount ?? 0 }}</div>
-                    <div class="stat-change text-muted">Across {{ $deptCount ?? 0 }} departments</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">
-                        <i class="ti ti-flag" style="color:var(--red-400)" aria-hidden="true"></i>
-                        Open reports
-                    </div>
-                    <div class="stat-value">{{ $openReports ?? 0 }}</div>
-                    @if(($openReports ?? 0) > 0)
-                        <div class="stat-change text-neg">Needs review</div>
-                    @endif
-                </div>
-            </div>
-
-            {{-- Two-column panels --}}
-            <div class="panel-grid">
-
-                {{-- Recent discussions --}}
-                <div class="panel">
-                    <div class="panel-head">
-                        <span class="panel-title">Recent discussions</span>
-                        <a href="{{ route('admin.discussions') }}" class="panel-action">View all</a>
-                    </div>
-                    <div class="panel-body">
-                        @forelse($recentDiscussions ?? [] as $disc)
-                            <div class="disc-item">
-                                <div class="disc-avatar" style="background:var(--purple-50);color:var(--purple-800)">
-                                    {{ strtoupper(substr($disc->user->first_name ?? 'U', 0, 1)) }}{{ strtoupper(substr($disc->user->last_name ?? '', 0, 1)) }}
-                                </div>
-                                <div style="flex:1;min-width:0">
-                                    <div class="disc-title">{{ $disc->title }}</div>
-                                    <div class="disc-meta">
-                                        <span class="badge badge-purple">{{ $disc->course->code ?? 'N/A' }}</span>
-                                        {{ $disc->replies_count ?? 0 }} replies ·
-                                        {{ $disc->created_at->diffForHumans() }}
-                                    </div>
-                                </div>
+            <div class="bg-white border rounded-lg p-5">
+                <p class="font-medium mb-3">Pending member approvals</p>
+                <div class="space-y-3">
+                    @forelse ($pendingApprovals as $user)
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm">{{ $user->name }}</span>
+                            <div class="flex gap-1">
+                                <form method="POST" action="{{ route('admin.Users.approve', $user) }}">
+                                    @csrf
+                                    <button class="text-green-600 text-xs border rounded px-2 py-1">Approve</button>
+                                </form>
+                                <form method="POST" action="{{ route('admin.Users.decline', $user) }}">
+                                    @csrf
+                                    <button class="text-red-600 text-xs border rounded px-2 py-1">Decline</button>
+                                </form>
                             </div>
-                        @empty
-                            <p style="font-size:13px;color:var(--muted);text-align:center;padding:1rem 0">No discussions yet.</p>
-                        @endforelse
-                    </div>
+                        </div>
+                    @empty
+                        <p class="text-sm text-gray-500">No pending approvals.</p>
+                    @endforelse
                 </div>
+            </div>
 
-                {{-- Activity feed --}}
-                <div class="panel">
-                    <div class="panel-head">
-                        <span class="panel-title">Activity feed</span>
-                    </div>
-                    <div class="panel-body">
-                        @forelse($activities ?? [] as $activity)
-                            <div class="activity-item">
-                                <div class="activity-dot"></div>
-                                <div>
-                                    <div class="activity-text">{!! $activity->description !!}</div>
-                                    <div class="activity-time">{{ $activity->created_at->diffForHumans() }}</div>
+            <div class="bg-white border rounded-lg p-5">
+                <p class="font-medium mb-3">Inactivity warnings</p>
+                <div class="space-y-2">
+                    @forelse ($warnedMembers as $user)
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm">{{ $user->name }}</span>
+                            @if ($user->status === 'blacklisted')
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs bg-red-50 text-red-700 px-2 py-0.5 rounded">Blacklisted</span>
+                                    <form method="POST" action="{{ route('admin.Users.unblacklist', $user) }}">
+                                        @csrf
+                                        <button class="text-xs border rounded px-2 py-1">Reinstate</button>
+                                    </form>
                                 </div>
-                            </div>
-                        @empty
-                            <p style="font-size:13px;color:var(--muted);text-align:center;padding:1rem 0">No recent activity.</p>
-                        @endforelse
-                    </div>
+                            @else
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded">Warning {{ $user->warning_count }} of 2</span>
+                                    <form method="POST" action="{{ route('admin.Users.warn', $user) }}">
+                                        @csrf
+                                        <button class="text-xs border rounded px-2 py-1">+1</button>
+                                    </form>
+                                </div>
+                            @endif
+                        </div>
+                    @empty
+                        <p class="text-sm text-gray-500">No members currently flagged for inactivity.</p>
+                    @endforelse
                 </div>
-
             </div>
 
-            {{-- User table --}}
-            <div class="full-panel">
-                <div class="panel-head">
-                    <span class="panel-title">User accounts</span>
-                    <a href="{{ route('admin.users.create') }}" class="panel-action">+ Add user</a>
+            <div class="bg-white border rounded-lg p-5">
+                <p class="font-medium mb-3">ML-recommended trending topics</p>
+                <div class="flex flex-wrap gap-2">
+                    @foreach ($trendingTopics as $t)
+                        <span class="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded">{{ $t }}</span>
+                    @endforeach
                 </div>
-                <div class="table-scroll">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Role</th>
-                                <th>Department</th>
-                                <th>Status</th>
-                                <th>Last active</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($users ?? [] as $user)
-                                <tr>
-                                    <td>{{ $user->first_name }} {{ $user->last_name }}</td>
-                                    <td>
-                                        @if($user->role === 'admin')
-                                            <span class="badge badge-purple">Admin</span>
-                                        @elseif($user->role === 'lecturer')
-                                            <span class="badge badge-teal">Lecturer</span>
-                                        @else
-                                            <span class="badge badge-blue">Student</span>
-                                        @endif
-                                    </td>
-                                    <td>{{ $user->department->name ?? '—' }}</td>
-                                    <td>
-                                        @if($user->status === 'active')
-                                            <span class="badge badge-green">Active</span>
-                                        @elseif($user->status === 'pending')
-                                            <span class="badge badge-amber">Pending</span>
-                                        @else
-                                            <span class="badge badge-red">Suspended</span>
-                                        @endif
-                                    </td>
-                                    <td>{{ $user->last_active_at ? $user->last_active_at->diffForHumans() : '—' }}</td>
-                                    <td>
-                                        <a href="{{ route('admin.users.edit', $user->id) }}"
-                                           style="font-size:12px;color:var(--purple-600);text-decoration:none;">Edit</a>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr><td colspan="6" style="text-align:center;color:var(--muted);padding:1.5rem">No users found.</td></tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-                @if(isset($users) && $users->hasPages())
-                    <div style="padding:12px 1rem;border-top:var(--border)">
-                        {{ $users->links() }}
-                    </div>
-                @endif
+                <p class="text-xs text-gray-400 mt-3">Placeholder — swap in real output from the recommendation microservice.</p>
             </div>
 
-        </div>{{-- /dash-body --}}
-    </div>{{-- /dash-main --}}
-</div>{{-- /dash-wrap --}}
+        </div>
+
+    </div>
+
 @endsection

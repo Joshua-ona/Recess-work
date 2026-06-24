@@ -34,38 +34,16 @@ Route::post('/logout', [AuthController::class, 'logout'])
     ->middleware('auth')
     ->name('logout');
 
-/*
-|--------------------------------------------------------------------------
-| Admin Routes
-|--------------------------------------------------------------------------
-*/
-
-Route::prefix('admin')
-    ->name('admin.')
-    ->middleware(['auth', 'role:admin'])
-    ->group(function () {
-
-        Route::get('/', [AdminDashboardController::class, 'index'])
-            ->name('dashboard');
-
-        Route::get('/analytics', [AdminDashboardController::class, 'analytics'])
-            ->name('analytics');
-
-        Route::resource('/users', AdminUserController::class)
-            ->names('users');
-
-        Route::get('/discussions', [AdminDashboardController::class, 'discussions'])
-            ->name('discussions');
-
-        Route::get('/courses', [AdminDashboardController::class, 'courses'])
-            ->name('courses');
-
-        Route::get('/reports', [AdminDashboardController::class, 'reports'])
-            ->name('reports');
-
-        Route::get('/settings', [AdminDashboardController::class, 'settings'])
-            ->name('settings');
-    });
+// ── Admin routes ───────────────────────────────────────────
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/',            [AdminDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/analytics',   [AdminDashboardController::class, 'analytics'])->name('analytics');
+    Route::resource('/users',  AdminUserController::class)->names('users');
+    Route::get('/discussions', [AdminDashboardController::class, 'discussions'])->name('discussions');
+    Route::get('/courses',     [AdminDashboardController::class, 'courses'])->name('courses');
+    Route::get('/reports',     [AdminDashboardController::class, 'reports'])->name('reports');
+    Route::get('/settings',    [AdminDashboardController::class, 'settings'])->name('settings');
+});
 
 /*
 |--------------------------------------------------------------------------

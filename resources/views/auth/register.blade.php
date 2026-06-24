@@ -4,6 +4,23 @@
 @section('body')
 <div class="auth-page">
     <div class="auth-card">
+        {{-- T&Cs Modal --}}
+<div id="tcs-modal" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;">
+    <div style="background:white;padding:30px;border-radius:10px;max-width:500px;width:90%;max-height:80vh;overflow-y:auto;">
+        <h2>Platform Rules & Terms</h2>
+        <br>
+        <p><strong>1.</strong> Post only relevant academic content.</p>
+        <p><strong>2.</strong> Respect all members at all times.</p>
+        <p><strong>3.</strong> Do not share personal information of others.</p>
+        <p><strong>4.</strong> Inactive members will receive warnings before being blacklisted.</p>
+        <p><strong>5.</strong> Quizzes must be attempted honestly without assistance.</p>
+        <p><strong>6.</strong> Moderators have authority to remove inappropriate content.</p>
+        <br>
+        <button onclick="document.getElementById('tcs-modal').style.display='none'" style="background:#1a3c8f;color:white;padding:10px 20px;border:none;border-radius:5px;cursor:pointer;width:100%;">
+            I Agree — Continue to Register
+        </button>
+    </div>
+</div>
 
         {{-- Logo --}}
         <div class="auth-logo">
@@ -161,6 +178,23 @@
                     />
                 </div>
             </div>
+
+            {{--T&Cs Checkbox--}}
+            <div class="form-group">
+                <label>
+                    <input
+                    type="checkbox"
+                    name="agreed_rules"
+                    value="1"
+                    required
+                    />
+                    I agree to the
+                    <a href="#">platform rules and terms</a>
+</label>
+@error('agreed_rules')
+<span class="invalid-feedback" role="alert">{{$message}}</span>
+@enderror
+</div>
 
             <button type="submit" class="btn btn-primary">Create account</button>
         </form>
