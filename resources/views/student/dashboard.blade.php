@@ -68,8 +68,8 @@
                         <i class="ti ti-heart" style="color:var(--pink-600)" aria-hidden="true"></i>
                         Upvotes received
                     </div>
-                    <div class="stat-value">{{ $upvoteCount ?? 0 }}</div>
-                    <div class="stat-change text-pos">↑ {{ $upvotesThisWeek ?? 0 }} this week</div>
+                    <div class="stat-value">{{ $upcomingQuiz ?? 0 }}</div>
+                    <div class="stat-change text-pos">↑ {{ $upComingQuizThisWeek ?? 0 }} this week</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-label">
@@ -81,10 +81,10 @@
                 <div class="stat-card">
                     <div class="stat-label">
                         <i class="ti ti-star" style="color:var(--amber-400)" aria-hidden="true"></i>
-                        Reputation
+                        Participation Score
                     </div>
-                    <div class="stat-value">{{ number_format($reputation ?? 0) }}</div>
-                    <div class="stat-change text-pos">↑ {{ $reputationGain ?? 0 }} pts</div>
+                    <div class="stat-value">{{ number_format($ParticipationScore?? 0) }}</div>
+                    <div class="stat-change text-pos">↑ {{ $ParticipationGain ?? 0 }} pts</div>
                 </div>
             </div>
 
