@@ -162,6 +162,23 @@
                 </div>
             </div>
 
+            {{--T&Cs Checkbox--}}
+            <div class="form-group">
+                <label>
+                    <input
+                    type="checkbox"
+                    name="agreed_rules"
+                    value="1"
+                    required
+                    />
+                    I agree to the
+                    <a href="#">platform rules and terms</a>
+</label>
+@error('agreed_rules')
+<span class="invalid-feedback" role="alert">{{$message}}</span>
+@enderror
+</div>
+
             <button type="submit" class="btn btn-primary">Create account</button>
         </form>
 
