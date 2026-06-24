@@ -41,6 +41,26 @@ Route::prefix('lecturer')->name('lecturer.')->middleware(['auth', 'role:lecturer
     Route::resource('/courses',       LecturerCourseController::class)->names('courses');
     Route::resource('/discussions',   LecturerDiscussionController::class)->names('discussions');
     Route::resource('/announcements', \App\Http\Controllers\Lecturer\LecturerAnnouncementController::class)->names('announcements');
+    Route::get('/categories', [LecturerDashboardController::class, 'categories'])
+    ->name('categories');
+
+Route::get('/quizzes', [LecturerDashboardController::class, 'quizzes'])
+    ->name('quizzes');
+
+Route::get('/performance', [LecturerDashboardController::class, 'performance'])
+    ->name('performance');
+
+Route::get('/messages', [LecturerDashboardController::class, 'messages'])
+    ->name('messages');
+
+Route::get('/notifications', [LecturerDashboardController::class, 'notifications'])
+    ->name('notifications');
+
+Route::get('/settings', [LecturerDashboardController::class, 'settings'])
+    ->name('settings');
+    
+    Route::get('/quizzes/create', [LecturerDashboardController::class, 'createQuiz'])
+    ->name('quizzes.create');
 });
 
 // ── Student routes ─────────────────────────────────────────
@@ -52,6 +72,13 @@ Route::prefix('student')->name('student.')->middleware(['auth', 'role:student'])
     Route::get('/courses/browse',   [StudentDashboardController::class, 'browseCourses'])->name('courses.browse');
     Route::get('/courses/{course}', [StudentDashboardController::class, 'course'])->name('course');
     Route::resource('/discussions', StudentDiscussionController::class)->names('discussions');
+    Route::get('/categories', [StudentDashboardController::class, 'categories'])->name('categories');
+    Route::get('/quizzes',          [StudentDashboardController::class, 'quizzes'])->name('quizzes');
+    Route::get('/messages',         [StudentDashboardController::class, 'messages'])->name('messages');
+    Route::get('/settings',          [StudentDashboardController::class, 'settings'])->name('settings');
+    Route::get('/reports', [StudentDashboardController::class, 'reports'])
+    ->name('reports');
+
 });
 
 // ── Redirect root to correct dashboard by role ─────────────

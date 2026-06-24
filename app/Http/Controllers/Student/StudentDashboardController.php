@@ -15,6 +15,28 @@ class StudentDashboardController extends Controller
     {
         return view('student.saved');
     }
+    public function quizzes()
+{
+    return view('student.quizzes');
+}
+
+public function messages()
+{
+    return view('student.messages');
+}
+public function categories()
+{
+    return view('student.categories');
+}
+public function reports()
+{
+    return view('student.reports');
+}
+
+public function settings()
+{
+    return view('student.settings');
+}
 
     public function profile()
     {
