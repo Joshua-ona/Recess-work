@@ -9,26 +9,28 @@ use App\Http\Controllers\Lecturer\LecturerDiscussionController;
 use App\Http\Controllers\Lecturer\LecturerCourseController;
 use App\Http\Controllers\Student\StudentDashboardController;
 use App\Http\Controllers\Student\StudentDiscussionController;
+use App\Http\Controllers\Auth\RegisterController;
 
 // ── Public routes ──────────────────────────────────────────
 Route::middleware('guest')->group(function () {
     Route::get('/login',    [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login',   [AuthController::class, 'login']);
-    Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
-    Route::post('/register',[AuthController::class, 'register']);
+    Route::get('/register', [RegisterController::class, 'showRegister'])->name('register');
+    Route::post('/register',[RegisterController::class, 'register']);
 });
 
 Route::get('/password/reset', fn() => view('auth.passwords.email'))->name('password.request');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
 // ── Admin routes ───────────────────────────────────────────
-Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
+Route::prefix('admin')->name('admin.dashboard')->middleware(['auth', 'role:system_admin'])->group(function () {
     Route::get('/',            [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::get('/analytics',   [AdminDashboardController::class, 'analytics'])->name('analytics');
     Route::get('/discussions', [AdminDashboardController::class, 'discussions'])->name('discussions');
     Route::get('/courses',     [AdminDashboardController::class, 'courses'])->name('courses');
     Route::get('/reports',     [AdminDashboardController::class, 'reports'])->name('reports');
     Route::get('/settings',    [AdminDashboardController::class, 'settings'])->name('settings');
+<<<<<<< HEAD
 
     // Member actions
     Route::post('/members/{user}/approve', [AdminUserController::class, 'approve'])
@@ -48,6 +50,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
 
     Route::post('/members/{user}/logout', [AdminUserController::class, 'logout'])
         ->name('Users.logout');
+=======
+>>>>>>> 6db54cd608af2260cbdbd38d1d960cd85f2c3889
 });
 
 // ── Lecturer routes ────────────────────────────────────────
@@ -101,9 +105,20 @@ Route::prefix('student')->name('student.')->middleware(['auth', 'role:student'])
 
 // ── Redirect root to correct dashboard by role ─────────────
 Route::get('/', function () {
-    if (!auth()->check()) return redirect()->route('login');
-    return match(auth()->user()->role) {
-        'admin'    => redirect()->route('admin.dashboard'),
+
+    if (!auth()->check()) {
+        return redirect()->route('login');
+    }
+
+Route::get('/quizzes/upload', function () {
+    return view('lecturer.upload-quiz');
+})->name('quizzes.upload');
+
+Route::post('/quizzes/import', [QuizController::class, 'import'])
+    ->name('quizzes.import');
+
+    return match (auth()->user()->role) {
+        'system_admin' => redirect()->route('admin.dashboard'),
         'lecturer' => redirect()->route('lecturer.dashboard'),
         default    => redirect()->route('student.dashboard'),
     };
