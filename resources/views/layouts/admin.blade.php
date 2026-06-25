@@ -8,7 +8,7 @@
         @vite('resources/css/app.css')
     @else
         {{-- Fallback so the page renders even if Tailwind isn't compiled yet --}}
-        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="https://cdn.tailwindcss.com/3.4.1"></script>
     @endif
 </head>
 <body class="bg-gray-50 text-gray-900">

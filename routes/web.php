@@ -23,7 +23,7 @@ Route::get('/password/reset', fn() => view('auth.passwords.email'))->name('passw
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
 // ── Admin routes ───────────────────────────────────────────
-Route::prefix('admin')->name('admin.dashboard')->middleware(['auth', 'role:system_admin'])->group(function () {
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:system_admin'])->group(function () {
     Route::get('/',            [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::get('/analytics',   [AdminDashboardController::class, 'analytics'])->name('analytics');
     Route::get('/discussions', [AdminDashboardController::class, 'discussions'])->name('discussions');

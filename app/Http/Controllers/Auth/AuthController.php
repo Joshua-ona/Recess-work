@@ -62,6 +62,15 @@
             'password' => ['required'],
         ]);
 
+        //check first for user existence
+        $user = User::where('email',$request->email)->first();
+
+        if(!$user){
+            return back()->withErrors([
+                'email' => 'No account found with this email',
+            ])->onlyInput('email');
+        }
+
         if (!Auth::attempt($credentials, $request->boolean('remember'))) {
             return back()->withErrors([
                 'email' => 'Invalid email or password.',
@@ -71,7 +80,7 @@
         $request->session()->regenerate();
 
         return match (Auth::user()->role) {
-            'admin' => redirect()->route('admin.dashboard'),
+            'system_admin' => redirect()->route('admin.dashboard'),
             'lecturer' => redirect()->route('lecturer.dashboard'),
             default => redirect()->route('student.dashboard'),
         };

@@ -23,6 +23,9 @@ return new class extends Migration
             $table->enum('role',['student','lecturer','group_admin','system_admin'])->default('student');
             $table->rememberToken();
             $table->boolean('is_enabled')->default(true);
+            $table->unsignedTinyInteger('warning_count')->default(0);
+            $table->timestamp('last_warning_at')->nullable();
+            $table->timestamp('blacklisted_until')->nullable();
             $table->timestamps();
         });
 

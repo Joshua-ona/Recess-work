@@ -12,16 +12,29 @@ class AdminDashboardController extends Controller
     {
         $totalMembers = User::count();
 
-        $activeToday = User::where('last_active_at', '>=', Carbon::today())->count();
+        //$activeToday = User::where('last_active_at', '>=', Carbon::today())->count();
 
-        $pendingApprovals = User::where('status', 'pending')
-            ->orderByDesc('created_at')
-            ->get();
 
-        $blacklistedCount = User::where('status', 'blacklisted')->count();
+        //testing the admin dashboard since table are non existant
+        $activeToday = 0;
+
+        // $pendingApprovals = User::where('status', 'pending')
+        //     ->orderByDesc('created_at')
+        //     ->get();
+
+        $pendingApprovals = User::where('is_enabled', 'false')->orderByDesc('created_at')->get();
+
+
+
+        // $blacklistedCount = User::where('status', 'blacklisted')->count();
+
+         $blacklistedCount = User::whereNotNull('blacklisted_until')
+         ->where('blacklisted_until', '>=', now())
+         ->count();
+                        
 
         $warnedMembers = User::where('warning_count', '>', 0)
-            ->orWhere('status', 'blacklisted')
+            ->whereNull('blacklisted_until')
             ->orderByDesc('warning_count')
             ->limit(10)
             ->get();
