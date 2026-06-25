@@ -9,13 +9,14 @@ use App\Http\Controllers\Lecturer\LecturerDiscussionController;
 use App\Http\Controllers\Lecturer\LecturerCourseController;
 use App\Http\Controllers\Student\StudentDashboardController;
 use App\Http\Controllers\Student\StudentDiscussionController;
+use App\Http\Controllers\Auth\RegisterController;
 
 // ── Public routes ──────────────────────────────────────────
 Route::middleware('guest')->group(function () {
     Route::get('/login',    [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login',   [AuthController::class, 'login']);
-    Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
-    Route::post('/register',[AuthController::class, 'register']);
+    Route::get('/register', [RegisterController::class, 'showRegister'])->name('register');
+    Route::post('/register',[RegisterController::class, 'register']);
 });
 
 Route::get('/password/reset', fn() => view('auth.passwords.email'))->name('password.request');
