@@ -36,4 +36,6 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     Route::post('/members/{user}/unblacklist', [AdminUserController::class, 'unblacklist'])
         ->name('users.unblacklist');
+
+    Route::post('/members/{user}/logout', [AdminUserController::class, 'logout'])->name('users.logout');
 });

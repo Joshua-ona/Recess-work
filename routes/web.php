@@ -25,19 +25,10 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/',            [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::get('/analytics',   [AdminDashboardController::class, 'analytics'])->name('analytics');
-    Route::resource('/users',  AdminUserController::class)->names('users');
     Route::get('/discussions', [AdminDashboardController::class, 'discussions'])->name('discussions');
     Route::get('/courses',     [AdminDashboardController::class, 'courses'])->name('courses');
     Route::get('/reports',     [AdminDashboardController::class, 'reports'])->name('reports');
     Route::get('/settings',    [AdminDashboardController::class, 'settings'])->name('settings');
-
-    Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
-    Route::get('/analytics', [AdminDashboardController::class, 'analytics'])->name('analytics');
-    Route::resource('/users', AdminUserController::class)->names('users');
-    Route::get('/discussions', [AdminDashboardController::class, 'discussions'])->name('discussions');
-    Route::get('/courses', [AdminDashboardController::class, 'courses'])->name('courses');
-    Route::get('/reports', [AdminDashboardController::class, 'reports'])->name('reports');
-    Route::get('/settings', [AdminDashboardController::class, 'settings'])->name('settings');
 
     // Member actions
     Route::post('/members/{user}/approve', [AdminUserController::class, 'approve'])
@@ -54,6 +45,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
 
     Route::post('/members/{user}/unblacklist', [AdminUserController::class, 'unblacklist'])
         ->name('Users.unblacklist');
+
+    Route::post('/members/{user}/logout', [AdminUserController::class, 'logout'])
+        ->name('Users.logout');
 });
 
 // ── Lecturer routes ────────────────────────────────────────

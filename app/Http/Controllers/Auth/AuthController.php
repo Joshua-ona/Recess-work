@@ -31,7 +31,20 @@ class AuthController extends Controller
 
     $request->session()->regenerate();
 
-    return match (Auth::user()->role) {
+    $user = Auth::user();
+
+    // Blacklisting still actually stops someone from logging back in;
+    // there's just no pending-approval gate before that point anymore.
+    if ($user->status === 'blacklisted') {
+        Auth::logout();
+        $request->session()->invalidate();
+
+        return back()->withErrors([
+            'email' => 'This account has been blacklisted.',
+        ])->onlyInput('email');
+    }
+
+    return match ($user->role) {
         'admin' => redirect()->route('admin.dashboard'),
         'lecturer' => redirect()->route('lecturer.dashboard'),
         default => redirect()->route('student.dashboard'),
@@ -55,7 +68,8 @@ class AuthController extends Controller
     ]);
 
     $user = User::create([
-        'name' => $data['first_name'].' '.$data['last_name'],
+        'first_name' => $data['first_name'],
+        'last_name' => $data['last_name'],
         'email' => $data['email'],
         'role' => $data['role'],
         'password' => $data['password'],
