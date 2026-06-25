@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@yield('title', 'Admin dashboard')</title>
+    @if (file_exists(public_path('build/manifest.json')))
+        @vite('resources/css/app.css')
+    @else
+        {{-- Fallback so the page renders even if Tailwind isn't compiled yet --}}
+        <script src="https://cdn.tailwindcss.com"></script>
+    @endif
+</head>
+<body class="bg-gray-50 text-gray-900">
+    <div class="max-w-6xl mx-auto px-6 py-6">
+        @if (session('status'))
+            <div class="mb-4 rounded-md bg-green-50 text-green-800 text-sm px-4 py-2">
+                {{ session('status') }}
+            </div>
+        @endif
+
+        @yield('content')
+    </div>
+</body>
+</html>
