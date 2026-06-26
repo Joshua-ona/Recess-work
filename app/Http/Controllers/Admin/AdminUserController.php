@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class AdminUserController extends Controller
 {
@@ -14,7 +15,7 @@ class AdminUserController extends Controller
     {
         $user->update(['status' => 'active']);
 
-        return back()->with('status', "{$user->name} approved.");
+        return back()->with('status', "{$user->full_name} approved.");
     }
 
     /**
@@ -31,8 +32,6 @@ class AdminUserController extends Controller
     /**
      * Manually issue an inactivity warning (req. 4). After 2 warnings the
      * member is auto-blacklisted for a configurable number of days.
-     * See also: Console\Commands\CheckMemberInactivity for the scheduled
-     * version of this same logic.
      */
     public function warn(User $user)
     {
@@ -46,7 +45,7 @@ class AdminUserController extends Controller
 
         $user->save();
 
-        return back()->with('status', "Warning issued to {$user->name}.");
+        return back()->with('status', "Warning issued to {$user->full_name}.");
     }
 
     /**
@@ -59,7 +58,29 @@ class AdminUserController extends Controller
             'blacklisted_until' => now()->addDays(config('forum.blacklist_days', 7)),
         ]);
 
-        return back()->with('status', "{$user->name} blacklisted.");
+        return back()->with('status', "{$user->full_name} blacklisted.");
+    }
+
+    /**
+     * Force-log-out a member from every device right now — e.g. to act on a
+     * security concern, or as a softer step before/instead of a blacklist.
+     *
+     * This project doesn't have Sanctum installed (no API tokens to revoke),
+     * so "logout" here means clearing that member's web session rows. It
+     * only has teeth on the 'database' session driver (which this project
+     * uses by default) — on file/cookie/redis drivers there's no reliable
+     * server-side way to invalidate a session by user id, so this is a
+     * harmless no-op there.
+     */
+    public function logout(User $user)
+    {
+        if (config('session.driver') === 'database') {
+            DB::table(config('session.table', 'sessions'))
+                ->where('user_id', $user->id)
+                ->delete();
+        }
+
+        return back()->with('status', "{$user->full_name} has been logged out.");
     }
 
     /**
@@ -73,6 +94,6 @@ class AdminUserController extends Controller
             'blacklisted_until' => null,
         ]);
 
-        return back()->with('status', "{$user->name} reinstated.");
+        return back()->with('status', "{$user->full_name} reinstated.");
     }
 }

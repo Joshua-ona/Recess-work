@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+ @extends('layouts.admin')
 
 @section('title', 'Admin dashboard')
 
@@ -7,8 +7,14 @@
     <div class="flex items-center justify-between border-b pb-3 mb-6">
         <div class="flex items-center gap-3">
             <span class="font-medium text-lg">Admin dashboard</span>
-            <span class="text-sm text-gray-500">{{ auth()->user()->name }}</span>
+            <span class="text-sm text-gray-500">{{ auth()->user()->full_name }}</span>
         </div>
+
+        <form method="POST" action="{{ route('logout')}}">
+            @csrf
+            <button type="submit" class="text-sm text-red-600 border border-red-400 rounded px-3 py-1">
+                Logout
+            </button>
     </div>
 
     <div class="grid grid-cols-4 gap-4 mb-8">
@@ -96,7 +102,7 @@
                 <div class="space-y-3">
                     @forelse ($pendingApprovals as $user)
                         <div class="flex items-center justify-between">
-                            <span class="text-sm">{{ $user->name }}</span>
+                            <span class="text-sm">{{ $user->full_name }}</span>
                             <div class="flex gap-1">
                                 <form method="POST" action="{{ route('admin.Users.approve', $user) }}">
                                     @csrf
@@ -116,30 +122,42 @@
 
             <div class="bg-white border rounded-lg p-5">
                 <p class="font-medium mb-3">Inactivity warnings</p>
-                <div class="space-y-2">
+                <div class="space-y-1">
                     @forelse ($warnedMembers as $user)
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm">{{ $user->name }}</span>
-                            @if ($user->status === 'blacklisted')
-                                <div class="flex items-center gap-2">
+                        <div class="py-2 border-t first:border-t-0">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-sm">{{ $user->full_name }}</span>
+                                @if ($user->status === 'blacklisted')
                                     <span class="text-xs bg-red-50 text-red-700 px-2 py-0.5 rounded">Blacklisted</span>
+                                @else
+                                    <span class="text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded">Warning {{ $user->warning_count }} of 2</span>
+                                @endif
+                            </div>
+                            <div class="flex gap-1 justify-end">
+                                @if ($user->status === 'blacklisted')
                                     <form method="POST" action="{{ route('admin.Users.unblacklist', $user) }}">
                                         @csrf
                                         <button class="text-xs border rounded px-2 py-1">Reinstate</button>
                                     </form>
-                                </div>
-                            @else
-                                <div class="flex items-center gap-2">
-                                    <span class="text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded">Warning {{ $user->warning_count }} of 2</span>
+                                @else
                                     <form method="POST" action="{{ route('admin.Users.warn', $user) }}">
                                         @csrf
-                                        <button class="text-xs border rounded px-2 py-1">+1</button>
+                                        <button class="text-xs border rounded px-2 py-1">+1 warning</button>
                                     </form>
-                                </div>
-                            @endif
+                                    <form method="POST" action="{{ route('admin.Users.logout', $user) }}">
+                                        @csrf
+                                        <button class="text-xs border rounded px-2 py-1">Log out</button>
+                                    </form>
+                                    <form method="POST" action="{{ route('admin.Users.blacklist', $user) }}"
+                                          onsubmit="return confirm('Blacklist {{ $user->full_name }} immediately?');">
+                                        @csrf
+                                        <button class="text-xs border rounded px-2 py-1 text-red-600">Blacklist</button>
+                                    </form>
+                                @endif
+                            </div>
                         </div>
                     @empty
-                        <p class="text-sm text-gray-500">No members currently flagged for inactivity.</p>
+                        <p class="text-sm text-gray-500 py-2">No members currently flagged for inactivity.</p>
                     @endforelse
                 </div>
             </div>
