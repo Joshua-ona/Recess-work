@@ -7,18 +7,26 @@ use App\Models\Question;
 
 class QuizController extends Controller
 {
-    public function import(Request $request)
+    public function showUploadForm()
+    {
+        return view('lecturer.upload-quiz');
+    }
+
+    public function uploadQuiz(Request $request)
     {
         $request->validate([
-            'file' => 'required|mimes:csv,txt',
+            'csv_file' => 'required|mimes:csv,txt'
         ]);
 
-        $file = fopen($request->file('file')->getRealPath(), 'r');
+        $file = $request->file('csv_file');
 
-        fgetcsv($file); // Skip header row
+        $handle = fopen($file->getRealPath(), 'r');
 
-        while (($row = fgetcsv($file)) !== false) {
+        // Skip CSV header row
+        fgetcsv($handle);
 
+        while (($row = fgetcsv($handle, 1000, ',')) !== FALSE)
+        {
             Question::create([
                 'quiz_id' => $row[0],
                 'question' => $row[1],
@@ -30,8 +38,10 @@ class QuizController extends Controller
             ]);
         }
 
-        fclose($file);
+        fclose($handle);
 
-        return back()->with('success', 'Quiz uploaded successfully.');
+        return redirect()
+            ->back()
+            ->with('success', 'Quiz uploaded successfully.');
     }
 }

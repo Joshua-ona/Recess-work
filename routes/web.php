@@ -12,6 +12,7 @@ use App\Http\Controllers\Student\StudentDashboardController;
 use App\Http\Controllers\Student\StudentDiscussionController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\QuizController;
+use App\Http\Controllers\Lecturer\LecturerQuizController;
 
 /*
 |--------------------------------------------------------------------------
@@ -80,11 +81,11 @@ Route::prefix('lecturer')
         Route::get('/categories', [LecturerDashboardController::class, 'categories'])
             ->name('categories');
 
-        Route::get('/quizzes', [LecturerDashboardController::class, 'quizzes'])
-            ->name('quizzes');
+      Route::get('/quizzes', [LecturerQuizController::class, 'index'])
+    ->name('quizzes');
 
-        Route::get('/quizzes/create', [LecturerDashboardController::class, 'createQuiz'])
-            ->name('quizzes.create');
+Route::get('/quizzes/upload', [LecturerQuizController::class, 'uploadForm'])
+    ->name('quizzes.upload');
 
         Route::get('/performance', [LecturerDashboardController::class, 'performance'])
             ->name('performance');
@@ -99,8 +100,11 @@ Route::prefix('lecturer')
             ->name('settings');
 
         // Export Questions
-        Route::get('/questions/export', [QuestionController::class, 'export'])
-            ->name('questions.export');
+       Route::get('/quizzes/upload', [QuizController::class, 'showUploadForm'])
+    ->name('quizzes.upload');
+
+Route::post('/quizzes/upload', [QuizController::class, 'uploadQuiz'])
+    ->name('quizzes.upload.submit');
     });
 
 /*
@@ -163,12 +167,6 @@ Route::get('/', function () {
         return redirect()->route('login');
     }
 
-Route::get('/quizzes/upload', function () {
-    return view('lecturer.upload-quiz');
-})->name('quizzes.upload');
-
-Route::post('/quizzes/import', [QuizController::class, 'import'])
-    ->name('quizzes.import');
 
     return match (auth()->user()->role) {
         'admin' => redirect()->route('admin.dashboard'),
