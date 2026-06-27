@@ -15,6 +15,12 @@ class Question extends Model
         'option_b',
         'option_c',
         'option_d',
-        'correct_answer'
+        'correct_answer',
     ];
+
+   
+    public function quiz()
+    {
+        return $this->belongsTo(Quiz::class, 'quiz_id', 'quiz_id');
+    }
 }
