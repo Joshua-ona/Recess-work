@@ -37,46 +37,22 @@ Route::middleware('guest')->group(function () {
     Route::post('/register', [RegisterController::class, 'register']);
 });
 
-Route::post('/logout', [AuthController::class, 'logout'])
-    ->middleware('auth')
-    ->name('logout');
+Route::get('/password/reset', fn() => view('auth.passwords.email'))->name('password.request');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
-Route::get('/password/reset', function () {
-    return view('auth.passwords.email');
-})->name('password.request');
+// ── Admin routes ───────────────────────────────────────────
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:system_admin'])->group(function () {
+    Route::get('/',            [AdminDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/analytics',   [AdminDashboardController::class, 'analytics'])->name('analytics');
+    Route::get('/discussions', [AdminDashboardController::class, 'discussions'])->name('discussions');
+    Route::get('/courses',     [AdminDashboardController::class, 'courses'])->name('courses');
+    Route::get('/reports',     [AdminDashboardController::class, 'reports'])->name('reports');
+    Route::get('/settings',    [AdminDashboardController::class, 'settings'])->name('settings');
+<<<<<<< HEAD
 
-
-/*
-|--------------------------------------------------------------------------
-| Admin Routes
-|--------------------------------------------------------------------------
-*/
-
-Route::prefix('admin')
-    ->name('admin.')
-    ->middleware(['auth', 'role:system_admin'])
-    ->group(function () {
-
-        Route::get('/', [AdminDashboardController::class, 'index'])
-            ->name('dashboard');
-
-        Route::get('/analytics', [AdminDashboardController::class, 'analytics'])
-            ->name('analytics');
-
-        Route::get('/discussions', [AdminDashboardController::class, 'discussions'])
-            ->name('discussions');
-
-        Route::get('/courses', [AdminDashboardController::class, 'courses'])
-            ->name('courses');
-
-        Route::get('/reports', [AdminDashboardController::class, 'reports'])
-            ->name('reports');
-
-        Route::get('/settings', [AdminDashboardController::class, 'settings'])
-            ->name('settings');
-
-        Route::post('/members/{user}/approve', [AdminUserController::class, 'approve'])
-            ->name('Users.approve');
+    // Member actions
+    Route::post('/members/{user}/approve', [AdminUserController::class, 'approve'])
+        ->name('Users.approve');
 
         Route::post('/members/{user}/decline', [AdminUserController::class, 'decline'])
             ->name('Users.decline');
@@ -90,45 +66,23 @@ Route::prefix('admin')
         Route::post('/members/{user}/unblacklist', [AdminUserController::class, 'unblacklist'])
             ->name('Users.unblacklist');
 
-        Route::post('/members/{user}/logout', [AdminUserController::class, 'logout'])
-            ->name('Users.logout');
+    Route::post('/members/{user}/logout', [AdminUserController::class, 'logout'])
+        ->name('Users.logout');
+=======
+>>>>>>> 6db54cd608af2260cbdbd38d1d960cd85f2c3889
 });
 
-
-/*
-|--------------------------------------------------------------------------
-| Lecturer Routes
-|--------------------------------------------------------------------------
-*/
-
-Route::prefix('lecturer')
-    ->name('lecturer.')
-    ->middleware(['auth', 'role:lecturer'])
-    ->group(function () {
-
-        Route::get('/', [LecturerDashboardController::class, 'index'])
-            ->name('dashboard');
-
-        Route::get('/engagement', [LecturerDashboardController::class, 'engagement'])
-            ->name('engagement');
-
-        Route::get('/pinned', [LecturerDashboardController::class, 'pinned'])
-            ->name('pinned');
-
-        Route::get('/flagged', [LecturerDashboardController::class, 'flagged'])
-            ->name('flagged');
-
-        Route::resource('/courses', LecturerCourseController::class)
-            ->names('courses');
-
-        Route::resource('/discussions', LecturerDiscussionController::class)
-            ->names('discussions');
-
-        Route::resource('/announcements', LecturerAnnouncementController::class)
-            ->names('announcements');
-
-        Route::get('/categories', [LecturerDashboardController::class, 'categories'])
-            ->name('categories');
+// ── Lecturer routes ────────────────────────────────────────
+Route::prefix('lecturer')->name('lecturer.')->middleware(['auth', 'role:lecturer'])->group(function () {
+    Route::get('/',          [LecturerDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/engagement',[LecturerDashboardController::class, 'engagement'])->name('engagement');
+    Route::get('/pinned',    [LecturerDashboardController::class, 'pinned'])->name('pinned');
+    Route::get('/flagged',   [LecturerDashboardController::class, 'flagged'])->name('flagged');
+    Route::resource('/courses',       LecturerCourseController::class)->names('courses');
+    Route::resource('/discussions',   LecturerDiscussionController::class)->names('discussions');
+    Route::resource('/announcements', \App\Http\Controllers\Lecturer\LecturerAnnouncementController::class)->names('announcements');
+    Route::get('/categories', [LecturerDashboardController::class, 'categories'])
+    ->name('categories');
 
         Route::get('/quizzes', [LecturerDashboardController::class, 'quizzes'])
             ->name('quizzes');
@@ -242,6 +196,5 @@ Route::get('/', function () {
         'lecturer'     => redirect()->route('lecturer.dashboard'),
         default        => redirect()->route('student.dashboard'),
     };
-
 })->middleware('auth');
 

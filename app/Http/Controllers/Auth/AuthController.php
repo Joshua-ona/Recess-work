@@ -73,7 +73,7 @@ class AuthController extends Controller
             'lecturer'     => redirect()->route('lecturer.dashboard'),
             default        => redirect()->route('student.dashboard'),
         };
-    }
+    
 
     /**
      * Handle user registration.
