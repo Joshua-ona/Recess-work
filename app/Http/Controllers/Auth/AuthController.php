@@ -68,12 +68,14 @@ class AuthController extends Controller
             ])->onlyInput('email');
         }
 
-        return match ($user->role) {
-            'system_admin' => redirect()->route('admin.dashboard'),
-            'lecturer'     => redirect()->route('lecturer.dashboard'),
-            default        => redirect()->route('student.dashboard'),
-        };
-    }
+       return match ($user->role) {
+    'system_admin' => redirect()->route('admin.dashboard'),
+    'lecturer'     => redirect()->route('lecturer.dashboard'),
+    default        => redirect()->route('student.dashboard'),
+};
+
+}
+    
 
     /**
      * Handle user registration.

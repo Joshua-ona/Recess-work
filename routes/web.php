@@ -86,8 +86,10 @@ Route::prefix('lecturer')->name('lecturer.')->middleware(['auth', 'role:lecturer
         Route::get('/quizzes/upload', [QuizController::class, 'showUploadForm'])
             ->name('quizzes.upload');
 
-        Route::post('/quizzes/upload', [QuizController::class, 'uploadQuiz'])
-            ->name('quizzes.upload.submit');
+       Route::post(
+    '/quizzes/{quiz}/upload',
+    [QuizController::class,'uploadQuiz']
+)->name('quizzes.upload');
 
         Route::get('/performance', [LecturerDashboardController::class, 'performance'])
             ->name('performance');
