@@ -15,7 +15,6 @@ use App\Http\Controllers\Lecturer\LecturerAnnouncementController;
 
 use App\Http\Controllers\Student\StudentDashboardController;
 use App\Http\Controllers\Student\StudentDiscussionController;
-use App\Http\Controllers\Auth\RegisterController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,7 +31,7 @@ Route::middleware('guest')->group(function () {
 
    Route::get('/chat', function () {
     return view('chat');
-});
+}) ->name('chat');
 
 Route::get('/password/reset', fn() => view('auth.passwords.email'))->name('password.request');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
