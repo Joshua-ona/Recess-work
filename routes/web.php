@@ -45,7 +45,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:system_admin']
     Route::get('/courses',     [AdminDashboardController::class, 'courses'])->name('courses');
     Route::get('/reports',     [AdminDashboardController::class, 'reports'])->name('reports');
     Route::get('/settings',    [AdminDashboardController::class, 'settings'])->name('settings');
-<<<<<<< HEAD
 
     // Member actions
     Route::post('/members/{user}/approve', [AdminUserController::class, 'approve'])
@@ -65,8 +64,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:system_admin']
 
     Route::post('/members/{user}/logout', [AdminUserController::class, 'logout'])
         ->name('Users.logout');
-=======
->>>>>>> 6db54cd608af2260cbdbd38d1d960cd85f2c3889
 });
 
 // ── Lecturer routes ────────────────────────────────────────
