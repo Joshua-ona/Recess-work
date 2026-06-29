@@ -31,10 +31,9 @@
             </div>
         @endif
 
-        <form action="{{ route('lecturer.quizzes.upload.submit') }}"
-              method="POST"
-              enctype="multipart/form-data">
-
+        <form action="{{ route('lecturer.quizzes.upload', $quiz->quiz_id) }}"
+      method="POST"
+      enctype="multipart/form-data">
             @csrf
 
             <input type="file"

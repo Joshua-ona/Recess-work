@@ -109,8 +109,8 @@ class QuizController extends Controller
     /**
      * Upload questions from CSV.
      */
-    public function uploadQuiz(Request $request)
-    {
+    public function uploadQuiz(Request $request, Quiz $quiz)
+{
         $request->validate([
             'csv_file' => 'required|mimes:csv,txt'
         ]);
@@ -123,15 +123,24 @@ class QuizController extends Controller
 
         while (($row = fgetcsv($handle, 1000, ',')) !== false) {
 
-            Question::create([
-                'quiz_id' => $row[0],
-                'question' => $row[1],
-                'option_a' => $row[2],
-                'option_b' => $row[3],
-                'option_c' => $row[4],
-                'option_d' => $row[5],
-                'correct_answer' => $row[6],
-            ]);
+           Question::create([
+
+    'quiz_id' => $quiz->quiz_id,
+
+    'question' => $row[0],
+
+    'option_a' => $row[1],
+
+    'option_b' => $row[2],
+
+    'option_c' => $row[3],
+
+    'option_d' => $row[4],
+
+    'correct_answer' => $row[5],
+
+]);
+            
         }
 
         fclose($handle);
