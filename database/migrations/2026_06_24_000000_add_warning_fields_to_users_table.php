@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->unsignedTinyInteger('warning_count');
+            $table->unsignedTinyInteger('warning_count')->default(0);
             $table->timestamp('last_warning_at')->nullable();
             $table->timestamp('blacklisted_until')->nullable();
         });

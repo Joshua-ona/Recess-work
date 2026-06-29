@@ -10,4 +10,8 @@ class Group extends Model
         'name',
         'description'
     ];
+    public function discussions()
+{
+    return $this->hasMany(Discussion::class);
+}
 }

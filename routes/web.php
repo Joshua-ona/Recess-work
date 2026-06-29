@@ -136,7 +136,30 @@ Route::prefix('student')->name('student.')->middleware(['auth', 'role:student'])
 
 });
 
-// ── Redirect root to correct dashboard by role ─────────────
+//Group routes
+use App\Http\Controllers\GroupController;
+use App\Http\Controllers\DiscussionController;
+
+Route::middleware('auth')->group(function () {
+    Route::resource('/groups', GroupController::class);
+    
+    // Discussion routes
+    Route::get('/groups/{group}/discussions', [DiscussionController::class, 'index']);
+    Route::get('/groups/{group}/discussions/create', [DiscussionController::class, 'create']);
+    Route::post('/groups/{group}/discussions', [DiscussionController::class, 'store']);
+    Route::get('/groups/{group}/discussions/{discussion}', [DiscussionController::class, 'show']);
+    
+    // Reply route
+    Route::post('/groups/{group}/discussions/{discussion}/replies', [DiscussionController::class, 'storeReply']);
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| Root Redirect
+|--------------------------------------------------------------------------
+*/
+
 Route::get('/', function () {
 
     if (!auth()->check()) {
