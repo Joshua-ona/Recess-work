@@ -9,6 +9,9 @@
             <span class="font-medium text-lg">Admin dashboard</span>
             <span class="text-sm text-gray-500">{{ auth()->user()->full_name }}</span>
         </div>
+        <a href="{{ route('admin.Users.index') }}" class="text-sm border rounded px-3 py-1.5 hover:bg-gray-50">
+            Manage all users
+        </a>
     </div>
 
     <div class="grid grid-cols-4 gap-4 mb-8">
@@ -127,26 +130,33 @@
                                     <span class="text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded">Warning {{ $user->warning_count }} of 2</span>
                                 @endif
                             </div>
-                            <div class="flex gap-1 justify-end">
+                            <div class="flex flex-col gap-2">
                                 @if ($user->status === 'blacklisted')
-                                    <form method="POST" action="{{ route('admin.Users.unblacklist', $user) }}">
+                                    <form method="POST" action="{{ route('admin.Users.unblacklist', $user) }}" class="flex justify-end">
                                         @csrf
                                         <button class="text-xs border rounded px-2 py-1">Reinstate</button>
                                     </form>
                                 @else
-                                    <form method="POST" action="{{ route('admin.Users.warn', $user) }}">
-                                        @csrf
-                                        <button class="text-xs border rounded px-2 py-1">+1 warning</button>
-                                    </form>
-                                    <form method="POST" action="{{ route('admin.Users.logout', $user) }}">
-                                        @csrf
-                                        <button class="text-xs border rounded px-2 py-1">Log out</button>
-                                    </form>
-                                    <form method="POST" action="{{ route('admin.Users.blacklist', $user) }}"
-                                          onsubmit="return confirm('Blacklist {{ $user->full_name }} immediately?');">
-                                        @csrf
-                                        <button class="text-xs border rounded px-2 py-1 text-red-600">Blacklist</button>
-                                    </form>
+                                    <details>
+                                        <summary class="text-xs border rounded px-2 py-1 inline-block cursor-pointer select-none">Warn</summary>
+                                        <form method="POST" action="{{ route('admin.Users.warn', $user) }}" class="mt-2 space-y-1">
+                                            @csrf
+                                            <textarea name="message" rows="2" required placeholder="Describe the rule violation…"
+                                                      class="w-full border rounded px-2 py-1 text-xs"></textarea>
+                                            <button class="text-xs border rounded px-2 py-1 w-full">Send warning</button>
+                                        </form>
+                                    </details>
+                                    <div class="flex gap-1 justify-end">
+                                        <form method="POST" action="{{ route('admin.Users.logout', $user) }}">
+                                            @csrf
+                                            <button class="text-xs border rounded px-2 py-1">Log out</button>
+                                        </form>
+                                        <form method="POST" action="{{ route('admin.Users.blacklist', $user) }}"
+                                              onsubmit="return confirm('Blacklist {{ $user->full_name }} immediately?');">
+                                            @csrf
+                                            <button class="text-xs border rounded px-2 py-1 text-red-600">Blacklist</button>
+                                        </form>
+                                    </div>
                                 @endif
                             </div>
                         </div>

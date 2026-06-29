@@ -5,10 +5,11 @@
 <div class="dash-wrap">
 
     @include('layouts.sidebar', [
-        'role'         => 'lecturer',
-        'user'         => auth()->user(),
-        'myCourses'    => $myCourses   ?? collect(),
-        'flaggedCount' => $flaggedCount ?? 0,
+        'role'            => 'student',
+        'user'            => auth()->user(),
+        'enrolledCourses' => $enrolledCourses ?? collect(),
+        'unreadCount'     => $unreadCount ?? 0,
+        'notifCount'      => $notifCount  ?? 0,
     ])
 
     <div class="dash-main">

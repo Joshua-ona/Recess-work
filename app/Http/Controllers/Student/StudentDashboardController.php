@@ -8,7 +8,9 @@ class StudentDashboardController extends Controller
 {
     public function index()
     {
-        return view('student.dashboard');
+        return view('student.dashboard', [
+            'notifCount' => auth()->user()->warnings()->whereNull('read_at')->count(),
+        ]);
     }
 
     public function saved()
@@ -45,7 +47,14 @@ public function settings()
 
     public function notifications()
     {
-        return view('student.notifications');
+        $warnings = auth()->user()->warnings()->with('issuer')->get();
+
+        // Viewing this page counts as reading them — clears the sidebar badge.
+        auth()->user()->warnings()->whereNull('read_at')->update(['read_at' => now()]);
+
+        return view('student.notifications', [
+            'warnings' => $warnings,
+        ]);
     }
 
     public function browseCourses()

@@ -12,13 +12,37 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasFactory,Notifiable;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
+
     protected $fillable = [
-        'first_name','last_name','email','password',
+        'first_name',
+        'last_name',
+        'email',
+        'password',
+        'role',
+        'is_enabled',
+        'last_active_at',
+        'warning_count',
+        'status',
+        'last_warning_at',
+        'blacklisted_until',
     ];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+
 
     protected $hidden = [
         'password','remember_token'
     ];
+
 
     protected $casts = [
         'email_verified_at' => 'datetime',
@@ -32,6 +56,12 @@ class User extends Authenticatable
     public function isSystemAdmin(): bool {return $this->role == 'system_admin';}
     public function isEnabled(): bool {return $this->is_enabled;}
 
+         /* Warning messages issued to this user, newest first.
+     */
+    public function warnings()
+    {
+        return $this->hasMany(UserWarning::class)->latest();
+    }
 
 
     
