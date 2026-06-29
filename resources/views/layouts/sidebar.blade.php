@@ -95,7 +95,7 @@
     <i class="ti ti-chart-bar"></i> Performance Reports
 </a>
 
-<a href="{{ route('lecturer.messages') }}" class="sidebar-item">
+<a href="{{ route('chat') }}" class="sidebar-item">
     <i class="ti ti-message-circle"></i> Messages
 </a>
 
@@ -160,7 +160,7 @@
         <i class="ti ti-clipboard-check"></i> Quizzes
     </a>
 
-    <a href="{{ route('student.messages') }}" class="sidebar-item">
+    <a href="{{ route('chat') }}" class="sidebar-item">
         <i class="ti ti-message-circle"></i> Messages
     </a>
 

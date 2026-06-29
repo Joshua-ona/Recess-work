@@ -17,8 +17,6 @@
 
             <div>
 
-                <h2>Edit Quiz</h2>
-
                 <p>{{ $quiz->title }}</p>
 
             </div>
@@ -39,6 +37,42 @@
         <h3 class="panel-title">
             Quiz Information
         </h3>
+        <div class="panel mt-4">
+
+    <div class="panel-head">
+        <h3 class="panel-title">
+            Import Questions
+        </h3>
+    </div>
+
+    <div class="panel-body">
+
+        <form
+            method="POST"
+            action="{{ route('lecturer.quizzes.upload',$quiz->quiz_id) }}"
+            enctype="multipart/form-data">
+
+            @csrf
+
+            <input
+                type="file"
+                name="csv_file"
+                class="form-control">
+
+            <br>
+
+            <button
+                class="btn btn-primary">
+
+                Upload CSV
+
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
 
     </div>
 
@@ -196,7 +230,14 @@
 
         D. {{ $question->option_d }}
 
+        <div class="alert alert-success mt-2">
+            <strong>Correct Answer:</strong>
+            {{ $question->correct_answer }}
+        </div>
+
+
     </div>
+
 
 </div>
 
