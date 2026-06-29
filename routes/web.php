@@ -1,23 +1,32 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Auth\RegisterController;
+
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminUserController;
+
 use App\Http\Controllers\Lecturer\LecturerDashboardController;
 use App\Http\Controllers\Lecturer\LecturerDiscussionController;
 use App\Http\Controllers\Lecturer\LecturerCourseController;
+use App\Http\Controllers\Lecturer\LecturerAnnouncementController;
+
 use App\Http\Controllers\Student\StudentDashboardController;
 use App\Http\Controllers\Student\StudentDiscussionController;
 use App\Http\Controllers\Auth\RegisterController;
-use Livewire\Livewire;
 
-// ── Public routes ──────────────────────────────────────────
+/*
+|--------------------------------------------------------------------------
+| Public Routes
+|--------------------------------------------------------------------------
+*/
+
 Route::middleware('guest')->group(function () {
     Route::get('/login',    [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login',   [AuthController::class, 'login']);
     Route::get('/register', [RegisterController::class, 'showRegister'])->name('register');
- 
     Route::post('/register',[RegisterController::class, 'register']);
 });
 
@@ -36,6 +45,28 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:system_admin']
     Route::get('/courses',     [AdminDashboardController::class, 'courses'])->name('courses');
     Route::get('/reports',     [AdminDashboardController::class, 'reports'])->name('reports');
     Route::get('/settings',    [AdminDashboardController::class, 'settings'])->name('settings');
+<<<<<<< HEAD
+
+    // Member actions
+    Route::post('/members/{user}/approve', [AdminUserController::class, 'approve'])
+        ->name('Users.approve');
+
+    Route::post('/members/{user}/decline', [AdminUserController::class, 'decline'])
+        ->name('Users.decline');
+
+    Route::post('/members/{user}/warn', [AdminUserController::class, 'warn'])
+        ->name('Users.warn');
+
+    Route::post('/members/{user}/blacklist', [AdminUserController::class, 'blacklist'])
+        ->name('Users.blacklist');
+
+    Route::post('/members/{user}/unblacklist', [AdminUserController::class, 'unblacklist'])
+        ->name('Users.unblacklist');
+
+    Route::post('/members/{user}/logout', [AdminUserController::class, 'logout'])
+        ->name('Users.logout');
+=======
+>>>>>>> 6db54cd608af2260cbdbd38d1d960cd85f2c3889
 });
 
 // ── Lecturer routes ────────────────────────────────────────
@@ -50,17 +81,26 @@ Route::prefix('lecturer')->name('lecturer.')->middleware(['auth', 'role:lecturer
     Route::get('/categories', [LecturerDashboardController::class, 'categories'])
     ->name('categories');
 
-Route::get('/quizzes', [LecturerDashboardController::class, 'quizzes'])
-    ->name('quizzes');
+        Route::get('/quizzes', [LecturerDashboardController::class, 'quizzes'])
+            ->name('quizzes');
 
-Route::get('/performance', [LecturerDashboardController::class, 'performance'])
-    ->name('performance');
+        Route::get('/quizzes/create', [LecturerDashboardController::class, 'createQuiz'])
+            ->name('quizzes.create');
 
-Route::get('/messages', [LecturerDashboardController::class, 'messages'])
-    ->name('messages');
+        Route::get('/quizzes/upload', [QuizController::class, 'showUploadForm'])
+            ->name('quizzes.upload');
 
-Route::get('/notifications', [LecturerDashboardController::class, 'notifications'])
-    ->name('notifications');
+        Route::post('/quizzes/upload', [QuizController::class, 'uploadQuiz'])
+            ->name('quizzes.upload.submit');
+
+        Route::get('/performance', [LecturerDashboardController::class, 'performance'])
+            ->name('performance');
+
+        Route::get('/messages', [LecturerDashboardController::class, 'messages'])
+            ->name('messages');
+
+        Route::get('/notifications', [LecturerDashboardController::class, 'notifications'])
+            ->name('notifications');
 
 Route::get('/settings', [LecturerDashboardController::class, 'settings'])
     ->name('settings');
@@ -80,10 +120,7 @@ Route::prefix('student')->name('student.')->middleware(['auth', 'role:student'])
     Route::resource('/discussions', StudentDiscussionController::class)->names('discussions');
     Route::get('/categories', [StudentDashboardController::class, 'categories'])->name('categories');
     Route::get('/quizzes',          [StudentDashboardController::class, 'quizzes'])->name('quizzes');
-    Route::get('/messages', function () {
-    return view('chat');
-})->name('messages');
-    
+    Route::get('/messages',         [StudentDashboardController::class, 'messages'])->name('messages');
     Route::get('/settings',          [StudentDashboardController::class, 'settings'])->name('settings');
     Route::get('/reports', [StudentDashboardController::class, 'reports'])
     ->name('reports');
@@ -97,24 +134,9 @@ Route::get('/', function () {
         return redirect()->route('login');
     }
 
-Route::get('/quizzes/upload', function () {
-    return view('lecturer.upload-quiz');
-})->name('quizzes.upload');
-
-Route::post('/quizzes/import', [QuizController::class, 'import'])
-    ->name('quizzes.import');
-
     return match (auth()->user()->role) {
         'system_admin' => redirect()->route('admin.dashboard'),
-        'lecturer' => redirect()->route('lecturer.dashboard'),
-        default    => redirect()->route('student.dashboard'),
+        'lecturer'     => redirect()->route('lecturer.dashboard'),
+        default        => redirect()->route('student.dashboard'),
     };
 })->middleware('auth');
-
-Route::middleware('auth')->group(function () {
-
-    Route::get('/chat', function () {
-        return view('chat');
-    })->name('chat');
-
-});
