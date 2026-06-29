@@ -12,7 +12,7 @@ use App\Http\Controllers\Lecturer\LecturerDashboardController;
 use App\Http\Controllers\Lecturer\LecturerDiscussionController;
 use App\Http\Controllers\Lecturer\LecturerCourseController;
 use App\Http\Controllers\Lecturer\LecturerAnnouncementController;
-
+use App\Http\Controllers\QuizController;
 use App\Http\Controllers\Student\StudentDashboardController;
 use App\Http\Controllers\Student\StudentDiscussionController;
 
@@ -86,10 +86,8 @@ Route::prefix('lecturer')->name('lecturer.')->middleware(['auth', 'role:lecturer
         Route::get('/quizzes/upload', [QuizController::class, 'showUploadForm'])
             ->name('quizzes.upload');
 
-       Route::post(
-    '/quizzes/{quiz}/upload',
-    [QuizController::class,'uploadQuiz']
-)->name('quizzes.upload');
+       Route::post('/quizzes/upload', [QuizController::class,'uploadQuiz'])
+       ->name('quizzes.upload.submit');
 
         Route::get('/performance', [LecturerDashboardController::class, 'performance'])
             ->name('performance');
@@ -102,10 +100,23 @@ Route::prefix('lecturer')->name('lecturer.')->middleware(['auth', 'role:lecturer
 
 Route::get('/settings', [LecturerDashboardController::class, 'settings'])
     ->name('settings');
-    
-    Route::get('/quizzes/create', [LecturerDashboardController::class, 'createQuiz'])
-    ->name('quizzes.create');
+    Route::get('/quizzes', [QuizController::class,'index'])
+        ->name('quizzes');
+    Route::get('/quizzes/create', [QuizController::class,'create'])
+        ->name('quizzes.create');
+
+Route::post('/quizzes', [QuizController::class,'store'])
+        ->name('quizzes.store');
+        Route::get('/quizzes/{quiz}', [QuizController::class,'show'])
+        ->name('quizzes.show');
+        Route::get('/quizzes/{quiz}/edit', [QuizController::class,'edit'])
+        ->name('quizzes.edit');
+        Route::put('/quizzes/{quiz}', [QuizController::class,'update'])
+        ->name('quizzes.update');
+   Route::delete('/quizzes/{quiz}', [QuizController::class,'destroy'])
+        ->name('quizzes.destroy');
 });
+
 
 // ── Student routes ─────────────────────────────────────────
 Route::prefix('student')->name('student.')->middleware(['auth', 'role:student'])->group(function () {
