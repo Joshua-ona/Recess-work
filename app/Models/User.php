@@ -46,6 +46,8 @@ class User extends Authenticatable
 
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'last_warning_at' => 'datetime',
+        'blacklisted_until' => 'datetime',
         'password' => 'hashed',
         'is_enabled'=>'boolean',
     ];
@@ -54,7 +56,6 @@ class User extends Authenticatable
     public function isLecturer(): bool {return $this->role == 'lecturer';}
     public function isGroupAdmin(): bool {return $this->role == 'group_admin';}
     public function isSystemAdmin(): bool {return $this->role == 'system_admin';}
-    public function isEnabled(): bool {return $this->is_enabled;}
 
          /* Warning messages issued to this user, newest first.
      */

@@ -16,12 +16,15 @@ class UserSeeder extends Seeder
     {
         //create the system administrator
 
-        User::create(
+        User::updateOrcreate(
+            [
+                'email' => config('university.admin_email'), 
+            ],
             [
                 'first_name' => 'System',
                 'last_name' => 'Administrator',
-                'email' => 'admin@forum.com',
-                'password' => Hash::make('admin1234'),
+                 
+                'password' => Hash::make(config('university.admin_password')),
                 'role' => 'system_admin',
                 'is_enabled' => true,
             ]);

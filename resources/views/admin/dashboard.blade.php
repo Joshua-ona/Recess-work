@@ -9,9 +9,18 @@
             <span class="font-medium text-lg">Admin dashboard</span>
             <span class="text-sm text-gray-500">{{ auth()->user()->full_name }}</span>
         </div>
+<<<<<<< HEAD
         <a href="{{ route('admin.Users.index') }}" class="text-sm border rounded px-3 py-1.5 hover:bg-gray-50">
             Manage all users
         </a>
+=======
+
+        <form method="POST" action="{{ route('logout')}}">
+            @csrf
+            <button type="submit" class="text-sm text-red-600 border border-red-400 rounded px-3 py-1">
+                Logout
+            </button>
+>>>>>>> 2de50549b54cdd2a6b15da22dea48a56dbd965f1
     </div>
 
     <div class="grid grid-cols-4 gap-4 mb-8">
