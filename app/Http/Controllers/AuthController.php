@@ -23,7 +23,7 @@ class AuthController extends Controller
             'last_name' => 'required|string',
             'email' => 'required|email|unique:users',
             'password' => 'required|string|min:8|confirmed',
-            'role' => 'required',
+            'role' => '',
             'agreed_rules' => 'accepted',
         ]);
 

@@ -423,6 +423,20 @@
     color: #777;
 
 }
+.notification-card {
+    margin-bottom: 12px;
+    padding: 14px;
+    border-radius: 10px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    transition: all 0.2s ease;
+}
+
+.notification-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
     </style>
     @stack('styles')
 </head>
