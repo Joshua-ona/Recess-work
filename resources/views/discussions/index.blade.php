@@ -1,18 +1,12 @@
-<div>
-     @extends('layouts.app')
+ @extends('layouts.app')
 @section('title', 'Discussions')
 
 @section('body')
+
+<div>
+    
 <div style="display:flex;height:100vh;font-family:sans-serif;">
-
-    {{-- Sidebar --}}
-    <div style="width:250px;background:#1a3c8f;color:white;padding:20px;">
-        <h2 style="margin-bottom:20px;">EduDiscuss</h2>
-        <a href="#" style="display:block;color:white;padding:10px;margin-bottom:5px;background:rgba(255,255,255,0.2);border-radius:5px;">💬 Discussions</a>
-        <a href="#" style="display:block;color:white;padding:10px;margin-bottom:5px;">📋 Categories</a>
-        <a href="#" style="display:block;color:white;padding:10px;margin-bottom:5px;">🔔 Notifications</a>
-    </div>
-
+    
     {{-- Main Content --}}
     <div style="flex:1;padding:30px;overflow-y:auto;background:#f5f6fa;">
 

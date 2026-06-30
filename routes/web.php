@@ -15,7 +15,8 @@ use App\Http\Controllers\Lecturer\LecturerAnnouncementController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\Student\StudentDashboardController;
 use App\Http\Controllers\Student\StudentDiscussionController;
-
+use App\Http\Controllers\GroupController;
+use App\Http\Controllers\DiscussionController;
 /*
 |--------------------------------------------------------------------------
 | Public Routes
@@ -129,19 +130,16 @@ Route::prefix('student')->name('student.')->middleware(['auth', 'role:student'])
     Route::get('/notifications',    [StudentDashboardController::class, 'notifications'])->name('notifications');
     Route::get('/courses/browse',   [StudentDashboardController::class, 'browseCourses'])->name('courses.browse');
     Route::get('/courses/{course}', [StudentDashboardController::class, 'course'])->name('course');
-    Route::resource('/discussions', StudentDiscussionController::class)->names('discussions');
+    Route::resource('/discussions', DiscussionController::class)->names('discussions');
     Route::get('/categories', [StudentDashboardController::class, 'categories'])->name('categories');
-    Route::get('/quizzes',          [StudentDashboardController::class, 'quizzes'])->name('quizzes');
-    Route::get('/messages',         [StudentDashboardController::class, 'messages'])->name('messages');
-    Route::get('/settings',          [StudentDashboardController::class, 'settings'])->name('settings');
+    Route::get('/quizzes',          [StudentDashboardController::class, 'quizzes'])->name('quizzes');  
     Route::get('/reports', [StudentDashboardController::class, 'reports'])
     ->name('reports');
 
 });
 
 //Group routes
-use App\Http\Controllers\GroupController;
-use App\Http\Controllers\DiscussionController;
+
 
 Route::middleware('auth')->group(function () {
     Route::resource('/groups', GroupController::class);

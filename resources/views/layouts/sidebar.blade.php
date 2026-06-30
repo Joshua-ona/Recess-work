@@ -76,10 +76,7 @@
                class="sidebar-item {{ request()->routeIs('lecturer.dashboard') ? 'active' : '' }}">
                 <i class="ti ti-layout-dashboard" aria-hidden="true"></i> Dashboard
             </a>
-            <a href="{{ route('lecturer.engagement') }}"
-               class="sidebar-item {{ request()->routeIs('lecturer.engagement') ? 'active' : '' }}">
-                <i class="ti ti-chart-bar" aria-hidden="true"></i> Engagement
-            </a>
+            
             <a href="{{ route('lecturer.discussions.index') }}" class="sidebar-item">
     <i class="ti ti-messages"></i> Discussions
 </a>
@@ -107,9 +104,8 @@
     <i class="ti ti-bookmark"></i> Pinned Topics
 </a>
 
-<a href="{{ route('lecturer.settings') }}" class="sidebar-item">
-    <i class="ti ti-settings"></i> Settings
-</a>
+
+
         </div>
         <div class="sidebar-section">
             <div class="sidebar-section-label">My courses</div>
@@ -164,9 +160,9 @@
         <i class="ti ti-message-circle"></i> Messages
     </a>
 
-    <a href="{{ route('student.settings') }}" class="sidebar-item">
-        <i class="ti ti-settings"></i> Settings
-    </a>
+   <a href="{{ route('groups.index') }}" class="sidebar-item">
+    <i class="ti ti-users-group"></i> Groups
+</a>
 
     <form method="POST" action="{{ route('logout') }}">
         @csrf
@@ -190,9 +186,7 @@
         </div>
         <div class="sidebar-section">
             <div class="sidebar-section-label">Account</div>
-            <a href="{{ route('student.profile') }}" class="sidebar-item">
-                <i class="ti ti-user" aria-hidden="true"></i> Profile
-            </a>
+            
             <a href="{{ route('student.notifications') }}" class="sidebar-item">
                 <i class="ti ti-bell" aria-hidden="true"></i> Notifications
                 @if(($notifCount ?? 0) > 0)
