@@ -108,13 +108,13 @@ new class extends Component {
                     class="chat-user {{ $selectedUser && $selectedUser->id == $user->id ? 'active' : '' }}">
 
                     <div class="chat-avatar">
-                        {{ strtoupper(substr($user->name,0,1)) }}
+                      {{ strtoupper(substr($user->first_name, 0, 1)) }}
                     </div>
 
                     <div class="chat-user-info">
 
                         <div class="chat-user-name">
-                            {{ $user->name }}
+                            {{ $user->first_name }} {{ $user->last_name }}
                         </div>
 
                         <div class="chat-user-email">
@@ -141,13 +141,13 @@ new class extends Component {
             @if($selectedUser)
 
                 <div class="chat-avatar">
-                    {{ strtoupper(substr($selectedUser->name,0,1)) }}
+                    {{ strtoupper(substr($selectedUser->first_name,0,1)) }}
                 </div>
 
                 <div>
 
                     <div class="chat-user-name">
-                        {{ $selectedUser->name }}
+                        {{ $selectedUser->first_name }} {{ $selectedUser->last_name }}
                     </div>
 
                     <div class="chat-status">
