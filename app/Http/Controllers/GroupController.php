@@ -7,11 +7,19 @@ use Illuminate\Http\Request;
 
 class GroupController extends Controller
 {
-    public function index()
-    {
-        $groups = Group::all();
-        return view('groups.index', compact('groups'));
-    }
+   public function index()
+{
+    $userId = auth()->id();
+    $myGroups = Group::whereHas('members', function($q) use ($userId) {
+        $q->where('user_id', $userId);
+    })->get();
+
+    $availableGroups = Group::whereDoesntHave('members', function($q) use ($userId) {
+        $q->where('user_id', $userId);
+    })->get();
+
+    return view('groups.index', compact('myGroups', 'availableGroups'));
+}
 
     public function create()
     {
@@ -33,6 +41,17 @@ class GroupController extends Controller
 
         return redirect('/groups')->with('success', 'Group created!');
     }
+
+    public function stats(Group $group)
+{
+    $stats = [
+        'discussions_count' => $group->discussions()->count(),
+        'replies_count' => \App\Models\Reply::whereIn('discussion_id', $group->discussions()->pluck('id'))->count(),
+        'latest_discussion' => $group->discussions()->latest()->first(),
+    ];
+
+    return view('groups.stats', compact('group', 'stats'));
+}
 
     public function show(Group $group)
     {
@@ -65,4 +84,17 @@ class GroupController extends Controller
     {
         return view('groups.discussions', compact('group'));
     }
+
+    public function join(Group $group)
+{
+    $user = auth()->user();
+
+    if ($group->members()->where('user_id', $user->id)->exists()) {
+        return redirect("/groups/{$group->id}")->with('success', 'You are already a member!');
+    }
+
+    $group->members()->attach($user->id, ['agreed_terms' => true]);
+
+    return redirect("/groups/{$group->id}")->with('success', 'You have joined the group!');
+}
 }

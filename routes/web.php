@@ -145,6 +145,9 @@ use App\Http\Controllers\DiscussionController;
 
 Route::middleware('auth')->group(function () {
     Route::resource('/groups', GroupController::class);
+
+    //Join group route
+    Route::post('/groups/{group}/join', [GroupController::class, 'join']);
     
     // Discussion routes
     Route::get('/groups/{group}/discussions', [DiscussionController::class, 'index']);
@@ -155,6 +158,11 @@ Route::middleware('auth')->group(function () {
     // Reply route
     Route::post('/groups/{group}/discussions/{discussion}/replies', [DiscussionController::class, 'storeReply']);
 });
+
+    //PDF Export Route
+    Route::get('/groups/{group}/discussions/{discussion}/pdf', [DiscussionController::class, 'exportPdf']);
+
+    Route::get('/groups/{group}/stats', [GroupController::class, 'stats']);
 
 
 /*
