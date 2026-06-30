@@ -87,11 +87,11 @@ Route::prefix('lecturer')->name('lecturer.')->middleware(['auth', 'role:lecturer
         Route::get('/quizzes/create', [LecturerDashboardController::class, 'createQuiz'])
             ->name('quizzes.create');
 
-        Route::get('/quizzes/upload', [QuizController::class, 'showUploadForm'])
-            ->name('quizzes.upload');
+        Route::get('/quizzes/{quiz}/upload', [QuizController::class, 'showUploadForm'])
+    ->name('quizzes.upload.form');
 
-       Route::post('/quizzes/upload', [QuizController::class,'uploadQuiz'])
-       ->name('quizzes.upload.submit');
+      Route::post('/quizzes/{quiz}/upload', [QuizController::class,'uploadQuiz'])
+    ->name('quizzes.upload');
 
         Route::get('/performance', [LecturerDashboardController::class, 'performance'])
             ->name('performance');
