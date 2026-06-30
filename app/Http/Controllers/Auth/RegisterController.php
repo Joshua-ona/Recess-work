@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use Illuminate\Foundation\Auth\RegistersUsers;
+//use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use App\Services\UserRegistrationService;
@@ -31,6 +31,7 @@ class RegisterController extends Controller
     public function __construct(UserRegistrationService $service)
     {
         $this->registrationService = $service;
+        $this->middleware('guest');
     }
    
 
@@ -54,8 +55,8 @@ class RegisterController extends Controller
 
         try{
             $user = $this->registrationService->execute($request->all());
-            auth()->login($user);
-            return redirect('/home');
+            //auth()->login($user);
+            return redirect()->route('verification.notice');
         }catch(\Exception $e){
             return back()->withErrors([
                 'email' =>
@@ -70,21 +71,21 @@ class RegisterController extends Controller
       return $this->registrationService->execute($data);
     }
 
-    protected function redirectTo()
-    {
+    // protected function redirectTo()
+    // {
 
-    if(!auth() -> check()){
-        return '/home';
-    }
-        $role = auth()->user()->role;
+    // if(!auth() -> check()){
+    //     return '/home';
+    // }
+    //     $role = auth()->user()->role;
 
-        return match($role){
-            'system_admin' => route('admin.dashboard'),
-            'lecturer' => route('lecturer.dashboard'),
-            'student' => route('student.dashboard'),
-            default => '/home',
-        };
-    }
+    //     return match($role){
+    //         'system_admin' => route('admin.dashboard'),
+    //         'lecturer' => route('lecturer.dashboard'),
+    //         'student' => route('student.dashboard'),
+    //         default => '/home',
+    //     };
+    // }
 
     public function showRegister()
     {
@@ -94,8 +95,10 @@ class RegisterController extends Controller
     public function register(Request $request){
         $this->validator($request->all())->validate();
         $user = $this->create($request->all());
-        auth()->login($user);
+        
+        session(['temp_user_id' => $user->id]);
+        app(VerificationController::class)->sendOtpForUser($user);
 
-        return redirect($this->redirectTo());
+        return redirect()->route('verification.notice');
     }
 }

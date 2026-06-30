@@ -10,6 +10,8 @@ use App\Http\Controllers\Lecturer\LecturerCourseController;
 use App\Http\Controllers\Student\StudentDashboardController;
 use App\Http\Controllers\Student\StudentDiscussionController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\VerificationController;
+use App\Http\Controllers\Admin\GroupController as AdminGroupController;
 
 // ── Public routes ──────────────────────────────────────────
 Route::middleware('guest')->group(function () {
@@ -17,6 +19,13 @@ Route::middleware('guest')->group(function () {
     Route::post('/login',   [AuthController::class, 'login']);
     Route::get('/register', [RegisterController::class, 'showRegister'])->name('register');
     Route::post('/register',[RegisterController::class, 'register']);
+
+});
+
+Route::middleware('web')->group(function () {
+    Route::get('/verify', function(){return view('auth.verify');})->name('verification.notice');
+    Route::post('verify/send', [VerificationController::class, 'sendOtp'])->name('verification.send');
+    Route::post('verify/check', [VerificationController::class, 'verifyOtp'])->name('verification.check');
 });
 
 Route::get('/password/reset', fn() => view('auth.passwords.email'))->name('password.request');
@@ -30,7 +39,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:system_admin']
     Route::get('/courses',     [AdminDashboardController::class, 'courses'])->name('courses');
     Route::get('/reports',     [AdminDashboardController::class, 'reports'])->name('reports');
     Route::get('/settings',    [AdminDashboardController::class, 'settings'])->name('settings');
-<<<<<<< HEAD
 
     // Member actions
     Route::post('/members/{user}/approve', [AdminUserController::class, 'approve'])
@@ -50,12 +58,17 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:system_admin']
 
     Route::post('/members/{user}/logout', [AdminUserController::class, 'logout'])
         ->name('Users.logout');
-=======
->>>>>>> 6db54cd608af2260cbdbd38d1d960cd85f2c3889
+
+    //GROUP ACTIONS
+
+    Route::get('/groups/pending',    [AdminGroupController::class, 'index'])->name('groups.index');
+    Route::post('/groups/{group}/approve',    [AdminGroupController::class, 'approve'])->name('groups.approve');
+    Route::post('/groups/{group}/reject',    [AdminGroupController::class, 'reject'])->name('groups.reject');
+
 });
 
 // ── Lecturer routes ────────────────────────────────────────
-Route::prefix('lecturer')->name('lecturer.')->middleware(['auth', 'role:lecturer'])->group(function () {
+Route::prefix('lecturer')->name('lecturer.')->middleware(['auth','verified','role:lecturer'])->group(function () {
     Route::get('/',          [LecturerDashboardController::class, 'index'])->name('dashboard');
     Route::get('/engagement',[LecturerDashboardController::class, 'engagement'])->name('engagement');
     Route::get('/pinned',    [LecturerDashboardController::class, 'pinned'])->name('pinned');
@@ -86,7 +99,7 @@ Route::get('/settings', [LecturerDashboardController::class, 'settings'])
 });
 
 // ── Student routes ─────────────────────────────────────────
-Route::prefix('student')->name('student.')->middleware(['auth', 'role:student'])->group(function () {
+Route::prefix('student')->name('student.')->middleware(['auth','verified','role:student'])->group(function () {
     Route::get('/',                 [StudentDashboardController::class, 'index'])->name('dashboard');
     Route::get('/saved',            [StudentDashboardController::class, 'saved'])->name('saved');
     Route::get('/profile',          [StudentDashboardController::class, 'profile'])->name('profile');
@@ -98,8 +111,15 @@ Route::prefix('student')->name('student.')->middleware(['auth', 'role:student'])
     Route::get('/quizzes',          [StudentDashboardController::class, 'quizzes'])->name('quizzes');
     Route::get('/messages',         [StudentDashboardController::class, 'messages'])->name('messages');
     Route::get('/settings',          [StudentDashboardController::class, 'settings'])->name('settings');
-    Route::get('/reports', [StudentDashboardController::class, 'reports'])
-    ->name('reports');
+    Route::get('/reports', [StudentDashboardController::class, 'reports'])->name('reports');
+    Route::get('/groups',    [StudentDashboardController::class, 'index'])->name('groups.index');
+    Route::get('/groups/{group}',    [StudentDashboardController::class, 'show'])->name('groups.show');
+
+
+    Route::post('/groups', [StudentDashboardController::class, 'store'])->name('groups.store');
+    Route::post('/groups/{group}/join', [StudentDashboardController::class, 'join'])->name('groups.join');
+    Route::post('/groups/{group}/message', [StudentDashboardController::class, 'message'])->name('groups.message');
+  
 
 });
 
@@ -110,16 +130,24 @@ Route::get('/', function () {
         return redirect()->route('login');
     }
 
+    $user = auth()->user();
+
+    if(is_null($user->email_verified_at) || !$user->is_enabled){
+        session(['temp_user_id' => $user->id]);
+        return redirect()->route('verification.notice');
+    }
+
+    return match (auth()->user()->role) {
+        'system_admin' => redirect()->route('admin.dashboard'),
+        'lecturer' => redirect()->route('lecturer.dashboard'),
+        default    => redirect()->route('student.dashboard'),
+
+    };
+})->middleware('auth');
+
 Route::get('/quizzes/upload', function () {
     return view('lecturer.upload-quiz');
 })->name('quizzes.upload');
 
 Route::post('/quizzes/import', [QuizController::class, 'import'])
     ->name('quizzes.import');
-
-    return match (auth()->user()->role) {
-        'system_admin' => redirect()->route('admin.dashboard'),
-        'lecturer' => redirect()->route('lecturer.dashboard'),
-        default    => redirect()->route('student.dashboard'),
-    };
-})->middleware('auth');

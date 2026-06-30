@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('password');
             $table->enum('role',['student','lecturer','group_admin','system_admin'])->default('student');
             $table->rememberToken();
-            $table->boolean('is_enabled')->default(true);
+            $table->boolean('is_enabled')->default(false);
             $table->unsignedTinyInteger('warning_count')->default(0);
             $table->timestamp('last_warning_at')->nullable();
             $table->timestamp('blacklisted_until')->nullable();

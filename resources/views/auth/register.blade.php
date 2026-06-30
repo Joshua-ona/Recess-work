@@ -37,14 +37,6 @@
 
     <h1 class="auth-heading">Create an account</h1>
 
-    @if ($errors->any())
-        <div class="alert alert-danger" role="alert">
-            @foreach ($errors->all() as $error)
-                <div>{{ $error }}</div>
-            @endforeach
-        </div>
-    @endif
-
     <form method="POST" action="{{ route('register') }}" novalidate>
         @csrf
 

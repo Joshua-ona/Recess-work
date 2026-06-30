@@ -6,8 +6,11 @@
 
     use App\Http\Controllers\Controller;
     use App\Models\User;
+    use App\Services\UserRegistrationService;
     use Illuminate\Http\Request;
     use Illuminate\Support\Facades\Auth;
+    use Illuminate\Support\Facades\Hash;
+     use Illuminate\Auth\Events\Registered;
 
     class AuthController extends Controller
     {
@@ -16,8 +19,8 @@
             return view('auth.login');
         }
 
-<<<<<<< HEAD
-    public function login(Request $request)
+
+public function login(Request $request)
 {
     $credentials = $request->validate([
         'email' => ['required', 'email'],
@@ -31,7 +34,6 @@
     }
 
     $request->session()->regenerate();
-
     $user = Auth::user();
 
     // Blacklisting still actually stops someone from logging back in;
@@ -45,59 +47,61 @@
         ])->onlyInput('email');
     }
 
+    if(!$user->is_enabled){
+        Auth::logout();
+        $request->session()->invalidate();
+        
+        return back()->withErrors([
+            'email' => 'Account is disabled.Contact Admin.',
+        ])->onlyInput('email');
+    }
+
+     if(is_null($user->email_verified_at)){
+        Auth::logout();
+        $request->session()->invalidate();
+        
+        return back()->withErrors([
+            'email' => 'Email not verified.Check your email for OTP.',
+        ])->onlyInput('email');
+    }
+
     return match ($user->role) {
-        'admin' => redirect()->route('admin.dashboard'),
+        'system_admin' => redirect()->route('admin.dashboard'),
         'lecturer' => redirect()->route('lecturer.dashboard'),
-        default => redirect()->route('student.dashboard'),
+        'student' => redirect()->route('student.dashboard'),
+        default => redirect()->route('home'),
     };
 }
 
-    public function showRegister()
-=======
-        public function login(Request $request)
->>>>>>> 6db54cd608af2260cbdbd38d1d960cd85f2c3889
-    {
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required'],
-        ]);
-
-        //check first for user existence
-        $user = User::where('email',$request->email)->first();
-
-        if(!$user){
-            return back()->withErrors([
-                'email' => 'No account found with this email',
-            ])->onlyInput('email');
-        }
-
-        if (!Auth::attempt($credentials, $request->boolean('remember'))) {
-            return back()->withErrors([
-                'email' => 'Invalid email or password.',
-            ])->onlyInput('email');
-        }
-
-        $request->session()->regenerate();
-
-        return match (Auth::user()->role) {
-            'system_admin' => redirect()->route('admin.dashboard'),
-            'lecturer' => redirect()->route('lecturer.dashboard'),
-            default => redirect()->route('student.dashboard'),
-        };
+    public function showRegister(){
+            return view('auth.register');
     }
 
+    public function register(Request $request)
+    {
+        $data = $request->validate([
+        'first_name' => 'required|string|max:255',
+        'last_name' => 'required|string|max:255',
+        'email' => [
+            'required',
+            'string',
+            'email',
+            'max:255',
+            'unique:users',
+            'regex:/^[a-zA-Z0-9._%+-]+@(students\.)?mak\.ac\.ug$'
+        ],
+        'password' => 'required|string|min:8|confirmed',
+        ]);
 
-<<<<<<< HEAD
-    $user = User::create([
-        'first_name' => $data['first_name'],
-        'last_name' => $data['last_name'],
-        'email' => $data['email'],
-        'role' => $data['role'],
-        'password' => $data['password'],
-    ]);
-=======
->>>>>>> 6db54cd608af2260cbdbd38d1d960cd85f2c3889
+        $user = $registrationService->execute($data);
 
+        event(new Registered($user));
+
+        //Auth::login($user);
+
+        return redirect()->route('verification.notice')->with('success','You have successfully registed.Please check your email to verify your account');
+
+    }
     public function logout(Request $request)
     {
         Auth::logout();
