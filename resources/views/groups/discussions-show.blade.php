@@ -42,11 +42,29 @@
                     · {{ $discussion->created_at->diffForHumans() }}
                 </div>
             </div>
-            <div class="dash-header-actions">
-                <a href="/groups/{{ $group->id }}/discussions" class="btn btn-outline btn-sm">
-                    <i class="ti ti-arrow-left"></i> Back
-                </a>
-            </div>
+           <div class="dash-header-actions">
+           {{-- Share buttons --}}
+<a href="https://wa.me/?text={{ urlencode($discussion->title . ' - ' . request()->url()) }}" 
+   target="_blank" class="btn btn-sm" style="background:#25D366; color:#fff;">
+    <i class="ti ti-brand-whatsapp"></i> WhatsApp
+</a>
+<a href="https://twitter.com/intent/tweet?text={{ urlencode($discussion->title) }}&url={{ urlencode(request()->url()) }}" 
+   target="_blank" class="btn btn-sm" style="background:#000; color:#fff;">
+    <i class="ti ti-brand-x"></i> Twitter
+</a>
+<a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(request()->url()) }}" 
+   target="_blank" class="btn btn-sm" style="background:#1877F2; color:#fff;">
+    <i class="ti ti-brand-facebook"></i> Facebook
+</a>
+<a href="https://t.me/share/url?url={{ urlencode(request()->url()) }}&text={{ urlencode($discussion->title) }}" 
+   target="_blank" class="btn btn-sm" style="background:#26A5E4; color:#fff;">
+    <i class="ti ti-brand-telegram"></i> Telegram
+</a>
+<a href="https://www.linkedin.com/sharing/share-offsite/?url={{ urlencode(request()->url()) }}" 
+   target="_blank" class="btn btn-sm" style="background:#0A66C2; color:#fff;">
+    <i class="ti ti-brand-linkedin"></i> LinkedIn
+</a>
+</div>
         </div>
 
         <div class="dash-body">
