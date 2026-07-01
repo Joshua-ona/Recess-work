@@ -29,10 +29,10 @@ class VerificationController extends Controller
     // if(!session('temp_user_id')){
     //     return redirect()->route('register')->withErrors(['otp' => 'Please register first.']);
     // }
-    return views('auth.verify');
+        return views('auth.verify');
     }
 
-    public function sendOtp(){
+       public function sendOtp(){
         $userId = session('temp_user_id');
 
         if(!$userId){
@@ -52,6 +52,8 @@ class VerificationController extends Controller
     public function sendOtpForUser($user)
     {
         $otp = random_int(100000,999999);
+
+        \Log::info('2. OTP GENERATED', ['otp' => $otp]);
          Verification::updateOrCreate(
             ['user_id' => $user->id],
             ['otp' => $otp, 'expires_at' => now()->addMinutes(10)],
@@ -71,7 +73,11 @@ class VerificationController extends Controller
             'otp' => 'required|digits:6'
         ]);
 
-        $userId = Auth::id()?? session('temp_user_id');
+        $userId = Auth::id() ?? session('temp_user_id');
+
+        if(!$userId){
+            return redirect()->route('register')->withErrors(['otp' => 'Session expired. Register Again']);
+        }
 
         $record = Verification::where('user_id', $userId)
                                 ->where('otp', $request->otp)
