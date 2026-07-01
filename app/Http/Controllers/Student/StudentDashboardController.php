@@ -2,14 +2,11 @@
 
 namespace App\Http\Controllers\Student;
 use App\Http\Controllers\Controller;
-<<<<<<< HEAD
 use App\Services\{GroupService,GroupChatService};
 use Iluminate\Http\Request;
 use App\Models\Group;
-=======
 use App\Models\PrivateComm;
 use App\Models\Quiz;
->>>>>>> 44d2470e921153fee253e0c93f4c5d1009eeb50f
 
 class StudentDashboardController extends Controller
 {
@@ -19,7 +16,6 @@ class StudentDashboardController extends Controller
 
     public function index()
     {
-<<<<<<< HEAD
         $user = auth()->user();
         $myGroupIds = $user->groups()->pluck('groups.id');
         $joinedGroupIds = auth()->user()->groups()->pluck('groups.id')->toArray();
@@ -51,22 +47,24 @@ class StudentDashboardController extends Controller
                     'user' => $user,
                     'activeGroup' => null,
                     'admin' => null,
-                    
-=======
-        return view('student.dashboard', [
-            'notifCount' => auth()->user()->warnings()->whereNull('read_at')->count(),
->>>>>>> 44d2470e921153fee253e0c93f4c5d1009eeb50f
         ]);
+                    
+       
     }
 
      public function show(Group $group)
      {
         $user = auth()->user();
-        $this->authorize('view',$group);
+        //$this->authorize('view',$group);
 
         $admin = $group->admin;
-        $members = $group->members()->where('user_id', '!=', $admin->id)->get();
+        $members = $group->users()->where('user_id', '!=', $admin->id)->get();
         $messages = $group->messages()->with('user')->latest()->get();
+
+        $browseGroups = Group::where('status','approved')
+                            ->whereNotIn('id',$user->groups()->pluck('groups.id'))
+                            ->latest('id')
+                            ->get();
 
         return view('student.dashboard', [
             'activeGroup' => $group,
@@ -74,10 +72,11 @@ class StudentDashboardController extends Controller
             'members' => $members,
             'messages' => $messages,
             'role' => 'student',
+            'browseGroups' => $browseGroups,
             'user' => $user,
             'discover' => $this->groupService->getDiscoverableGroupsFor($user),
             'myGroups' => $this->groupService->getMyGroups($user),
-            'enrolledCourses' => collects(),
+            'enrolledCourses' => collect(),
             'unreadCount' => 0,
             'notifCount' => 0,
 

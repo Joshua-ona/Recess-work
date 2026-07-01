@@ -11,14 +11,21 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('verifications', function(Blueprint $table){
-            $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->string('otp',6);
-            $table->timestamp('expires_at');
-            $table->timestamps();
-            
-        });
+       Schema::create('verifications', function (Blueprint $table) {
+
+    $table->id();
+
+    $table->foreignId('user_id')
+        ->unique()
+        ->constrained()
+        ->cascadeOnDelete();
+
+    $table->string('otp',6);
+
+    $table->timestamp('expires_at');
+
+    $table->timestamps();
+});
     }
 
     /**
@@ -26,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::dropIfExists('verifications');
     }
 };

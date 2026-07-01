@@ -10,7 +10,8 @@ namespace App\Http\Controllers\Auth;
     use Illuminate\Http\Request;
     use Illuminate\Support\Facades\Auth;
     use Illuminate\Support\Facades\Hash;
-     use Illuminate\Auth\Events\Registered;
+    use Illuminate\Auth\Events\Registered;
+     
 
 
 class AuthController extends Controller
@@ -26,10 +27,13 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
-    public function logout(Request $request)
-    {
-        Auth::logout();
-    }
+   public function logout(Request $request)
+{
+    Auth::logout();
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+    return redirect()->route('login');
+}
 
     public function showRegister(){
             return view('auth.register');
@@ -65,30 +69,21 @@ class AuthController extends Controller
         ])->onlyInput('email');
     }
 
-    if(!$user->is_enabled){
-        Auth::logout();
-        $request->session()->invalidate();
-        
-        return back()->withErrors([
-            'email' => 'Account is disabled.Contact Admin.',
-        ])->onlyInput('email');
-    }
+   if (!$user->is_enabled || is_null($user->email_verified_at)) {
 
-     if(is_null($user->email_verified_at)){
         Auth::logout();
-        $request->session()->invalidate();
-        
-        return back()->withErrors([
-            'email' => 'Email not verified.Check your email for OTP.',
-        ])->onlyInput('email');
-    }
 
-    return match ($user->role) {
-        'system_admin' => redirect()->route('admin.dashboard'),
-        'lecturer' => redirect()->route('lecturer.dashboard'),
-        'student' => redirect()->route('student.dashboard'),
-        default => redirect()->route('home'),
-    };
+        $request->session()->invalidate();
+
+        $request->session()->regenerateToken();
+
+        session(['temp_user_id' => $user->id]);
+
+        return redirect()
+            ->route('verification.notice')
+            ->with('error', 'Please verify your email first.');
+        }
+        
 }
 
 
@@ -113,11 +108,8 @@ class AuthController extends Controller
 
         $user = $this->registrationService->execute($data);
 
-        event(new Registered($user));
 
         app(VerificationController::class)->sendOtpForUser($user);
-
-        Auth::login($user);
 
         return redirect()->route('verification.notice')->with('success','You have successfully registed.Please check your email to verify your account');
 

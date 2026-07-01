@@ -5,31 +5,7 @@
 
 <div class="dash-wrap">
 
-    <div class="dash-main">
-        <div class="dash-header">...</div>
-        <div class="dash-body">
-            @if($activeGroup)
-            @include('student.groups.show',
-            [
-            'group' => $activeGroup,
-            'admin' => $admin,
-            'members' => $members,
-            'messages' => $messages,
-            'role' => 'student',
-            'user' => auth()->user(),
-            'enrolledCourses' => $enrolledCourses ?? collect(),
-            'unreadCount' => $unreadCount ?? 0,
-            'notifCount' => $notifCount ?? 0,
-            ])
 
-            @else
-            @include('student.groups.index',[
-            'myGroups' => $myGroups,
-            'discoverGroups' => $discoverGroups
-            ])
-            @endif
-        </div>
-    </div>
 
     {{-- Main --}}
     <div class="dash-main">
@@ -66,6 +42,31 @@
         </div>
 
         <div class="dash-body">
+            <div class="dash-main">
+                <div class="dash-header">...</div>
+                <div class="dash-body">
+                    @if($activeGroup)
+                    @include('student.groups.show',
+                    [
+                    'group' => $activeGroup,
+                    'admin' => $admin,
+                    'members' => $members,
+                    'messages' => $messages,
+                    'role' => 'student',
+                    'user' => auth()->user(),
+                    'enrolledCourses' => $enrolledCourses ?? collect(),
+                    'unreadCount' => $unreadCount ?? 0,
+                    'notifCount' => $notifCount ?? 0,
+                    ])
+
+                    @else
+                    @include('student.groups.index',[
+                    'myGroups' => $myGroups,
+                    'discoverGroups' => $discoverGroups
+                    ])
+                    @endif
+                </div>
+            </div>
 
             @if (session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
