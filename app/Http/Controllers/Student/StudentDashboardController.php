@@ -1,11 +1,15 @@
 <?php
 
 namespace App\Http\Controllers\Student;
-
 use App\Http\Controllers\Controller;
+<<<<<<< HEAD
 use App\Services\{GroupService,GroupChatService};
 use Iluminate\Http\Request;
 use App\Models\Group;
+=======
+use App\Models\PrivateComm;
+use App\Models\Quiz;
+>>>>>>> 44d2470e921153fee253e0c93f4c5d1009eeb50f
 
 class StudentDashboardController extends Controller
 {
@@ -15,6 +19,7 @@ class StudentDashboardController extends Controller
 
     public function index()
     {
+<<<<<<< HEAD
         $user = auth()->user();
         $myGroupIds = $user->groups()->pluck('groups.id');
         $joinedGroupIds = auth()->user()->groups()->pluck('groups.id')->toArray();
@@ -47,6 +52,10 @@ class StudentDashboardController extends Controller
                     'activeGroup' => null,
                     'admin' => null,
                     
+=======
+        return view('student.dashboard', [
+            'notifCount' => auth()->user()->warnings()->whereNull('read_at')->count(),
+>>>>>>> 44d2470e921153fee253e0c93f4c5d1009eeb50f
         ]);
     }
 
@@ -141,10 +150,74 @@ public function settings()
         return view('student.profile');
     }
 
-    public function notifications()
-    {
-        return view('student.notifications');
+  public function notifications()
+{
+    $notifications = collect();
+
+    // --------------------
+    // Warnings
+    // --------------------
+    $warnings = auth()->user()->warnings()->with('issuer')->get();
+
+    foreach ($warnings as $warning) {
+        $notifications->push([
+            'type' => 'warning',
+            'message' => $warning->message,
+            'sender' => $warning->issuer?->full_name ?? 'Admin',
+            'created_at' => $warning->created_at,
+        ]);
     }
+
+    // --------------------
+    // Messages
+    // --------------------
+    $messages = PrivateComm::with('sender')
+        ->where('receiver_id', auth()->id())
+        ->latest()
+        ->get();
+
+    foreach ($messages as $message) {
+        $notifications->push([
+            'type' => 'message',
+            'message' => $message->content,
+           'sender' => $message->sender
+    ? $message->sender->first_name . ' ' . $message->sender->last_name
+    : 'Unknown',
+            'created_at' => $message->created_at,
+        ]);
+    }
+
+    // --------------------
+    // Quizzes
+    // --------------------
+$groupIds = auth()->user()
+    ->groups()
+    ->pluck('groups.id');
+
+$quizzes = Quiz::whereIn('group_id', $groupIds)
+    ->where('is_published', true)
+    ->latest()
+    ->get();
+
+foreach ($quizzes as $quiz) {
+    $notifications->push([
+        'type' => 'quiz',
+        'message' => "New quiz: {$quiz->title}",
+        'sender' => 'Course Quiz',
+        'created_at' => $quiz->created_at,]);
+}
+    $notifications = $notifications->sortByDesc('created_at');
+
+    auth()->user()->warnings()
+        ->whereNull('read_at')
+        ->update([
+            'read_at' => now(),
+        ]);
+
+    return view('student.notifications', [
+        'notifications' => $notifications,
+    ]);
+}
 
     public function browseCourses()
     {

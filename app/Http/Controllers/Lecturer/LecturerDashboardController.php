@@ -32,7 +32,13 @@ public function messages()
 
 public function notifications()
 {
-    return view('lecturer.notifications');
+    $warnings = auth()->user()->warnings()->with('issuer')->get();
+
+    auth()->user()->warnings()->whereNull('read_at')->update(['read_at' => now()]);
+
+    return view('lecturer.notifications', [
+        'warnings' => $warnings,
+    ]);
 }
 
 public function settings()

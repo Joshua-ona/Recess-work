@@ -38,8 +38,12 @@ public function execute(array $data):User{
     $user = new User();
 
     $user->email = $email;
+<<<<<<< HEAD
     $user->first_name = trim($data['first_name']);
     $user->last_name = trim($data['last_name']);
+=======
+    $user->name = $data['first_name'].' '.$data['last_name'];
+>>>>>>> 44d2470e921153fee253e0c93f4c5d1009eeb50f
     $user->password = Hash::make($data['password']);
     $user->role = $role;
     $user->is_enabled = false;

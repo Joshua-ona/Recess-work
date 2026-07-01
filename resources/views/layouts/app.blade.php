@@ -9,6 +9,7 @@
 
     {{-- Tabler Icons --}}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.4.0/tabler-icons.min.css" />
+<<<<<<< HEAD
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
     <style>
     *,
@@ -18,6 +19,13 @@
         margin: 0;
         padding: 0;
     }
+=======
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+@vite(['resources/css/app.css', 'resources/js/app.js'])  
+@livewireStyles
+  <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+>>>>>>> 44d2470e921153fee253e0c93f4c5d1009eeb50f
 
     :root {
         --purple-50: #EEEDFE;
@@ -826,6 +834,7 @@
         .sidebar {
             display: none;
         }
+<<<<<<< HEAD
 
         .panel-grid {
             grid-template-columns: 1fr;
@@ -835,12 +844,240 @@
             grid-template-columns: 1fr;
         }
     }
+=======
+        /* ================= CHAT ================= */
+
+.chat-wrapper{
+    display:flex;
+    height:calc(100vh - 70px);
+    background:#fff;
+    border-radius:12px;
+    overflow:hidden;
+    border:var(--border);
+}
+
+.chat-users{
+    width:320px;
+    background:#fff;
+    border-right:var(--border);
+    display:flex;
+    flex-direction:column;
+}
+
+.chat-users-header{
+    padding:18px;
+    font-weight:600;
+    font-size:18px;
+    border-bottom:var(--border);
+}
+
+.chat-users-list{
+    overflow-y:auto;
+    flex:1;
+}
+
+.chat-user{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    padding:14px 18px;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.chat-user:hover{
+    background:#f5f5f5;
+}
+
+.chat-user.active{
+    background:var(--purple-50);
+}
+
+.chat-avatar{
+    width:46px;
+    height:46px;
+    border-radius:50%;
+    background:var(--purple-800);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:600;
+}
+
+.chat-user-name{
+    font-weight:600;
+}
+
+.chat-user-email{
+    color:#777;
+    font-size:13px;
+}
+
+.chat-main{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+}
+
+.chat-header{
+    height:72px;
+    border-bottom:var(--border);
+    display:flex;
+    align-items:center;
+    gap:15px;
+    padding:0 25px;
+    background:#f7f7f7;
+}
+
+.chat-messages{
+    flex:1;
+    overflow:auto;
+    padding:25px;
+    background:#efeae2;
+}
+
+.message-row{
+    display:flex;
+    margin-bottom:15px;
+}
+
+.message-row.me{
+    justify-content:flex-end;
+}
+
+.message{
+    max-width:65%;
+    padding:12px 16px;
+    border-radius:12px;
+    box-shadow:0 1px 3px rgba(0,0,0,.08);
+}
+
+.message.received{
+    background:#fff;
+}
+
+.message.sent{
+    background:#d9fdd3;
+}
+
+.message-time{
+    font-size:11px;
+    color:#777;
+    text-align:right;
+    margin-top:4px;
+}
+
+.chat-input{
+    display:flex;
+    gap:15px;
+    padding:15px;
+    border-top:var(--border);
+    background:#fff;
+}
+
+.chat-input input{
+    flex:1;
+    border:var(--border);
+    border-radius:999px;
+    padding:12px 18px;
+    outline:none;
+}
+
+.chat-send{
+    background:var(--purple-800);
+    color:white;
+    border:none;
+    border-radius:999px;
+    padding:12px 24px;
+    cursor:pointer;
+}
+
+.chat-send:hover{
+    background:var(--purple-600);
+}
+.messages-container {
+    height: 100%;
+    overflow-y: auto;
+    padding: 20px;
+    background: #efeae2;
+}
+
+
+.message-row {
+    display: flex;
+    width: 100%;
+    margin-bottom: 12px;
+}
+
+
+.message-row.sent {
+    justify-content: flex-end;
+}
+
+
+.message-row.received {
+    justify-content: flex-start;
+}
+
+
+.message-bubble {
+
+    max-width: 420px;
+    padding: 12px 16px;
+    border-radius: 18px;
+    font-size: 14px;
+    box-shadow: 0 2px 5px rgba(0,0,0,.12);
+
+}
+
+
+.sent-bubble {
+
+    background: #d9fdd3;
+    border-bottom-right-radius: 4px;
+
+}
+
+
+.received-bubble {
+
+    background: white;
+    border-bottom-left-radius: 4px;
+
+}
+
+
+.message-time {
+
+    margin-top: 5px;
+    text-align: right;
+    font-size: 11px;
+    color: #777;
+
+}
+.notification-card {
+    margin-bottom: 12px;
+    padding: 14px;
+    border-radius: 10px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    transition: all 0.2s ease;
+}
+
+.notification-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+>>>>>>> 44d2470e921153fee253e0c93f4c5d1009eeb50f
     </style>
     @stack('styles')
 </head>
 
 <body>
     @yield('body')
+    @livewireStyles
     @stack('scripts')
 </body>
 

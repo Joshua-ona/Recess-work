@@ -4,10 +4,53 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class AdminUserController extends Controller
 {
+    /**
+     * List every user, with a search box and an "online now" indicator
+     * (based on whether they have a row in the sessions table), so the
+     * admin can blacklist or log out anyone — not just members who already
+     * have a warning.
+     */
+    public function index(Request $request)
+    {
+        $search = $request->query('search');
+
+        $users = User::query()
+            ->with(['warnings.issuer'])
+            ->when($search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('first_name', 'like', "%{$search}%")
+                        ->orWhere('last_name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                });
+            })
+            ->orderBy('first_name')
+            ->paginate(20)
+            ->withQueryString();
+
+        // A user "is online" here means they currently have a session row —
+        // i.e. they haven't logged out (or been force-logged-out) since
+        // last signing in. Only meaningful on the 'database' session driver.
+        $onlineIds = [];
+        if (config('session.driver') === 'database') {
+            $onlineIds = DB::table(config('session.table', 'sessions'))
+                ->whereNotNull('user_id')
+                ->pluck('user_id')
+                ->unique()
+                ->all();
+        }
+
+        return view('admin.users.index', [
+            'users' => $users,
+            'onlineIds' => $onlineIds,
+            'search' => $search ?? '',
+        ]);
+    }
+
     /**
      * Approve a pending registration (req. 5 — rules acceptance gate).
      */
@@ -30,11 +73,25 @@ class AdminUserController extends Controller
     }
 
     /**
-     * Manually issue an inactivity warning (req. 4). After 2 warnings the
-     * member is auto-blacklisted for a configurable number of days.
+     * Send a warning message for violating platform rules (req. 4). After
+     * 2 warnings the member is auto-blacklisted for a configurable number
+     * of days.
      */
-    public function warn(User $user)
+    public function warn(Request $request, User $user)
     {
+        $request->validate([
+            'message' => ['required', 'string', 'max:1000'],
+        ]);
+
+        if ($user->id === $request->user()->id) {
+            return back()->with('status', "You can't warn your own account.");
+        }
+
+        $user->warnings()->create([
+            'issued_by' => $request->user()->id,
+            'message' => $request->input('message'),
+        ]);
+
         $user->warning_count += 1;
         $user->last_warning_at = now();
 
@@ -45,14 +102,19 @@ class AdminUserController extends Controller
 
         $user->save();
 
-        return back()->with('status', "Warning issued to {$user->full_name}.");
+        return back()->with('status', "Warning sent to {$user->full_name}.");
     }
 
     /**
-     * Manual override to blacklist a member outright.
+     * Manual override to blacklist a member outright — from anywhere in
+     * the admin dashboard, regardless of whether they've been warned.
      */
-    public function blacklist(User $user)
+    public function blacklist(Request $request, User $user)
     {
+        if ($user->id === $request->user()->id) {
+            return back()->with('status', "You can't blacklist your own account.");
+        }
+
         $user->update([
             'status' => 'blacklisted',
             'blacklisted_until' => now()->addDays(config('forum.blacklist_days', 7)),
@@ -72,8 +134,12 @@ class AdminUserController extends Controller
      * server-side way to invalidate a session by user id, so this is a
      * harmless no-op there.
      */
-    public function logout(User $user)
+    public function logout(Request $request, User $user)
     {
+        if ($user->id === $request->user()->id) {
+            return back()->with('status', "Use the regular Log out button for your own account.");
+        }
+
         if (config('session.driver') === 'database') {
             DB::table(config('session.table', 'sessions'))
                 ->where('user_id', $user->id)

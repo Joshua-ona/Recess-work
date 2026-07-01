@@ -1,22 +1,38 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Auth\RegisterController;
+
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminUserController;
+
 use App\Http\Controllers\Lecturer\LecturerDashboardController;
 use App\Http\Controllers\Lecturer\LecturerDiscussionController;
 use App\Http\Controllers\Lecturer\LecturerCourseController;
+use App\Http\Controllers\Lecturer\LecturerAnnouncementController;
+use App\Http\Controllers\QuizController;
 use App\Http\Controllers\Student\StudentDashboardController;
 use App\Http\Controllers\Student\StudentDiscussionController;
+<<<<<<< HEAD
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\Admin\GroupController as AdminGroupController;
+=======
+use App\Http\Controllers\GroupController;
+use App\Http\Controllers\DiscussionController;
+/*
+|--------------------------------------------------------------------------
+| Public Routes
+|--------------------------------------------------------------------------
+*/
+>>>>>>> 44d2470e921153fee253e0c93f4c5d1009eeb50f
 
-// ── Public routes ──────────────────────────────────────────
 Route::middleware('guest')->group(function () {
     Route::get('/login',    [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login',   [AuthController::class, 'login']);
+<<<<<<< HEAD
     Route::get('/register', [RegisterController::class, 'showRegister'])->name('register');
     Route::post('/register',[RegisterController::class, 'register']);
 
@@ -26,13 +42,21 @@ Route::middleware('web')->group(function () {
     Route::get('/verify', function(){return view('auth.verify');})->name('verification.notice');
     Route::post('verify/send', [VerificationController::class, 'sendOtp'])->name('verification.send');
     Route::post('verify/check', [VerificationController::class, 'verifyOtp'])->name('verification.check');
+=======
+    Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
+    Route::post('/register',[AuthController::class, 'register']);
+>>>>>>> 44d2470e921153fee253e0c93f4c5d1009eeb50f
 });
+
+   Route::get('/chat', function () {
+    return view('chat');
+}) ->name('chat');
 
 Route::get('/password/reset', fn() => view('auth.passwords.email'))->name('password.request');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
 // ── Admin routes ───────────────────────────────────────────
-Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:system_admin'])->group(function () {
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/',            [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::get('/analytics',   [AdminDashboardController::class, 'analytics'])->name('analytics');
     Route::get('/discussions', [AdminDashboardController::class, 'discussions'])->name('discussions');
@@ -41,6 +65,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:system_admin']
     Route::get('/settings',    [AdminDashboardController::class, 'settings'])->name('settings');
 
     // Member actions
+    Route::get('/members', [AdminUserController::class, 'index'])
+        ->name('Users.index');
+
     Route::post('/members/{user}/approve', [AdminUserController::class, 'approve'])
         ->name('Users.approve');
 
@@ -58,6 +85,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:system_admin']
 
     Route::post('/members/{user}/logout', [AdminUserController::class, 'logout'])
         ->name('Users.logout');
+<<<<<<< HEAD
 
     //GROUP ACTIONS
 
@@ -65,6 +93,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:system_admin']
     Route::post('/groups/{group}/approve',    [AdminGroupController::class, 'approve'])->name('groups.approve');
     Route::post('/groups/{group}/reject',    [AdminGroupController::class, 'reject'])->name('groups.reject');
 
+=======
+>>>>>>> 44d2470e921153fee253e0c93f4c5d1009eeb50f
 });
 
 // ── Lecturer routes ────────────────────────────────────────
@@ -79,24 +109,46 @@ Route::prefix('lecturer')->name('lecturer.')->middleware(['auth','verified','rol
     Route::get('/categories', [LecturerDashboardController::class, 'categories'])
     ->name('categories');
 
-Route::get('/quizzes', [LecturerDashboardController::class, 'quizzes'])
-    ->name('quizzes');
+        Route::get('/quizzes', [LecturerDashboardController::class, 'quizzes'])
+            ->name('quizzes');
 
-Route::get('/performance', [LecturerDashboardController::class, 'performance'])
-    ->name('performance');
+        Route::get('/quizzes/create', [LecturerDashboardController::class, 'createQuiz'])
+            ->name('quizzes.create');
 
-Route::get('/messages', [LecturerDashboardController::class, 'messages'])
-    ->name('messages');
+        Route::get('/quizzes/{quiz}/upload', [QuizController::class, 'showUploadForm'])
+    ->name('quizzes.upload.form');
 
-Route::get('/notifications', [LecturerDashboardController::class, 'notifications'])
-    ->name('notifications');
+      Route::post('/quizzes/{quiz}/upload', [QuizController::class,'uploadQuiz'])
+    ->name('quizzes.upload');
+
+        Route::get('/performance', [LecturerDashboardController::class, 'performance'])
+            ->name('performance');
+
+        Route::get('/messages', [LecturerDashboardController::class, 'messages'])
+            ->name('messages');
+
+        Route::get('/notifications', [LecturerDashboardController::class, 'notifications'])
+            ->name('notifications');
 
 Route::get('/settings', [LecturerDashboardController::class, 'settings'])
     ->name('settings');
-    
-    Route::get('/quizzes/create', [LecturerDashboardController::class, 'createQuiz'])
-    ->name('quizzes.create');
+    Route::get('/quizzes', [QuizController::class,'index'])
+        ->name('quizzes');
+    Route::get('/quizzes/create', [QuizController::class,'create'])
+        ->name('quizzes.create');
+
+Route::post('/quizzes', [QuizController::class,'store'])
+        ->name('quizzes.store');
+        Route::get('/quizzes/{quiz}', [QuizController::class,'show'])
+        ->name('quizzes.show');
+        Route::get('/quizzes/{quiz}/edit', [QuizController::class,'edit'])
+        ->name('quizzes.edit');
+        Route::put('/quizzes/{quiz}', [QuizController::class,'update'])
+        ->name('quizzes.update');
+   Route::delete('/quizzes/{quiz}', [QuizController::class,'destroy'])
+        ->name('quizzes.destroy');
 });
+
 
 // ── Student routes ─────────────────────────────────────────
 Route::prefix('student')->name('student.')->middleware(['auth','verified','role:student'])->group(function () {
@@ -106,8 +158,9 @@ Route::prefix('student')->name('student.')->middleware(['auth','verified','role:
     Route::get('/notifications',    [StudentDashboardController::class, 'notifications'])->name('notifications');
     Route::get('/courses/browse',   [StudentDashboardController::class, 'browseCourses'])->name('courses.browse');
     Route::get('/courses/{course}', [StudentDashboardController::class, 'course'])->name('course');
-    Route::resource('/discussions', StudentDiscussionController::class)->names('discussions');
+    Route::resource('/discussions', DiscussionController::class)->names('discussions');
     Route::get('/categories', [StudentDashboardController::class, 'categories'])->name('categories');
+<<<<<<< HEAD
     Route::get('/quizzes',          [StudentDashboardController::class, 'quizzes'])->name('quizzes');
     Route::get('/messages',         [StudentDashboardController::class, 'messages'])->name('messages');
     Route::get('/settings',          [StudentDashboardController::class, 'settings'])->name('settings');
@@ -120,16 +173,52 @@ Route::prefix('student')->name('student.')->middleware(['auth','verified','role:
     Route::post('/groups/{group}/join', [StudentDashboardController::class, 'join'])->name('groups.join');
     Route::post('/groups/{group}/message', [StudentDashboardController::class, 'message'])->name('groups.message');
   
+=======
+    Route::get('/quizzes',          [StudentDashboardController::class, 'quizzes'])->name('quizzes');  
+    Route::get('/reports', [StudentDashboardController::class, 'reports'])
+    ->name('reports');
+>>>>>>> 44d2470e921153fee253e0c93f4c5d1009eeb50f
 
 });
 
-// ── Redirect root to correct dashboard by role ─────────────
+//Group routes
+
+
+Route::middleware('auth')->group(function () {
+    Route::resource('/groups', GroupController::class);
+
+    //Join group route
+    Route::post('/groups/{group}/join', [GroupController::class, 'join']);
+    
+    // Discussion routes
+    Route::get('/groups/{group}/discussions', [DiscussionController::class, 'index']);
+    Route::get('/groups/{group}/discussions/create', [DiscussionController::class, 'create']);
+    Route::post('/groups/{group}/discussions', [DiscussionController::class, 'store']);
+    Route::get('/groups/{group}/discussions/{discussion}', [DiscussionController::class, 'show']);
+    
+    // Reply route
+    Route::post('/groups/{group}/discussions/{discussion}/replies', [DiscussionController::class, 'storeReply']);
+});
+
+    //PDF Export Route
+    Route::get('/groups/{group}/discussions/{discussion}/pdf', [DiscussionController::class, 'exportPdf']);
+
+    Route::get('/groups/{group}/stats', [GroupController::class, 'stats']);
+
+
+/*
+|--------------------------------------------------------------------------
+| Root Redirect
+|--------------------------------------------------------------------------
+*/
+
 Route::get('/', function () {
 
     if (!auth()->check()) {
         return redirect()->route('login');
     }
 
+<<<<<<< HEAD
     $user = auth()->user();
 
     if(is_null($user->email_verified_at) || !$user->is_enabled){
@@ -142,6 +231,12 @@ Route::get('/', function () {
         'lecturer' => redirect()->route('lecturer.dashboard'),
         default    => redirect()->route('student.dashboard'),
 
+=======
+    return match (auth()->user()->role) {
+        'system_admin' => redirect()->route('admin.dashboard'),
+        'lecturer'     => redirect()->route('lecturer.dashboard'),
+        default        => redirect()->route('student.dashboard'),
+>>>>>>> 44d2470e921153fee253e0c93f4c5d1009eeb50f
     };
 })->middleware('auth');
 

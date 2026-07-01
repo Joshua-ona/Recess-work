@@ -3,35 +3,154 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Quiz;
 use App\Models\Question;
 
 class QuizController extends Controller
 {
-    public function import(Request $request)
+    /**
+     * Display all quizzes.
+     */
+    public function index()
+    {
+        $quizzes = Quiz::where('created_by', auth()->id())->get();
+
+        return view('lecturer.quizzes.index', compact('quizzes'));
+    }
+
+    /**
+     * Show the Create Quiz page.
+     */
+    public function create()
+    {
+        return view('lecturer.quizzes.create');
+    }
+
+    /**
+     * Save a new quiz.
+     */
+    public function store(Request $request)
     {
         $request->validate([
-            'file' => 'required|mimes:csv,txt',
+            'title' => 'required|max:255',
+            'group_id' => 'required',
+            'target_category' => 'required',
+            'start_time' => 'required|date',
+            'duration_mins' => 'required|integer|min:1',
         ]);
 
-        $file = fopen($request->file('file')->getRealPath(), 'r');
+        $quiz = Quiz::create([
+            'created_by' => auth()->id(),
+            'group_id' => $request->group_id,
+            'title' => $request->title,
+            'start_time' => $request->start_time,
+            'duration_mins' => $request->duration_mins,
+            'target_category' => $request->target_category,
+            'is_published' => false,
+        ]);
 
-        fgetcsv($file); // Skip header row
+        return redirect()->route('lecturer.quizzes.edit', $quiz->quiz_id);
+    }
 
-        while (($row = fgetcsv($file)) !== false) {
+    /**
+     * Show one quiz.
+     */
+    public function show(Quiz $quiz)
+    {
+        return view('lecturer.quizzes.show', compact('quiz'));
+    }
+    public function quizzes()
+{
+    $quizzes = \App\Models\Quiz::all();
 
-            Question::create([
-                'quiz_id' => $row[0],
-                'question' => $row[1],
-                'option_a' => $row[2],
-                'option_b' => $row[3],
-                'option_c' => $row[4],
-                'option_d' => $row[5],
-                'correct_answer' => $row[6],
-            ]);
+    return view('lecturer.quizzes', compact('quizzes'));
+}
+
+    /**
+     * Show Edit Quiz page.
+     */
+    public function edit(Quiz $quiz)
+    {
+        $quiz->load('questions');
+
+        return view('lecturer.quizzes.edit', compact('quiz'));
+    }
+
+    /**
+     * Update quiz.
+     */
+    public function update(Request $request, Quiz $quiz)
+    {
+        $quiz->update($request->only([
+            'title',
+            'group_id',
+            'target_category',
+            'start_time',
+            'duration_mins',
+            'is_published'
+        ]));
+
+        return back()->with('success', 'Quiz updated successfully.');
+    }
+
+    /**
+     * Delete quiz.
+     */
+    public function destroy(Quiz $quiz)
+    {
+        $quiz->delete();
+
+        return redirect()->route('lecturer.quizzes')
+            ->with('success', 'Quiz deleted.');
+    }
+
+    /**
+     * Show CSV upload page.
+     */
+   public function showUploadForm(Quiz $quiz)
+{
+    return view('lecturer.upload-quiz', compact('quiz'));
+}
+
+    /**
+     * Upload questions from CSV.
+     */
+    public function uploadQuiz(Request $request, Quiz $quiz)
+{
+        $request->validate([
+            'csv_file' => 'required|mimes:csv,txt'
+        ]);
+
+        $file = $request->file('csv_file');
+
+        $handle = fopen($file->getRealPath(), 'r');
+
+        fgetcsv($handle);
+
+        while (($row = fgetcsv($handle, 1000, ',')) !== false) {
+
+           Question::create([
+
+    'quiz_id' => $quiz->quiz_id,
+
+    'question' => $row[0],
+
+    'option_a' => $row[1],
+
+    'option_b' => $row[2],
+
+    'option_c' => $row[3],
+
+    'option_d' => $row[4],
+
+    'correct_answer' => $row[5],
+
+]);
+            
         }
 
-        fclose($file);
+        fclose($handle);
 
-        return back()->with('success', 'Quiz uploaded successfully.');
+        return back()->with('success', 'Questions uploaded successfully.');
     }
 }

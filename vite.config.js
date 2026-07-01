@@ -6,9 +6,16 @@ export default defineConfig({
     plugins: [
         laravel({
             input: [
+<<<<<<< HEAD
                 'resources/css/tailwind.css',
                 'resources/js/app.js',
             ],
+=======
+    'resources/css/app.css',
+    'resources/sass/app.scss',
+    'resources/js/app.js',
+],
+>>>>>>> 44d2470e921153fee253e0c93f4c5d1009eeb50f
             refresh: true,
         }),
         vue({

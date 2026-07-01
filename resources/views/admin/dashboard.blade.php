@@ -1,10 +1,22 @@
 @extends('layouts.admin')
 @section('title', 'Admin dashboard')
 @section('content')
+<<<<<<< HEAD
 <div class="flex items-center justify-between border-b pb-3 mb-6">
     <div class="flex items-center gap-3">
         <span class="font-medium text-lg">Admin dashboard</span>
         <span class="text-sm text-gray-500">{{ auth()->user()->full_name }}</span>
+=======
+
+    <div class="flex items-center justify-between border-b pb-3 mb-6">
+        <div class="flex items-center gap-3">
+            <span class="font-medium text-lg">Admin dashboard</span>
+            <span class="text-sm text-gray-500">{{ auth()->user()->full_name }}</span>
+        </div>
+        <a href="{{ route('admin.Users.index') }}" class="text-sm border rounded px-3 py-1.5 hover:bg-gray-50">
+            Manage all users
+        </a>
+>>>>>>> 44d2470e921153fee253e0c93f4c5d1009eeb50f
     </div>
 
     {{--
@@ -131,6 +143,7 @@
                 all</a>
                 --}}
             </div>
+<<<<<<< HEAD
             <div class="space-y-3">
                 @forelse($groups as $g)
                 <div class="border-b py-3 flex justify-between items-center">
@@ -149,6 +162,55 @@
                             <button class="bg-red-600text-white px-3 py-1 roundedtext-sm">Reject</button>
                         </form>
                     </div>
+=======
+
+            <div class="bg-white border rounded-lg p-5">
+                <p class="font-medium mb-3">Inactivity warnings</p>
+                <div class="space-y-1">
+                    @forelse ($warnedMembers as $user)
+                        <div class="py-2 border-t first:border-t-0">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-sm">{{ $user->full_name }}</span>
+                                @if ($user->status === 'blacklisted')
+                                    <span class="text-xs bg-red-50 text-red-700 px-2 py-0.5 rounded">Blacklisted</span>
+                                @else
+                                    <span class="text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded">Warning {{ $user->warning_count }} of 2</span>
+                                @endif
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                @if ($user->status === 'blacklisted')
+                                    <form method="POST" action="{{ route('admin.Users.unblacklist', $user) }}" class="flex justify-end">
+                                        @csrf
+                                        <button class="text-xs border rounded px-2 py-1">Reinstate</button>
+                                    </form>
+                                @else
+                                    <details>
+                                        <summary class="text-xs border rounded px-2 py-1 inline-block cursor-pointer select-none">Warn</summary>
+                                        <form method="POST" action="{{ route('admin.Users.warn', $user) }}" class="mt-2 space-y-1">
+                                            @csrf
+                                            <textarea name="message" rows="2" required placeholder="Describe the rule violation…"
+                                                      class="w-full border rounded px-2 py-1 text-xs"></textarea>
+                                            <button class="text-xs border rounded px-2 py-1 w-full">Send warning</button>
+                                        </form>
+                                    </details>
+                                    <div class="flex gap-1 justify-end">
+                                        <form method="POST" action="{{ route('admin.Users.logout', $user) }}">
+                                            @csrf
+                                            <button class="text-xs border rounded px-2 py-1">Log out</button>
+                                        </form>
+                                        <form method="POST" action="{{ route('admin.Users.blacklist', $user) }}"
+                                              onsubmit="return confirm('Blacklist {{ $user->full_name }} immediately?');">
+                                            @csrf
+                                            <button class="text-xs border rounded px-2 py-1 text-red-600">Blacklist</button>
+                                        </form>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    @empty
+                        <p class="text-sm text-gray-500 py-2">No members currently flagged for inactivity.</p>
+                    @endforelse
+>>>>>>> 44d2470e921153fee253e0c93f4c5d1009eeb50f
                 </div>
                 @empty
                 <p class="text-gray-500">No pending groups.</p>

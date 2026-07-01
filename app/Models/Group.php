@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+<<<<<<< HEAD
 use Illuminate\Database\Eloquent\Relations\{BelongsTo,HasMany};
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
@@ -25,3 +26,22 @@ class Group extends Model
         return $this->hasMany(GroupMessage::class)->oldest();
     }
 }
+=======
+use App\Models\User;
+
+class Group extends Model
+{
+    protected $fillable = [
+        'name',
+        'description'
+    ];
+    public function discussions()
+{
+    return $this->hasMany(Discussion::class);
+}
+public function members()
+{
+    return $this->belongsToMany(User::class, 'group_user')->withPivot('agreed_terms')->withTimestamps();
+}
+}
+>>>>>>> 44d2470e921153fee253e0c93f4c5d1009eeb50f

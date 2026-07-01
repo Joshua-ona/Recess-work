@@ -16,16 +16,21 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('first_name');
-            $table->string('last_name');
+             $table->string('last_name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->enum('role',['student','lecturer','group_admin','system_admin'])->default('student');
+            $table->enum('role', ['admin', 'lecturer', 'student'])->default('student');
+            $table->boolean('is_enabled')->default(false);
+            $table->string('status')->default('active');
             $table->rememberToken();
+<<<<<<< HEAD
             $table->boolean('is_enabled')->default(false);
             $table->unsignedTinyInteger('warning_count')->default(0);
             $table->timestamp('last_warning_at')->nullable();
             $table->timestamp('blacklisted_until')->nullable();
+=======
+>>>>>>> 44d2470e921153fee253e0c93f4c5d1009eeb50f
             $table->timestamps();
         });
 

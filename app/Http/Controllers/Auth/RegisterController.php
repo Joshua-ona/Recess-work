@@ -7,9 +7,6 @@ use App\Models\User;
 //use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use App\Services\UserRegistrationService;
-use Illuminate\Http\Request;
-use Exception;
 
 class RegisterController extends Controller
 {
@@ -24,34 +21,42 @@ class RegisterController extends Controller
     |
     */
 
-    // use RegistersUsers;
-    protected $registrationService;
+    use RegistersUsers;
 
+    /**
+     * Where to redirect users after registration.
+     *
+     * @var string
+     */
+    protected $redirectTo = '/home';
 
-    public function __construct(UserRegistrationService $service)
+    /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
     {
+<<<<<<< HEAD
         $this->registrationService = $service;
+=======
+>>>>>>> 44d2470e921153fee253e0c93f4c5d1009eeb50f
         $this->middleware('guest');
     }
-   
 
     /**
      * Get a validator for an incoming registration request.
      *
      * @return \Illuminate\Contracts\Validation\Validator
      */
-
-
     protected function validator(array $data)
     {
         return Validator::make($data, [
-            'first_name' => ['required', 'string', 'max:255'],
-            'last_name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-
-            'terms' => ['required','accepted'],
         ]);
+<<<<<<< HEAD
 
         try{
             $user = $this->registrationService->execute($request->all());
@@ -63,11 +68,18 @@ class RegisterController extends Controller
                         $e->getMessage()
             ]);
         }
+=======
+>>>>>>> 44d2470e921153fee253e0c93f4c5d1009eeb50f
     }
 
-
+    /**
+     * Create a new user instance after a valid registration.
+     *
+     * @return User
+     */
     protected function create(array $data)
     {
+<<<<<<< HEAD
       return $this->registrationService->execute($data);
     }
 
@@ -100,5 +112,12 @@ class RegisterController extends Controller
         app(VerificationController::class)->sendOtpForUser($user);
 
         return redirect()->route('verification.notice');
+=======
+        return User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password']),
+        ]);
+>>>>>>> 44d2470e921153fee253e0c93f4c5d1009eeb50f
     }
 }

@@ -7,6 +7,7 @@
         "dev": "vite"
     },
     "devDependencies": {
+        "@laravel/echo-vue": "^2.3.7",
         "@popperjs/core": "^2.11.6",
         "@tailwindcss/postcss": "^4.3.1",
         "@tailwindcss/vite": "^4.0.0",
@@ -15,8 +16,13 @@
         "axios": "^1.11.0",
         "bootstrap": "^5.2.3",
         "concurrently": "^9.0.1",
+        "laravel-echo": "^2.3.7",
         "laravel-vite-plugin": "^2.0.0",
+<<<<<<< HEAD
         "postcss": "^8.5.16",
+=======
+        "pusher-js": "^8.5.0",
+>>>>>>> 44d2470e921153fee253e0c93f4c5d1009eeb50f
         "sass": "^1.56.1",
         "tailwindcss": "^4.3.1",
         "vite": "^7.0.7",
