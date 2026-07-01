@@ -33,14 +33,25 @@ class AuthController extends Controller
 
     $user = Auth::user();
 
-    // Blacklisting still actually stops someone from logging back in;
-    // there's just no pending-approval gate before that point anymore.
+    // Blacklisting stops a login outright.
     if ($user->status === 'blacklisted') {
         Auth::logout();
         $request->session()->invalidate();
 
         return back()->withErrors([
             'email' => 'This account has been blacklisted.',
+        ])->onlyInput('email');
+    }
+
+    // Lecturers who self-registered (picked "Lecturer" at sign-up, rather
+    // than being invited by an admin) need explicit admin approval before
+    // they can sign in.
+    if ($user->status === 'pending') {
+        Auth::logout();
+        $request->session()->invalidate();
+
+        return back()->withErrors([
+            'email' => 'Your lecturer account is awaiting admin approval.',
         ])->onlyInput('email');
     }
 
@@ -73,7 +84,16 @@ class AuthController extends Controller
         'email' => $data['email'],
         'role' => $data['role'],
         'password' => $data['password'],
+        // Self-registered lecturers need an admin's go-ahead before they
+        // can use the account; everyone else is active immediately.
+        'status' => $data['role'] === 'lecturer' ? 'pending' : 'active',
     ]);
+
+    if ($user->status === 'pending') {
+        return redirect()
+            ->route('login')
+            ->with('status', 'Account created. An admin needs to approve your lecturer account before you can sign in.');
+    }
 
     Auth::login($user);
 

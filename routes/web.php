@@ -1,27 +1,18 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
 use App\Http\Controllers\Auth\AuthController;
-use App\Http\Controllers\Auth\RegisterController;
-
+use App\Http\Controllers\LecturerActivationController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminUserController;
-
+use App\Http\Controllers\Admin\AdminLecturerController;
 use App\Http\Controllers\Lecturer\LecturerDashboardController;
 use App\Http\Controllers\Lecturer\LecturerDiscussionController;
 use App\Http\Controllers\Lecturer\LecturerCourseController;
-use App\Http\Controllers\Lecturer\LecturerAnnouncementController;
-use App\Http\Controllers\QuizController;
 use App\Http\Controllers\Student\StudentDashboardController;
 use App\Http\Controllers\Student\StudentDiscussionController;
 
-/*
-|--------------------------------------------------------------------------
-| Public Routes
-|--------------------------------------------------------------------------
-*/
-
+// ── Public routes ──────────────────────────────────────────
 Route::middleware('guest')->group(function () {
     Route::get('/login',    [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login',   [AuthController::class, 'login']);
@@ -29,12 +20,15 @@ Route::middleware('guest')->group(function () {
     Route::post('/register',[AuthController::class, 'register']);
 });
 
-   Route::get('/chat', function () {
-    return view('chat');
-}) ->name('chat');
-
 Route::get('/password/reset', fn() => view('auth.passwords.email'))->name('password.request');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
+
+// Lecturer account activation (reached via the emailed invite link — the
+// token itself is the access control, so no auth/guest middleware here).
+Route::get('/lecturer/activate/{token}', [LecturerActivationController::class, 'show'])
+    ->name('lecturer.activate.show');
+Route::post('/lecturer/activate/{token}', [LecturerActivationController::class, 'activate'])
+    ->name('lecturer.activate.store');
 
 // ── Admin routes ───────────────────────────────────────────
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
@@ -66,6 +60,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
 
     Route::post('/members/{user}/logout', [AdminUserController::class, 'logout'])
         ->name('Users.logout');
+
+    // Add a lecturer (admin creates the account; lecturer activates by email)
+    Route::get('/lecturers/create', [AdminLecturerController::class, 'create'])
+        ->name('lecturers.create');
+    Route::post('/lecturers', [AdminLecturerController::class, 'store'])
+        ->name('lecturers.store');
 });
 
 // ── Lecturer routes ────────────────────────────────────────
@@ -80,46 +80,24 @@ Route::prefix('lecturer')->name('lecturer.')->middleware(['auth', 'role:lecturer
     Route::get('/categories', [LecturerDashboardController::class, 'categories'])
     ->name('categories');
 
-        Route::get('/quizzes', [LecturerDashboardController::class, 'quizzes'])
-            ->name('quizzes');
+Route::get('/quizzes', [LecturerDashboardController::class, 'quizzes'])
+    ->name('quizzes');
 
-        Route::get('/quizzes/create', [LecturerDashboardController::class, 'createQuiz'])
-            ->name('quizzes.create');
+Route::get('/performance', [LecturerDashboardController::class, 'performance'])
+    ->name('performance');
 
-        Route::get('/quizzes/upload', [QuizController::class, 'showUploadForm'])
-            ->name('quizzes.upload');
+Route::get('/messages', [LecturerDashboardController::class, 'messages'])
+    ->name('messages');
 
-       Route::post('/quizzes/upload', [QuizController::class,'uploadQuiz'])
-       ->name('quizzes.upload.submit');
-
-        Route::get('/performance', [LecturerDashboardController::class, 'performance'])
-            ->name('performance');
-
-        Route::get('/messages', [LecturerDashboardController::class, 'messages'])
-            ->name('messages');
-
-        Route::get('/notifications', [LecturerDashboardController::class, 'notifications'])
-            ->name('notifications');
+Route::get('/notifications', [LecturerDashboardController::class, 'notifications'])
+    ->name('notifications');
 
 Route::get('/settings', [LecturerDashboardController::class, 'settings'])
     ->name('settings');
-    Route::get('/quizzes', [QuizController::class,'index'])
-        ->name('quizzes');
-    Route::get('/quizzes/create', [QuizController::class,'create'])
-        ->name('quizzes.create');
-
-Route::post('/quizzes', [QuizController::class,'store'])
-        ->name('quizzes.store');
-        Route::get('/quizzes/{quiz}', [QuizController::class,'show'])
-        ->name('quizzes.show');
-        Route::get('/quizzes/{quiz}/edit', [QuizController::class,'edit'])
-        ->name('quizzes.edit');
-        Route::put('/quizzes/{quiz}', [QuizController::class,'update'])
-        ->name('quizzes.update');
-   Route::delete('/quizzes/{quiz}', [QuizController::class,'destroy'])
-        ->name('quizzes.destroy');
+    
+    Route::get('/quizzes/create', [LecturerDashboardController::class, 'createQuiz'])
+    ->name('quizzes.create');
 });
-
 
 // ── Student routes ─────────────────────────────────────────
 Route::prefix('student')->name('student.')->middleware(['auth', 'role:student'])->group(function () {
@@ -139,39 +117,12 @@ Route::prefix('student')->name('student.')->middleware(['auth', 'role:student'])
 
 });
 
-//Group routes
-use App\Http\Controllers\GroupController;
-use App\Http\Controllers\DiscussionController;
-
-Route::middleware('auth')->group(function () {
-    Route::resource('/groups', GroupController::class);
-    
-    // Discussion routes
-    Route::get('/groups/{group}/discussions', [DiscussionController::class, 'index']);
-    Route::get('/groups/{group}/discussions/create', [DiscussionController::class, 'create']);
-    Route::post('/groups/{group}/discussions', [DiscussionController::class, 'store']);
-    Route::get('/groups/{group}/discussions/{discussion}', [DiscussionController::class, 'show']);
-    
-    // Reply route
-    Route::post('/groups/{group}/discussions/{discussion}/replies', [DiscussionController::class, 'storeReply']);
-});
-
-
-/*
-|--------------------------------------------------------------------------
-| Root Redirect
-|--------------------------------------------------------------------------
-*/
-
+// ── Redirect root to correct dashboard by role ─────────────
 Route::get('/', function () {
-
-    if (!auth()->check()) {
-        return redirect()->route('login');
-    }
-
-    return match (auth()->user()->role) {
-        'system_admin' => redirect()->route('admin.dashboard'),
-        'lecturer'     => redirect()->route('lecturer.dashboard'),
-        default        => redirect()->route('student.dashboard'),
+    if (!auth()->check()) return redirect()->route('login');
+    return match(auth()->user()->role) {
+        'admin'    => redirect()->route('admin.dashboard'),
+        'lecturer' => redirect()->route('lecturer.dashboard'),
+        default    => redirect()->route('student.dashboard'),
     };
 })->middleware('auth');
