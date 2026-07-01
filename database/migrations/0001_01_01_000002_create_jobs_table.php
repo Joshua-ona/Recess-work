@@ -12,7 +12,16 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-        $table->string('role')->default('student')->after('email');
+            if (! Schema::hasColumn('users', 'invite_token')) {
+                // Stores a hash of the activation token, not the raw token
+                // itself — the raw token only ever exists in the emailed
+                // link, the same way Laravel handles password-reset tokens.
+                $table->string('invite_token')->nullable()->unique();
+            }
+
+            if (! Schema::hasColumn('users', 'invite_token_expires_at')) {
+                $table->timestamp('invite_token_expires_at')->nullable();
+            }
     });
   
         Schema::create('jobs', function (Blueprint $table) {

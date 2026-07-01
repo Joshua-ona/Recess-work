@@ -42,18 +42,26 @@ class DiscussionController extends Controller
         $discussion->load('replies.user');
         return view('groups.discussions-show', compact('group', 'discussion'));
     }
+
     public function storeReply(Request $request, Group $group, Discussion $discussion)
-{
-    $request->validate([
-        'body' => 'required'
-    ]);
+    {
+        $request->validate([
+            'body' => 'required'
+        ]);
 
-    $discussion->replies()->create([
-        'user_id' => auth()->id(),
-        'body'    => $request->body
-    ]);
+        $discussion->replies()->create([
+            'user_id' => auth()->id(),
+            'body'    => $request->body
+        ]);
 
-    return redirect("/groups/{$group->id}/discussions/{$discussion->id}")
-        ->with('success', 'Reply posted!');
-}
+        return redirect("/groups/{$group->id}/discussions/{$discussion->id}")
+            ->with('success', 'Reply posted!');
+    }
+
+    public function exportPdf(Group $group, Discussion $discussion)
+    {
+        $discussion->load('replies.user');
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('groups.discussion-pdf', compact('group', 'discussion'));
+        return $pdf->download('discussion-' . $discussion->id . '.pdf');
+    }
 }

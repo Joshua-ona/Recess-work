@@ -5,6 +5,17 @@
 
 @section('body')
 
+<div style="display:flex; min-height:100vh, flex-direction:column;">
+
+
+       {{-- Sidebar --}}
+    @include('layouts.sidebar', [
+        'role'            => 'student',
+        'user'            => auth()->user(),
+        'enrolledCourses' => $enrolledCourses ?? collect(),
+        'unreadCount'     => $unreadCount ?? 0,
+        'notifCount'      => $notifCount  ?? 0,
+    ])
 <h1>Create New Group</h1>
 
 
@@ -42,5 +53,5 @@ Create
 
 </form>
 
-
+</div>
 @endsectio

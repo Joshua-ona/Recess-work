@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\Group;
 
 class User extends Authenticatable
 {
@@ -56,6 +57,10 @@ class User extends Authenticatable
     public function isLecturer(): bool {return $this->role == 'lecturer';}
     public function isGroupAdmin(): bool {return $this->role == 'group_admin';}
     public function isSystemAdmin(): bool {return $this->role == 'system_admin';}
+    public function groups()
+{
+    return $this->belongsToMany(Group::class, 'group_user')->withPivot('agreed_terms')->withTimestamps();
+}
 
          /* Warning messages issued to this user, newest first.
      */

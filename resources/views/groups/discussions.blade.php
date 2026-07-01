@@ -3,34 +3,17 @@
 @section('title', 'Group Discussions')
 
 @section('body')
-<div class="dash-wrap">
+<div style="display:flex; min-height:100vh, flex-direction:column;">
 
-    {{-- SIDEBAR --}}
-    <aside class="sidebar">
-        <div class="sidebar-logo">
-            <div class="sidebar-logo-row">
-                <div class="sidebar-logo-icon"><i class="ti ti-messages"></i></div>
-                <div>
-                    <div class="sidebar-logo-name">EduDiscuss</div>
-                    <div class="sidebar-logo-sub">E-Discussion Platform</div>
-                </div>
-            </div>
-        </div>
-        <div class="sidebar-section">
-            <div class="sidebar-section-label">Main</div>
-            <a href="/dashboard" class="sidebar-item"><i class="ti ti-layout-dashboard"></i> Dashboard</a>
-            <a href="/groups" class="sidebar-item active"><i class="ti ti-users-group"></i> Groups</a>
-            <a href="/discussions" class="sidebar-item"><i class="ti ti-message-circle"></i> Discussions</a>
-        </div>
-        <div class="sidebar-spacer"></div>
-        <div class="sidebar-user">
-            <div class="sidebar-avatar">{{ strtoupper(substr(auth()->user()->name, 0, 2)) }}</div>
-            <div>
-                <div class="sidebar-user-name">{{ auth()->user()->name }}</div>
-                <div class="sidebar-user-meta">{{ auth()->user()->role }}</div>
-            </div>
-        </div>
-    </aside>
+
+       {{-- Sidebar --}}
+    @include('layouts.sidebar', [
+        'role'            => 'student',
+        'user'            => auth()->user(),
+        'enrolledCourses' => $enrolledCourses ?? collect(),
+        'unreadCount'     => $unreadCount ?? 0,
+        'notifCount'      => $notifCount  ?? 0,
+    ])
 
     {{-- MAIN --}}
     <div class="dash-main">
@@ -40,10 +23,13 @@
                 <div class="dash-header-sub">Discussions in this group</div>
             </div>
             <div class="dash-header-actions">
-                <a href="/groups/{{ $group->id }}/discussions/create" class="btn btn-primary btn-sm">
-                    <i class="ti ti-plus"></i> New Discussion
-                </a>
-            </div>
+    <a href="/groups/{{ $group->id }}/stats" class="btn btn-outline btn-sm">
+        <i class="ti ti-chart-bar"></i> Statistics
+    </a>
+    <a href="/groups/{{ $group->id }}/discussions/create" class="btn btn-primary btn-sm">
+        <i class="ti ti-plus"></i> New Discussion
+    </a>
+</div>
         </div>
 
         <div class="dash-body">

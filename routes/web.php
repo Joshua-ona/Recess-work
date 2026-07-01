@@ -13,6 +13,14 @@ use App\Http\Controllers\Student\StudentDashboardController;
 use App\Http\Controllers\Student\StudentDiscussionController;
 
 // ── Public routes ──────────────────────────────────────────
+use App\Http\Controllers\GroupController;
+use App\Http\Controllers\DiscussionController;
+/*
+|--------------------------------------------------------------------------
+| Public Routes
+|--------------------------------------------------------------------------
+*/
+
 Route::middleware('guest')->group(function () {
     Route::get('/login',    [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login',   [AuthController::class, 'login']);
@@ -86,11 +94,20 @@ Route::get('/quizzes', [LecturerDashboardController::class, 'quizzes'])
 Route::get('/performance', [LecturerDashboardController::class, 'performance'])
     ->name('performance');
 
-Route::get('/messages', [LecturerDashboardController::class, 'messages'])
-    ->name('messages');
+        Route::get('/quizzes/{quiz}/upload', [QuizController::class, 'showUploadForm'])
+    ->name('quizzes.upload.form');
 
-Route::get('/notifications', [LecturerDashboardController::class, 'notifications'])
-    ->name('notifications');
+      Route::post('/quizzes/{quiz}/upload', [QuizController::class,'uploadQuiz'])
+    ->name('quizzes.upload');
+
+        Route::get('/performance', [LecturerDashboardController::class, 'performance'])
+            ->name('performance');
+
+        Route::get('/messages', [LecturerDashboardController::class, 'messages'])
+            ->name('messages');
+
+        Route::get('/notifications', [LecturerDashboardController::class, 'notifications'])
+            ->name('notifications');
 
 Route::get('/settings', [LecturerDashboardController::class, 'settings'])
     ->name('settings');
@@ -107,17 +124,45 @@ Route::prefix('student')->name('student.')->middleware(['auth', 'role:student'])
     Route::get('/notifications',    [StudentDashboardController::class, 'notifications'])->name('notifications');
     Route::get('/courses/browse',   [StudentDashboardController::class, 'browseCourses'])->name('courses.browse');
     Route::get('/courses/{course}', [StudentDashboardController::class, 'course'])->name('course');
-    Route::resource('/discussions', StudentDiscussionController::class)->names('discussions');
+    Route::resource('/discussions', DiscussionController::class)->names('discussions');
     Route::get('/categories', [StudentDashboardController::class, 'categories'])->name('categories');
-    Route::get('/quizzes',          [StudentDashboardController::class, 'quizzes'])->name('quizzes');
-    Route::get('/messages',         [StudentDashboardController::class, 'messages'])->name('messages');
-    Route::get('/settings',          [StudentDashboardController::class, 'settings'])->name('settings');
+    Route::get('/quizzes',          [StudentDashboardController::class, 'quizzes'])->name('quizzes');  
     Route::get('/reports', [StudentDashboardController::class, 'reports'])
     ->name('reports');
 
 });
 
-// ── Redirect root to correct dashboard by role ─────────────
+//Group routes
+
+
+Route::middleware('auth')->group(function () {
+    Route::resource('/groups', GroupController::class);
+
+    //Join group route
+    Route::post('/groups/{group}/join', [GroupController::class, 'join']);
+    
+    // Discussion routes
+    Route::get('/groups/{group}/discussions', [DiscussionController::class, 'index']);
+    Route::get('/groups/{group}/discussions/create', [DiscussionController::class, 'create']);
+    Route::post('/groups/{group}/discussions', [DiscussionController::class, 'store']);
+    Route::get('/groups/{group}/discussions/{discussion}', [DiscussionController::class, 'show']);
+    
+    // Reply route
+    Route::post('/groups/{group}/discussions/{discussion}/replies', [DiscussionController::class, 'storeReply']);
+});
+
+    //PDF Export Route
+    Route::get('/groups/{group}/discussions/{discussion}/pdf', [DiscussionController::class, 'exportPdf']);
+
+    Route::get('/groups/{group}/stats', [GroupController::class, 'stats']);
+
+
+/*
+|--------------------------------------------------------------------------
+| Root Redirect
+|--------------------------------------------------------------------------
+*/
+
 Route::get('/', function () {
     if (!auth()->check()) return redirect()->route('login');
     return match(auth()->user()->role) {

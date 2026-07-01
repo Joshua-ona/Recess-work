@@ -59,6 +59,12 @@ class QuizController extends Controller
     {
         return view('lecturer.quizzes.show', compact('quiz'));
     }
+    public function quizzes()
+{
+    $quizzes = \App\Models\Quiz::all();
+
+    return view('lecturer.quizzes', compact('quizzes'));
+}
 
     /**
      * Show Edit Quiz page.
@@ -101,10 +107,10 @@ class QuizController extends Controller
     /**
      * Show CSV upload page.
      */
-    public function showUploadForm()
-    {
-        return view('lecturer.upload-quiz');
-    }
+   public function showUploadForm(Quiz $quiz)
+{
+    return view('lecturer.upload-quiz', compact('quiz'));
+}
 
     /**
      * Upload questions from CSV.
