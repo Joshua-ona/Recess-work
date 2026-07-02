@@ -33,16 +33,6 @@ Route::middleware('guest')->group(function () {
 
 });
 
-Route::middleware('web')->group(function () {
-    Route::get('/verify', function(){return view('auth.verify');})->name('verification.notice');
-    Route::post('verify/send', [VerificationController::class, 'sendOtp'])->name('verification.send');
-    Route::post('verify/check', [VerificationController::class, 'verifyOtp'])->name('verification.check');
-
-    // Route::get('email/verify/{id}/{hash}', [VerificationController::class,'verify'])
-    //                                 ->middleware(['auth','signed'])
-    //                                 ->name('verification.verify');
-
-});
 
 Route::get('/chat', function () {
     return view('chat');})->name('chat');
@@ -51,7 +41,7 @@ Route::get('/password/reset', fn() => view('auth.passwords.email'))->name('passw
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
 // ── Admin routes ───────────────────────────────────────────
-Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
+Route::prefix('system_admin')->name('admin.')->middleware(['auth', 'role:system_admin'])->group(function () {
     Route::get('/',            [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::get('/analytics',   [AdminDashboardController::class, 'analytics'])->name('analytics');
     Route::get('/discussions', [AdminDashboardController::class, 'discussions'])->name('discussions');
@@ -161,13 +151,9 @@ Route::prefix('student')->name('student.')->middleware(['auth','role:student'])-
     Route::get('/groups/{group}',    [StudentDashboardController::class, 'show'])->name('groups.show');
 
 
-    Route::post('/groups', [StudentDashboardController::class, 'store'])->name('groups.store');
+    //Route::post('/groups', [StudentDashboardController::class, 'store'])->name('groups.store');
     Route::post('/groups/{group}/join', [StudentDashboardController::class, 'join'])->name('groups.join');
     Route::post('/groups/{group}/message', [StudentDashboardController::class, 'message'])->name('groups.message');
-
-    Route::get('/quizzes',          [StudentDashboardController::class, 'quizzes'])->name('quizzes');  
-    Route::get('/reports', [StudentDashboardController::class, 'reports'])->name('reports');
-
 
 });
 

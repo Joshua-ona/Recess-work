@@ -69,25 +69,19 @@ class AuthController extends Controller
         ])->onlyInput('email');
     }
 
-   if (!$user->is_enabled || is_null($user->email_verified_at)) {
 
-        Auth::logout();
+    return match ($user->role){
+        'system_admin' => redirect()->route('admin.dashboard'),
+        'lecturer' => redirect()->route('lecturer.dashboard'),
+        'student' => redirect()->route('student.dashboard'),
+        //default => redirect()->route('home'),
 
-        $request->session()->invalidate();
-
-        $request->session()->regenerateToken();
-
-        session(['temp_user_id' => $user->id]);
-
-        return redirect()
-            ->route('verification.notice')
-            ->with('error', 'Please verify your email first.');
-        }
+    };
+    
+    
         
 }
 
-
-    
 
     public function register(Request $request)
     {
@@ -101,17 +95,13 @@ class AuthController extends Controller
             'email',
             'max:255',
             'unique:users',
-            'regex:/^[a-zA-Z0-9._%+-]+@(students\.)?mak\.ac\.ug$/'
         ],
         'password' => 'required|string|min:8|confirmed',
         ]);
 
         $user = $this->registrationService->execute($data);
 
-
-        app(VerificationController::class)->sendOtpForUser($user);
-
-        return redirect()->route('verification.notice')->with('success','You have successfully registed.Please check your email to verify your account');
+        return redirect()->route('student.dashboard');
 
     }
   
