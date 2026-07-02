@@ -154,9 +154,9 @@
 
             <input
                 type="datetime-local"
-                name="starts_at"
+                name="start_time"
                 class="form-control"
-                value="{{ old('starts_at',$quiz->starts_at) }}">
+                value="{{ old('start_time',$quiz->start_time) }}">
 
         </div>
 

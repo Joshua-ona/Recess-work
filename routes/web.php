@@ -15,6 +15,7 @@ use App\Http\Controllers\Lecturer\LecturerAnnouncementController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\Student\StudentDashboardController;
 use App\Http\Controllers\Student\StudentDiscussionController;
+use App\Http\Controllers\StudentQuizController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\DiscussionController;
 /*
@@ -117,7 +118,9 @@ Route::post('/quizzes', [QuizController::class,'store'])
         ->name('quizzes.edit');
         Route::put('/quizzes/{quiz}', [QuizController::class,'update'])
         ->name('quizzes.update');
-   Route::delete('/quizzes/{quiz}', [QuizController::class,'destroy'])
+        Route::post('/quizzes/{quiz}/publish', [QuizController::class, 'publish'])
+        ->name('lecturer.quizzes.publish');
+        Route::delete('/quizzes/{quiz}', [QuizController::class,'destroy'])
         ->name('quizzes.destroy');
 });
 
@@ -132,10 +135,11 @@ Route::prefix('student')->name('student.')->middleware(['auth', 'role:student'])
     Route::get('/courses/{course}', [StudentDashboardController::class, 'course'])->name('course');
     Route::resource('/discussions', DiscussionController::class)->names('discussions');
     Route::get('/categories', [StudentDashboardController::class, 'categories'])->name('categories');
-    Route::get('/quizzes',          [StudentDashboardController::class, 'quizzes'])->name('quizzes');  
+     Route::get('/quizzes',          [StudentDashboardController::class, 'quizzes'])->name('quizzes');  
     Route::get('/reports', [StudentDashboardController::class, 'reports'])
     ->name('reports');
-
+   Route::get('/quizzes', [StudentQuizController::class, 'index'])
+    ->name('quizzes.index');
 });
 
 //Group routes

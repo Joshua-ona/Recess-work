@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
+use App\Models\Quiz;
 
 class StudentDashboardController extends Controller
 {
@@ -19,7 +20,8 @@ class StudentDashboardController extends Controller
     }
     public function quizzes()
 {
-    return view('student.quizzes');
+    $quizzes = Quiz::all();
+    return view('student.quizzes', compact('quizzes'));
 }
 
 public function messages()
