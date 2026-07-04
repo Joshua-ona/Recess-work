@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="<?php echo e(str_replace('_', '-', app()->getLocale())); ?>">
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'EduDiscuss') — E-Discussion Platform</title>
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
+    <title><?php echo $__env->yieldContent('title', 'EduDiscuss'); ?> — E-Discussion Platform</title>
 
-    {{-- Tabler Icons --}}
+    
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.4.0/tabler-icons.min.css" />
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
@@ -20,7 +20,7 @@
         padding: 0;
     }
 
-    <link rel="stylesheet"href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">@vite(['resources/css/app.css', 'resources/js/app.js']) @livewireStyles <style>*,
+    <link rel="stylesheet"href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"><?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?> <?php echo \Livewire\Mechanisms\FrontendAssets\FrontendAssets::styles(); ?> <style>*,
     *::before,
     *::after {
         box-sizing: border-box;
@@ -1034,13 +1034,14 @@
     }
 
     </style>
-    @stack('styles')
+    <?php echo $__env->yieldPushContent('styles'); ?>
 </head>
 
 <body>
-    @yield('body')
-    @livewireStyles
-    @stack('scripts')
+    <?php echo $__env->yieldContent('body'); ?>
+    <?php echo \Livewire\Mechanisms\FrontendAssets\FrontendAssets::styles(); ?>
+
+    <?php echo $__env->yieldPushContent('scripts'); ?>
 </body>
 
-</html>
+</html><?php /**PATH C:\xampp\htdocs\fave\resources\views/layouts/app.blade.php ENDPATH**/ ?>

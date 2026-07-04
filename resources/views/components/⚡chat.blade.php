@@ -17,86 +17,81 @@ new class extends Component {
     public function mount()
     {
         $this->users = User::where('id', '!=', Auth::id())->get();
-         $this->message= '';
-         $this->loginId= Auth::id();
+        $this->message = '';
+        $this->loginId = Auth::id();
     }
 
-   public function selectUser($id)
-{
-    $this->selectedUser = User::findOrFail($id);
+    public function selectUser($id)
+    {
+        $this->selectedUser = User::findOrFail($id);
 
-    $this->messages = PrivateComm::where(function ($query) use ($id) {
+        $this->messages = PrivateComm::where(function ($query) use ($id) {
+            $query->where('sender_id', auth()->id())
+                  ->where('receiver_id', $id);
+        })->orWhere(function ($query) use ($id) {
+            $query->where('sender_id', $id)
+                  ->where('receiver_id', auth()->id());
+        })
+        ->orderBy('created_at')
+        ->get();
 
-        $query->where('sender_id', auth()->id())
-              ->where('receiver_id', $id);
-
-    })->orWhere(function ($query) use ($id) {
-
-        $query->where('sender_id', $id)
-              ->where('receiver_id', auth()->id());
-
-    })
-    ->orderBy('created_at')
-    ->get();
-}
-
-   public function sendMessage()
-{
-    if (!$this->selectedUser || trim($this->message) == '') {
-        return;
+        // Force scroll when opening a conversation
+        $this->dispatch('force-scroll-to-bottom');
     }
 
-    $message = PrivateComm::create([
-        'sender_id' => auth()->id(),
-        'receiver_id' => $this->selectedUser->id,
-        'content' => $this->message,
-    ]);
-    $this->messages->push($message);
-    $this->message = '';
-     $this->dispatch('message-sent');
-   broadcast(new MessageSent($message))->toOthers();
-    
-}
-    public function getListeners(){
-        return[
+    public function sendMessage()
+    {
+        if (!$this->selectedUser || trim($this->message) == '') {
+            return;
+        }
+
+        $message = PrivateComm::create([
+            'sender_id' => auth()->id(),
+            'receiver_id' => $this->selectedUser->id,
+            'content' => $this->message,
+        ]);
+
+        $this->messages = $this->messages->push($message);
+        $this->message = '';
+
+        // Auto‑scroll (only if near bottom)
+        $this->dispatch('scroll-to-bottom');
+
+        broadcast(new MessageSent($message))->toOthers();
+    }
+
+    public function getListeners()
+    {
+        return [
             "echo-private:chat.{$this->loginId},MessageSent" => "newChatMessageNotification"
         ];
     }
 
-   public function newChatMessageNotification($message)
-{
-    if (!$this->selectedUser) {
-        return;
-    }
+    public function newChatMessageNotification($message)
+    {
+        if (!$this->selectedUser) {
+            return;
+        }
 
-    if ($message['sender_id'] == $this->selectedUser->id) {
-
-        $messageObj = PrivateComm::find($message['id']);
-
-        if ($messageObj) {
-            $this->messages->push($messageObj);
+        if ($message['sender_id'] == $this->selectedUser->id) {
+            $messageObj = PrivateComm::find($message['id']);
+            if ($messageObj) {
+                $this->messages = $this->messages->push($messageObj);
+                // Scroll on incoming message (only if near bottom)
+                $this->dispatch('scroll-to-bottom');
+            }
         }
     }
-}
-    public function rendered()
-{
-    $this->dispatch('scroll-to-bottom');
-}
 
-}; ?>
-
+};
+?>
 <div class="chat-wrapper">
 
     {{-- Users --}}
     <div class="chat-users">
 
         <div class="chat-users-header">
-
-            <input
-                type="text"
-                placeholder="Search users..."
-                class="chat-search">
-
+            <input type="text" placeholder="Search users..." class="chat-search">
         </div>
 
         <div class="chat-users-list">
@@ -108,19 +103,16 @@ new class extends Component {
                     class="chat-user {{ $selectedUser && $selectedUser->id == $user->id ? 'active' : '' }}">
 
                     <div class="chat-avatar">
-                      {{ strtoupper(substr($user->first_name, 0, 1)) }}
+                        {{ strtoupper(substr($user->first_name, 0, 1)) }}
                     </div>
 
-                    <div class="chat-user-info">
-
+                    <div style="flex:1; min-width:0;">
                         <div class="chat-user-name">
                             {{ $user->first_name }} {{ $user->last_name }}
                         </div>
-
                         <div class="chat-user-email">
                             {{ $user->email }}
                         </div>
-
                     </div>
 
                 </button>
@@ -130,7 +122,6 @@ new class extends Component {
         </div>
 
     </div>
-
 
     {{-- Conversation --}}
     <div class="chat-main">
@@ -145,93 +136,68 @@ new class extends Component {
                 </div>
 
                 <div>
-
                     <div class="chat-user-name">
                         {{ $selectedUser->first_name }} {{ $selectedUser->last_name }}
                     </div>
-
-                    <div class="chat-status">
-                        Online
-                    </div>
-
+                    <div style="font-size:13px; color:#2b8c4a;">Online</div>
                 </div>
 
             @else
 
-                <div class="chat-empty-header">
-                    Select a conversation
-                </div>
+                <div style="color:#777; font-size:16px;">Select a conversation</div>
 
             @endif
 
         </div>
 
-
         {{-- Messages --}}
-<div id="chat-box" class="chat-messages overflow-y-auto">
+        <div id="chat-box" class="chat-messages overflow-y-auto">
 
-@foreach($messages as $msg)
+            @foreach($messages as $msg)
 
-    @if($msg->sender_id == auth()->id())
+                @if($msg->sender_id == auth()->id())
 
-        {{-- SENT --}}
-        <div class="message-row sent">
+                    {{-- SENT --}}
+                    <div class="message-row sent">
+                        <div class="message-bubble sent-bubble">
+                            {{ $msg->content }}
+                            <div class="message-time">
+                                {{ $msg->created_at->format('H:i') }}
+                            </div>
+                        </div>
+                    </div>
 
-            <div class="message-bubble sent-bubble">
+                @else
 
-                {{ $msg->content }}
+                    {{-- RECEIVED --}}
+                    <div class="message-row received">
+                        <div class="message-bubble received-bubble">
+                            {{ $msg->content }}
+                            <div class="message-time">
+                                {{ $msg->created_at->format('H:i') }}
+                            </div>
+                        </div>
+                    </div>
 
-                <div class="message-time">
-                    {{ $msg->created_at->format('H:i') }}
-                </div>
+                @endif
 
-            </div>
-
-        </div>
-
-
-    @else
-
-        {{-- RECEIVED --}}
-        <div class="message-row received">
-
-            <div class="message-bubble received-bubble">
-
-                {{ $msg->content }}
-
-                <div class="message-time">
-                    {{ $msg->created_at->format('H:i') }}
-                </div>
-
-            </div>
+            @endforeach
 
         </div>
-
-    @endif
-
-
-@endforeach
-
-</div>
 
         {{-- Input --}}
-        <form
-            wire:submit.prevent="sendMessage"
-            class="chat-input">
-<input
-    type="text"
-    id="message"
-    name="message"
-    wire:model="message"
-    class="chat-input-field"
-    placeholder="Type a message..."
-    autocomplete="off">
+        <form wire:submit.prevent="sendMessage" class="chat-input">
 
-            <button
-                class="chat-send">
+            <input
+                type="text"
+                id="message"
+                name="message"
+                wire:model="message"
+                placeholder="Type a message..."
+                autocomplete="off">
 
+            <button class="chat-send">
                 Send
-
             </button>
 
         </form>
@@ -239,17 +205,41 @@ new class extends Component {
     </div>
 
 </div>
+
 <script>
 document.addEventListener('livewire:init', () => {
 
-    Livewire.on('scroll-to-bottom', () => {
-        setTimeout(() => {
-            const box = document.getElementById('chat-box');
+    const chatBox = document.getElementById('chat-box');
 
-            if (box) {
-                box.scrollTop = box.scrollHeight;
-            }
-        }, 50);
+    function isNearBottom() {
+        if (!chatBox) return true;
+        const threshold = 100;
+        const distanceToBottom = chatBox.scrollHeight - chatBox.scrollTop - chatBox.clientHeight;
+        return distanceToBottom < threshold;
+    }
+
+    function scrollToBottom() {
+        if (!chatBox) return;
+        chatBox.scrollTo({
+            top: chatBox.scrollHeight,
+            behavior: 'smooth'
+        });
+    }
+
+    // Auto‑scroll on new message – only if near bottom (WhatsApp style)
+    Livewire.on('scroll-to-bottom', () => {
+        if (isNearBottom()) {
+            setTimeout(() => {
+                scrollToBottom();
+            }, 100);
+        }
+    });
+
+    // Force scroll when opening a conversation
+    Livewire.on('force-scroll-to-bottom', () => {
+        setTimeout(() => {
+            scrollToBottom();
+        }, 150);
     });
 
 });
