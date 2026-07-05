@@ -36,9 +36,10 @@
                     <td>{{ $quiz->duration_mins }} mins</td>
 
                     <td>
-                        <a href="#" class="btn btn-primary">
-                            Start Quiz
-                        </a>
+                       <a href="{{ route('student.quizzes.attempt', $quiz->quiz_id) }}"
+   class="btn btn-primary">
+    Start Quiz
+</a>
                     </td>
 
                 </tr>

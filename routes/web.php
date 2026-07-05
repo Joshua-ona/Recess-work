@@ -15,7 +15,7 @@ use App\Http\Controllers\Lecturer\LecturerAnnouncementController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\Student\StudentDashboardController;
 use App\Http\Controllers\Student\StudentDiscussionController;
-use App\Http\Controllers\StudentQuizController;
+use App\Http\Controllers\Student\StudentQuizController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\DiscussionController;
 /*
@@ -135,11 +135,14 @@ Route::prefix('student')->name('student.')->middleware(['auth', 'role:student'])
     Route::get('/courses/{course}', [StudentDashboardController::class, 'course'])->name('course');
     Route::resource('/discussions', DiscussionController::class)->names('discussions');
     Route::get('/categories', [StudentDashboardController::class, 'categories'])->name('categories');
-     Route::get('/quizzes',          [StudentDashboardController::class, 'quizzes'])->name('quizzes');  
     Route::get('/reports', [StudentDashboardController::class, 'reports'])
     ->name('reports');
    Route::get('/quizzes', [StudentQuizController::class, 'index'])
-    ->name('quizzes.index');
+    ->name('quizzes');
+    Route::get('/quizzes/{quiz}/attempt', [StudentQuizController::class, 'attempt'])
+    ->name('quizzes.attempt');
+    Route::post('/quizzes/{quiz}/questions/{question}/answer', [StudentQuizController::class, 'answer'])
+    ->name('quizzes.answer');
 });
 
 //Group routes
