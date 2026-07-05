@@ -4,20 +4,46 @@
 namespace App\Http\Controllers\Auth;
 
 
-use App\Http\Controllers\Controller;
-use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+    use App\Http\Controllers\Controller;
+    use App\Models\User;
+    use App\Services\UserRegistrationService;
+    use Illuminate\Http\Request;
+    use Illuminate\Support\Facades\Auth;
+    use Illuminate\Support\Facades\Hash;
+    use Illuminate\Auth\Events\Registered;
+     
+
 
 class AuthController extends Controller
 {
+
+     public function __construct(UserRegistrationService $registrationService)
+     {
+        $this->registrationService = $registrationService;
+    }
+
     public function showLogin()
     {
         return view('auth.login');
     }
 
-    public function login(Request $request)
+   public function logout(Request $request)
 {
+    Auth::logout();
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+    return redirect()->route('login');
+}
+
+    public function showRegister(){
+            return view('auth.register');
+    }
+
+
+
+    public function login(Request $request)
+
+    {
     $credentials = $request->validate([
         'email' => ['required', 'email'],
         'password' => ['required'],
@@ -30,7 +56,6 @@ class AuthController extends Controller
     }
 
     $request->session()->regenerate();
-
     $user = Auth::user();
 
     // Blacklisting stops a login outright.
@@ -43,73 +68,54 @@ class AuthController extends Controller
         ])->onlyInput('email');
     }
 
-    // Lecturers who self-registered (picked "Lecturer" at sign-up, rather
-    // than being invited by an admin) need explicit admin approval before
-    // they can sign in.
-    if ($user->status === 'pending') {
+   if (!$user->is_enabled || is_null($user->email_verified_at)) {
         Auth::logout();
         $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        session(['temp_user_id' => $user->id]);
 
-        return back()->withErrors([
-            'email' => 'Your lecturer account is awaiting admin approval.',
-        ])->onlyInput('email');
+        return redirect()
+            ->route('verification.notice')
+            ->with('error', 'Please verify your email first.');
     }
 
-    return match ($user->role) {
-        'admin' => redirect()->route('admin.dashboard'),
-        'lecturer' => redirect()->route('lecturer.dashboard'),
-        default => redirect()->route('student.dashboard'),
+    return match (true) {
+        in_array($user->role, ['admin', 'admin']) => redirect()->route('admin.dashboard'),
+        $user->role === 'lecturer'                        => redirect()->route('lecturer.dashboard'),
+        default                                           => redirect()->route('student.dashboard'),
     };
 }
 
-    public function showRegister()
-    {
-        return view('auth.register');
-    }
+
+    
 
     public function register(Request $request)
-{
-    $data = $request->validate([
-        'first_name' => ['required', 'string', 'max:255'],
-        'last_name' => ['required', 'string', 'max:255'],
-        'email' => ['required', 'email', 'unique:users,email'],
-        'password' => ['required', 'confirmed', 'min:8'],
-        'role' => ['required', 'in:student,lecturer,admin'],
-        'student_id' => ['required', 'string', 'max:255'],
-    ]);
+    {
+        \Log::info('Register parts');
+        $data = $request->validate([
+        'first_name' => 'required|string|max:255',
+        'last_name' => 'required|string|max:255',
+        'email' => [
+            'required',
+            'string',
+            'email',
+            'max:255',
+            'unique:users',
+            'regex:/^[a-zA-Z0-9._%+-]+@(students\.)?mak\.ac\.ug$/'
+        ],
+        'password' => 'required|string|min:8|confirmed',
+        ]);
 
-    $user = User::create([
-        'first_name' => $data['first_name'],
-        'last_name' => $data['last_name'],
-        'email' => $data['email'],
-        'role' => $data['role'],
-        'password' => $data['password'],
-        // Self-registered lecturers need an admin's go-ahead before they
-        // can use the account; everyone else is active immediately.
-        'status' => $data['role'] === 'lecturer' ? 'pending' : 'active',
-    ]);
+        $user = $this->registrationService->execute($data);
 
-    if ($user->status === 'pending') {
-        return redirect()
-            ->route('login')
-            ->with('status', 'Account created. An admin needs to approve your lecturer account before you can sign in.');
+
+        app(VerificationController::class)->sendOtpForUser($user);
+
+        return redirect()->route('verification.notice')->with('success','You have successfully registed.Please check your email to verify your account');
+
     }
-
-    Auth::login($user);
-
-    return match ($user->role) {
-        'admin' => redirect()->route('admin.dashboard'),
-        'lecturer' => redirect()->route('lecturer.dashboard'),
-        default => redirect()->route('student.dashboard'),
-    };
+  
 }
-  public function logout(Request $request)
-{
-    Auth::logout();
 
-    $request->session()->invalidate();
-    $request->session()->regenerateToken();
-
-    return redirect()->route('login');
-}
-}
+    
+ 

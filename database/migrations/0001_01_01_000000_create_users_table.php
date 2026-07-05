@@ -24,6 +24,9 @@ return new class extends Migration
             $table->boolean('is_enabled')->default(false);
             $table->string('status')->default('active');
             $table->rememberToken();
+            $table->unsignedTinyInteger('warning_count')->default(0);
+            $table->timestamp('last_warning_at')->nullable();
+            $table->timestamp('blacklisted_until')->nullable();
             $table->timestamps();
         });
 

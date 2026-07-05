@@ -7,11 +7,11 @@
 <div class="dash-wrap">
 
     @include('layouts.sidebar', [
-        'role' => auth()->user()->role,
-        'user' => auth()->user(),
-        'enrolledCourses' => collect(),
-        'unreadCount' => 0,
-        'notifCount' => 0,
+    'role' => auth()->user()->role,
+    'user' => auth()->user(),
+    'enrolledCourses' => collect(),
+    'unreadCount' => 0,
+    'notifCount' => 0,
     ])
 
     <main class="dash-main">

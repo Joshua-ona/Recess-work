@@ -13,8 +13,11 @@ use App\Http\Controllers\Student\StudentDashboardController;
 use App\Http\Controllers\Student\StudentDiscussionController;
 
 // ── Public routes ──────────────────────────────────────────
+use App\Http\Controllers\Auth\VerificationController;
+use App\Http\Controllers\Admin\GroupController as AdminGroupController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\DiscussionController;
+
 /*
 |--------------------------------------------------------------------------
 | Public Routes
@@ -22,11 +25,22 @@ use App\Http\Controllers\DiscussionController;
 */
 
 Route::middleware('guest')->group(function () {
-    Route::get('/login',    [AuthController::class, 'showLogin'])->name('login');
-    Route::post('/login',   [AuthController::class, 'login']);
+    Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+    Route::post('/login', [AuthController::class, 'login']);
+
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
-    Route::post('/register',[AuthController::class, 'register']);
+    Route::post('/register', [AuthController::class, 'register']);
 });
+
+Route::middleware('web')->group(function () {
+    Route::get('/verify', function(){return view('auth.verify');})->name('verification.notice');
+    Route::post('verify/send', [VerificationController::class, 'sendOtp'])->name('verification.send');
+    Route::post('verify/check', [VerificationController::class, 'verifyOtp'])->name('verification.check');
+});
+
+Route::get('/chat', function () {
+    return view('chat');
+})->name('chat');
 
 Route::get('/password/reset', fn() => view('auth.passwords.email'))->name('password.request');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
@@ -40,12 +54,12 @@ Route::post('/lecturer/activate/{token}', [LecturerActivationController::class, 
 
 // ── Admin routes ───────────────────────────────────────────
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
-    Route::get('/',            [AdminDashboardController::class, 'index'])->name('dashboard');
-    Route::get('/analytics',   [AdminDashboardController::class, 'analytics'])->name('analytics');
+    Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/analytics', [AdminDashboardController::class, 'analytics'])->name('analytics');
     Route::get('/discussions', [AdminDashboardController::class, 'discussions'])->name('discussions');
-    Route::get('/courses',     [AdminDashboardController::class, 'courses'])->name('courses');
-    Route::get('/reports',     [AdminDashboardController::class, 'reports'])->name('reports');
-    Route::get('/settings',    [AdminDashboardController::class, 'settings'])->name('settings');
+    Route::get('/courses', [AdminDashboardController::class, 'courses'])->name('courses');
+    Route::get('/reports', [AdminDashboardController::class, 'reports'])->name('reports');
+    Route::get('/settings', [AdminDashboardController::class, 'settings'])->name('settings');
 
     // Member actions
     Route::get('/members', [AdminUserController::class, 'index'])
@@ -74,71 +88,62 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
         ->name('lecturers.create');
     Route::post('/lecturers', [AdminLecturerController::class, 'store'])
         ->name('lecturers.store');
+    
+    // GROUP ACTIONS
+    Route::get('/groups/pending', [AdminGroupController::class, 'index'])->name('groups.index');
+    Route::post('/groups/{group}/approve', [AdminGroupController::class, 'approve'])->name('groups.approve');
+    Route::post('/groups/{group}/reject', [AdminGroupController::class, 'reject'])->name('groups.reject');
 });
 
 // ── Lecturer routes ────────────────────────────────────────
 Route::prefix('lecturer')->name('lecturer.')->middleware(['auth', 'role:lecturer'])->group(function () {
-    Route::get('/',          [LecturerDashboardController::class, 'index'])->name('dashboard');
-    Route::get('/engagement',[LecturerDashboardController::class, 'engagement'])->name('engagement');
-    Route::get('/pinned',    [LecturerDashboardController::class, 'pinned'])->name('pinned');
-    Route::get('/flagged',   [LecturerDashboardController::class, 'flagged'])->name('flagged');
-    Route::resource('/courses',       LecturerCourseController::class)->names('courses');
-    Route::resource('/discussions',   LecturerDiscussionController::class)->names('discussions');
+    Route::get('/', [LecturerDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/engagement', [LecturerDashboardController::class, 'engagement'])->name('engagement');
+    Route::get('/pinned', [LecturerDashboardController::class, 'pinned'])->name('pinned');
+    Route::get('/flagged', [LecturerDashboardController::class, 'flagged'])->name('flagged');
+    Route::resource('/courses', LecturerCourseController::class)->names('courses');
+    Route::resource('/discussions', LecturerDiscussionController::class)->names('discussions');
     Route::resource('/announcements', \App\Http\Controllers\Lecturer\LecturerAnnouncementController::class)->names('announcements');
-    Route::get('/categories', [LecturerDashboardController::class, 'categories'])
-    ->name('categories');
+    Route::get('/categories', [LecturerDashboardController::class, 'categories'])->name('categories');
 
-Route::get('/quizzes', [LecturerDashboardController::class, 'quizzes'])
-    ->name('quizzes');
+    Route::get('/quizzes', [LecturerDashboardController::class, 'quizzes'])->name('quizzes');
+    Route::get('/performance', [LecturerDashboardController::class, 'performance'])->name('performance');
+    Route::post('/quizzes/{quiz}/upload', [QuizController::class, 'uploadQuiz'])->name('quizzes.upload');
 
-Route::get('/performance', [LecturerDashboardController::class, 'performance'])
-    ->name('performance');
-
-        Route::get('/quizzes/{quiz}/upload', [QuizController::class, 'showUploadForm'])
-    ->name('quizzes.upload.form');
-
-      Route::post('/quizzes/{quiz}/upload', [QuizController::class,'uploadQuiz'])
-    ->name('quizzes.upload');
-
-        Route::get('/performance', [LecturerDashboardController::class, 'performance'])
-            ->name('performance');
-
-        Route::get('/messages', [LecturerDashboardController::class, 'messages'])
-            ->name('messages');
-
-        Route::get('/notifications', [LecturerDashboardController::class, 'notifications'])
-            ->name('notifications');
-
-Route::get('/settings', [LecturerDashboardController::class, 'settings'])
-    ->name('settings');
-    
-    Route::get('/quizzes/create', [LecturerDashboardController::class, 'createQuiz'])
-    ->name('quizzes.create');
+    Route::get('/messages', [LecturerDashboardController::class, 'messages'])->name('messages');
+    Route::get('/notifications', [LecturerDashboardController::class, 'notifications'])->name('notifications');
+    Route::get('/settings', [LecturerDashboardController::class, 'settings'])->name('settings');
+    Route::get('/quizzes/create', [LecturerDashboardController::class, 'createQuiz'])->name('quizzes.create');
 });
 
 // ── Student routes ─────────────────────────────────────────
 Route::prefix('student')->name('student.')->middleware(['auth', 'role:student'])->group(function () {
-    Route::get('/',                 [StudentDashboardController::class, 'index'])->name('dashboard');
-    Route::get('/saved',            [StudentDashboardController::class, 'saved'])->name('saved');
-    Route::get('/profile',          [StudentDashboardController::class, 'profile'])->name('profile');
-    Route::get('/notifications',    [StudentDashboardController::class, 'notifications'])->name('notifications');
-    Route::get('/courses/browse',   [StudentDashboardController::class, 'browseCourses'])->name('courses.browse');
+    Route::get('/', [StudentDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/saved', [StudentDashboardController::class, 'saved'])->name('saved');
+    Route::get('/profile', [StudentDashboardController::class, 'profile'])->name('profile');
+    Route::get('/notifications', [StudentDashboardController::class, 'notifications'])->name('notifications');
+    Route::get('/courses/browse', [StudentDashboardController::class, 'browseCourses'])->name('courses.browse');
     Route::get('/courses/{course}', [StudentDashboardController::class, 'course'])->name('course');
     Route::resource('/discussions', DiscussionController::class)->names('discussions');
     Route::get('/categories', [StudentDashboardController::class, 'categories'])->name('categories');
-    Route::get('/quizzes',          [StudentDashboardController::class, 'quizzes'])->name('quizzes');  
-    Route::get('/reports', [StudentDashboardController::class, 'reports'])
-    ->name('reports');
 
+    Route::get('/quizzes', [StudentDashboardController::class, 'quizzes'])->name('quizzes');
+    Route::get('/messages', [StudentDashboardController::class, 'messages'])->name('messages');
+    Route::get('/settings', [StudentDashboardController::class, 'settings'])->name('settings');
+    Route::get('/reports', [StudentDashboardController::class, 'reports'])->name('reports');
+    Route::get('/groups', [StudentDashboardController::class, 'index'])->name('groups.index');
+    Route::get('/groups/{group}', [StudentDashboardController::class, 'show'])->name('groups.show');
+
+    Route::post('/groups', [StudentDashboardController::class, 'store'])->name('groups.store');
+    Route::post('/groups/{group}/join', [StudentDashboardController::class, 'join'])->name('groups.join');
+    Route::post('/groups/{group}/message', [StudentDashboardController::class, 'message'])->name('groups.message');
 });
 
-//Group routes
-
-
+// ── Group routes ──────────────────────────────────────────
 Route::middleware('auth')->group(function () {
     Route::resource('/groups', GroupController::class);
 
-    //Join group route
+    // Join group route
     Route::post('/groups/{group}/join', [GroupController::class, 'join']);
     
     // Discussion routes
@@ -151,11 +156,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/groups/{group}/discussions/{discussion}/replies', [DiscussionController::class, 'storeReply']);
 });
 
-    //PDF Export Route
-    Route::get('/groups/{group}/discussions/{discussion}/pdf', [DiscussionController::class, 'exportPdf']);
-
-    Route::get('/groups/{group}/stats', [GroupController::class, 'stats']);
-
+// PDF Export Route
+Route::get('/groups/{group}/discussions/{discussion}/pdf', [DiscussionController::class, 'exportPdf']);
+Route::get('/groups/{group}/stats', [GroupController::class, 'stats']);
 
 /*
 |--------------------------------------------------------------------------
@@ -164,10 +167,28 @@ Route::middleware('auth')->group(function () {
 */
 
 Route::get('/', function () {
-    if (!auth()->check()) return redirect()->route('login');
-    return match(auth()->user()->role) {
-        'admin'    => redirect()->route('admin.dashboard'),
+    if (!auth()->check()) {
+        return redirect()->route('login');
+    }
+
+    $user = auth()->user();
+
+    // SUPER ADMIN BYPASS: Super admin doesn't need verification
+    if ($user->isSuperAdmin()) {
+        return redirect()->route('admin.dashboard');
+    }
+
+    // Check if user needs verification (non-super admin users)
+    if ($user->needsVerification()) {
+        session(['temp_user_id' => $user->id]);
+        return redirect()->route('verification.notice');
+    }
+
+    // Redirect based on role
+    return match ($user->role) {
+        'admin' => redirect()->route('admin.dashboard'),
         'lecturer' => redirect()->route('lecturer.dashboard'),
-        default    => redirect()->route('student.dashboard'),
+        'student' => redirect()->route('student.dashboard'),
+        default => abort(403),
     };
-})->middleware('auth');
+});
