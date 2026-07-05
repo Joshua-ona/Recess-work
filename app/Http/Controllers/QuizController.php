@@ -79,23 +79,26 @@ class QuizController extends Controller
     /**
      * Update quiz.
      */
-    public function update(Request $request, Quiz $quiz)
-    {
-        $quiz->update($request->only([
-            'title',
-            'group_id',
-            'target_category',
-            'start_time',
-            'duration_mins',
-            'is_published'
-        ]));
+public function update(Request $request, Quiz $quiz)
+{
+    $quiz->title = $request->title;
+    //$quiz->group_id = $request->group_id;
+    $quiz->group_id = 2;
+    $quiz->target_category = $request->target_category;
+    $quiz->duration_mins = $request->duration_mins;
 
-        return back()->with('success', 'Quiz updated successfully.');
-    }
+    
+    $quiz->start_time = $request->start_time;
 
-    /**
-     * Delete quiz.
-     */
+    
+    $quiz->is_published = 1;
+
+    $quiz->save();
+
+    return back()->with('success', 'Quiz published successfully.');
+}
+     
+     
     public function destroy(Quiz $quiz)
     {
         $quiz->delete();
@@ -153,4 +156,13 @@ class QuizController extends Controller
 
         return back()->with('success', 'Questions uploaded successfully.');
     }
+    public function publish($quiz)
+{
+    $quiz = Quiz::findOrFail($quiz);
+
+    $quiz->is_published = 1;
+    $quiz->save();
+
+    return redirect()->back()->with('success', 'Quiz published successfully!');
+}
 }
