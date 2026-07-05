@@ -4,20 +4,46 @@
 namespace App\Http\Controllers\Auth;
 
 
-use App\Http\Controllers\Controller;
-use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+    use App\Http\Controllers\Controller;
+    use App\Models\User;
+    use App\Services\UserRegistrationService;
+    use Illuminate\Http\Request;
+    use Illuminate\Support\Facades\Auth;
+    use Illuminate\Support\Facades\Hash;
+    use Illuminate\Auth\Events\Registered;
+     
+
 
 class AuthController extends Controller
 {
+
+     public function __construct(UserRegistrationService $registrationService)
+     {
+        $this->registrationService = $registrationService;
+    }
+
     public function showLogin()
     {
         return view('auth.login');
     }
 
-    public function login(Request $request)
+   public function logout(Request $request)
 {
+    Auth::logout();
+    $request->session()->invalidate();
+    //$request->session()->regenerateToken();
+    return redirect()->route('login');
+}
+
+    public function showRegister(){
+            return view('auth.register');
+    }
+
+
+
+    public function login(Request $request)
+
+    {
     $credentials = $request->validate([
         'email' => ['required', 'email'],
         'password' => ['required'],
@@ -30,7 +56,6 @@ class AuthController extends Controller
     }
 
     $request->session()->regenerate();
-
     $user = Auth::user();
 
     // Blacklisting still actually stops someone from logging back in;
@@ -44,52 +69,43 @@ class AuthController extends Controller
         ])->onlyInput('email');
     }
 
-    return match ($user->role) {
-        'admin' => redirect()->route('admin.dashboard'),
+
+    return match ($user->role){
+        'system_admin' => redirect()->route('admin.dashboard'),
         'lecturer' => redirect()->route('lecturer.dashboard'),
-        default => redirect()->route('student.dashboard'),
+        'student' => redirect()->route('student.dashboard'),
+        //default => redirect()->route('home'),
+
     };
+    
+    
+        
 }
 
-    public function showRegister()
-    {
-        return view('auth.register');
-    }
 
     public function register(Request $request)
-{
-    $data = $request->validate([
-        'first_name' => ['required', 'string', 'max:255'],
-        'last_name' => ['required', 'string', 'max:255'],
-        'email' => ['required', 'email', 'unique:users,email'],
-        'password' => ['required', 'confirmed', 'min:8'],
-        'role' => ['required', 'in:student,lecturer,admin'],
-        'student_id' => ['required', 'string', 'max:255'],
-    ]);
+    {
+        \Log::info('Register parts');
+        $data = $request->validate([
+        'first_name' => 'required|string|max:255',
+        'last_name' => 'required|string|max:255',
+        'email' => [
+            'required',
+            'string',
+            'email',
+            'max:255',
+            'unique:users',
+        ],
+        'password' => 'required|string|min:8|confirmed',
+        ]);
 
-    $user = User::create([
-        'first_name' => $data['first_name'],
-        'last_name' => $data['last_name'],
-        'email' => $data['email'],
-        'role' => $data['role'],
-        'password' => $data['password'],
-    ]);
+        $user = $this->registrationService->execute($data);
 
-    Auth::login($user);
+        return redirect()->route('student.dashboard');
 
-    return match ($user->role) {
-        'admin' => redirect()->route('admin.dashboard'),
-        'lecturer' => redirect()->route('lecturer.dashboard'),
-        default => redirect()->route('student.dashboard'),
-    };
+    }
+  
 }
-  public function logout(Request $request)
-{
-    Auth::logout();
 
-    $request->session()->invalidate();
-    $request->session()->regenerateToken();
-
-    return redirect()->route('login');
-}
-}
+    
+ 

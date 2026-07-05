@@ -18,12 +18,13 @@ return new class extends Migration
             $table->string('first_name');
              $table->string('last_name');
             $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->enum('role', ['admin', 'lecturer', 'student'])->default('student');
-            $table->boolean('is_enabled')->default(false);
+            $table->enum('role', ['system_admin', 'lecturer', 'student'])->default('student');
             $table->string('status')->default('active');
             $table->rememberToken();
+            $table->unsignedTinyInteger('warning_count')->default(0);
+            $table->timestamp('last_warning_at')->nullable();
+            $table->timestamp('blacklisted_until')->nullable();
             $table->timestamps();
         });
 

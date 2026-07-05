@@ -11,9 +11,21 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            //
-        });
+       Schema::create('verifications', function (Blueprint $table) {
+
+    $table->id();
+
+    $table->foreignId('user_id')
+        ->unique()
+        ->constrained()
+        ->cascadeOnDelete();
+
+    $table->string('otp',6);
+
+    $table->timestamp('expires_at');
+
+    $table->timestamps();
+});
     }
 
     /**
@@ -21,11 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-         Schema::table('users', function (Blueprint $table) {
-        $table->dropColumn('role');
-    });
-        Schema::table('users', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('verifications');
     }
 };

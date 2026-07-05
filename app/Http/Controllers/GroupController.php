@@ -10,11 +10,11 @@ class GroupController extends Controller
    public function index()
 {
     $userId = auth()->id();
-    $myGroups = Group::whereHas('members', function($q) use ($userId) {
+    $myGroups = Group::whereHas('users', function($q) use ($userId) {
         $q->where('user_id', $userId);
     })->get();
 
-    $availableGroups = Group::whereDoesntHave('members', function($q) use ($userId) {
+    $availableGroups = Group::whereDoesntHave('users', function($q) use ($userId) {
         $q->where('user_id', $userId);
     })->get();
 
@@ -89,11 +89,11 @@ class GroupController extends Controller
 {
     $user = auth()->user();
 
-    if ($group->members()->where('user_id', $user->id)->exists()) {
+    if ($group->users()->where('user_id', $user->id)->exists()) {
         return redirect("/groups/{$group->id}")->with('success', 'You are already a member!');
     }
 
-    $group->members()->attach($user->id, ['agreed_terms' => true]);
+    $group->users()->attach($user->id, ['agreed_terms' => true]);
 
     return redirect("/groups/{$group->id}")->with('success', 'You have joined the group!');
 }

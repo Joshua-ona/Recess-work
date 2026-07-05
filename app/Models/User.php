@@ -1,12 +1,13 @@
 <?php
 
 namespace App\Models;
-
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use App\Models\Group;
+
 
 class User extends Authenticatable
 {
@@ -20,17 +21,7 @@ class User extends Authenticatable
      */
 
     protected $fillable = [
-        'first_name',
-        'last_name',
-        'email',
-        'password',
-        'role',
-        'is_enabled',
-        'last_active_at',
-        'warning_count',
-        'status',
-        'last_warning_at',
-        'blacklisted_until',
+        'first_name','last_name','email','password','role','is_enabled','warning_count','email_verified_at','last_warning_at','blacklisted_until',
     ];
 
     /**
@@ -46,9 +37,9 @@ class User extends Authenticatable
 
 
     protected $casts = [
-        'email_verified_at' => 'datetime',
-        'last_warning_at' => 'datetime',
-        'blacklisted_until' => 'datetime',
+        'email_verified_at' => 'timestamp',
+        'last_warning_at' => 'timestamp',
+        'blacklisted_until' => 'timestamp',
         'password' => 'hashed',
         'is_enabled'=>'boolean',
     ];
@@ -57,11 +48,15 @@ class User extends Authenticatable
     public function isLecturer(): bool {return $this->role == 'lecturer';}
     public function isGroupAdmin(): bool {return $this->role == 'group_admin';}
     public function isSystemAdmin(): bool {return $this->role == 'system_admin';}
-    public function groups()
-{
-    return $this->belongsToMany(Group::class, 'group_user')->withPivot('agreed_terms')->withTimestamps();
-}
 
+ 
+
+    public function verification(): HasOne
+    {
+        return $this->hasOne(Verification::class);
+
+    }
+    
          /* Warning messages issued to this user, newest first.
      */
     public function warnings()
@@ -69,6 +64,10 @@ class User extends Authenticatable
         return $this->hasMany(UserWarning::class)->latest();
     }
 
+    public function groups(): BelongsToMany
+    {
+        return $this->belongsToMany(Group::class, 'group_members')->withPivot('role')->withTimestamps();
+    }
 
     
 }

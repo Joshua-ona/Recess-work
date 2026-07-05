@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Group;
 use Illuminate\Support\Carbon;
 
 class AdminDashboardController extends Controller
@@ -17,6 +18,9 @@ class AdminDashboardController extends Controller
 
         //testing the admin dashboard since table are non existant
         $activeToday = 0;
+        $groups = Group::where('status','pending')->with('admin')->latest()
+                ->take(5)
+                ->get();
 
         // $pendingApprovals = User::where('status', 'pending')
         //     ->orderByDesc('created_at')
@@ -72,7 +76,21 @@ class AdminDashboardController extends Controller
             'topContributors',
             'flaggedContent',
             'upcomingQuizzes',
-            'trendingTopics'
+            'trendingTopics',
+            'groups',
         ));
+    }
+
+    
+    public function approve(Group $group)
+    {
+        $this->groupService->approve($group);
+        return back()->with('success', 'Group Approved');
+    }
+
+    public function reject(Group $group)
+    {
+        $this->groupService->reject($group);
+        return back()->with('error', 'Group Rejected');
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Services;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 
 class UserRegistrationService
 {
@@ -11,40 +12,24 @@ public function execute(array $data):User{
 
     $email = trim($data['email']);
     $adminEmail = trim(config('university.admin_email'));
-    $domain = substr(strrchr($email,'@'), 1);
 
-    // allowed domains
-    $allowedDomains = ['mak.ac.ug','students.mak.ac.ug'];
-
-    if(!in_array($domain, $allowedDomains)){
-        throw new \Exception("Registration Not Allowed for this email domain");
-    }
-    
     if($email === $adminEmail){
-        $role = 'system_admin';
+        throw ValidationException::withMessages([
+            'email' => 'Reserved Email Address.Contact the Administrator'
+            ]);
     }
 
-    else if($domain === 'mak.ac.ug'){
-        $role='lecturer';
-    }
-
-    else if($domain === 'students.mak.ac.ug'){
-        $role='student';
-    }
-    else{
-        throw new \Exception('Registration Not Allowed for this Email');
-    }
 
     $user = new User();
 
     $user->email = $email;
-    $user->name = $data['first_name'].' '.$data['last_name'];
+    $user->first_name = trim($data['first_name']);
+    $user->last_name = trim($data['last_name']);
+
     $user->password = Hash::make($data['password']);
-    $user->role = $role;
-    $user->is_enabled = true;
+    $user->role = 'student';
 
     $user->save();
-
     return $user;
 
     }
