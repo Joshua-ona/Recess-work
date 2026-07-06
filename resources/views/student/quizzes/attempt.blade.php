@@ -24,6 +24,9 @@
                         <div>
                             <h4 class="mb-0">{{ $quiz->title }}</h4>
                             <small>{{ $quiz->course->course_name ?? '' }}</small>
+                            EXAM MODE ACTIVE:
+                            LEAVING THIS PAGE OR OPENING ANOTHER TAB WILL TERMINATE YOUR ATTEMPT 
+                            IMMEDIATELY!
                         </div>
 
                         <div>
@@ -45,57 +48,59 @@
                         <div class="progress">
 
                             <div class="progress-bar"
-                                 style="width:{{ ($currentQuestion/$totalQuestions)*100 }}%">
-                            </div>
+                                    style="width:{{ ($currentPage / $totalPages) * 100 }}%">
+                                </div>
 
-                        </div>
-
-                        <small>
-                            Question {{ $currentQuestion }}
-                            of
-                            {{ $totalQuestions }}
-                        </small>
+                                <small>
+                                    Page {{ $currentPage }}
+                                    of
+                                    {{ $totalPages }}
+                                </small>
 
                     </div>
 
-                   <form method="POST" action="{{ route('student.quizzes.answer', [
-                        'quiz' => $quiz->quiz_id,
-                        'question' => $question->question_id
-                    ]) }}">
+                   <form method="POST"
+      action="{{ route('student.quizzes.answer', $quiz->quiz_id) }}">
+    
                         @csrf
 
-                        <h4 class="mb-4">
+                        
+                        @foreach($questions as $question)
 
-                            {{ $question->question }}
+    <h4 class="mb-4">
+        {{ $question->question }}
+    </h4>
 
-                        </h4>
+    @foreach($question->options as $option)
 
-                        @foreach($question->options as $option)
+        <div class="form-check border rounded p-3 mb-3">
 
-                            <div class="form-check border rounded p-3 mb-3">
+            <input
+                class="form-check-input"
+                type="radio"
+                name="answers[{{ $question->question_id }}]"
+                value="{{ $option->id }}"
+                id="option{{ $option->id }}">
 
-                                <input
-                                    class="form-check-input"
-                                    type="radio"
-                                    name="answer"
-                                    value="{{ $option->id }}"
-                                    id="option{{ $option->id }}">
+            <label
+                class="form-check-label ms-2"
+                for="option{{ $option->id }}">
 
-                                <label
-                                    class="form-check-label ms-2"
-                                    for="option{{ $option->id }}">
+                {{ $option->option_text }}
 
-                                    {{ $option->option_text }}
+            </label>
 
-                                </label>
+        </div>
 
-                            </div>
+    @endforeach
 
-                        @endforeach
+    <hr>
+
+@endforeach
 
                         <div class="d-flex justify-content-between mt-5">
 
-                            @if($previousQuestion)
+                            @if($previousPage)
 
                                 <a
                                    href="{{ route('student.quizzes.attempt',[$quiz->id,$previousQuestion]) }}"
@@ -106,6 +111,10 @@
                                 </a>
 
                             @else
+                            <input
+                                type="hidden"
+                                name="next"
+                                value="{{ $currentPage + 1 }}">
 
                                 <button
                                     class="btn btn-secondary"

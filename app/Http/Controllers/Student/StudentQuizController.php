@@ -18,47 +18,62 @@ class StudentQuizController extends Controller
 }  //
 public function attempt(Quiz $quiz,$number=1)
 {
-  $questions = $quiz->questions;
+  $perPage = 5;
 
-    $question = $questions->values()->get($number - 1);
+$questions = $quiz->questions->values();
 
-    return view('student.quizzes.attempt',[
-        'quiz'=>$quiz,
-        'question'=>$question,
-        'currentQuestion'=>$number,
-        'totalQuestions'=>$questions->count(),
-        'previousQuestion'=>$number>1 ? $number-1 : null,
-    ]);
+$pageQuestions = $questions->slice(
+    ($number - 1) * $perPage,
+    $perPage
+);;
+
+   return view('student.quizzes.attempt', [
+    'quiz' => $quiz,
+    'questions' => $pageQuestions,
+    'currentPage' => $number,
+    'totalPages' => ceil($questions->count() / $perPage),
+    'previousPage' => $number > 1 ? $number - 1 : null,
+]);
 }
-public function answer(Request $request, Quiz $quiz, $question)
+public function answer(Request $request, Quiz $quiz)
 {
-    $selected = $request->answer;
+    $answers = $request->input('answers', []);
 
-    $questions = $quiz->questions;
-    $currentQuestion = $questions->firstWhere('question_id', $question);
+    $score = session('score', 0);
 
-    if (!$currentQuestion) {
-        abort(404);
+    foreach ($answers as $questionId => $selectedAnswer) {
+
+        $question = $quiz->questions()
+            ->where('question_id', $questionId)
+            ->first();
+
+        if (!$question) {
+            continue;
+        }
+
+        if ($selectedAnswer == $question->correct_answer) {
+            $score++;
+        }
     }
 
-    // check correctness
-    $isCorrect = $selected === $currentQuestion->correct_answer;
+    session(['score' => $score]);
 
-    // TODO: save result (optional for now)
+    $nextPage = $request->input('next');
 
-    // move to next question
-    $nextNumber = $request->get('next', null);
+    $perPage = 5;
+    $totalPages = ceil($quiz->questions()->count() / $perPage);
 
-    if ($nextNumber) {
+    if ($nextPage <= $totalPages) {
         return redirect()->route('student.quizzes.attempt', [
             'quiz' => $quiz->quiz_id,
-            'number' => $nextNumber
+            'page' => $nextPage,
         ]);
     }
 
-    return redirect()->route('student.quizzes.attempt', [
-        'quiz' => $quiz->quiz_id,
-        'number' => 1
+    return view('student.quizzes.result', [
+        'quiz' => $quiz,
+        'score' => $score,
+        'total' => $quiz->questions()->count(),
     ]);
 }
 }

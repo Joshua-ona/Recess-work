@@ -133,6 +133,14 @@ Route::prefix('student')->name('student.')->middleware(['auth', 'role:student'])
     Route::get('/courses/{course}', [StudentDashboardController::class, 'course'])->name('course');
     Route::resource('/discussions', DiscussionController::class)->names('discussions');
     Route::get('/categories', [StudentDashboardController::class, 'categories'])->name('categories');
+    Route::get('/reports', [StudentDashboardController::class, 'reports'])
+    ->name('reports');
+   Route::get('/quizzes', [StudentQuizController::class, 'index'])
+    ->name('quizzes');
+    Route::get('/quizzes/{quiz}/attempt', [StudentQuizController::class, 'attempt'])
+    ->name('quizzes.attempt');
+    Route::post('/quizzes/{quiz}/answer', [StudentQuizController::class, 'answer'])
+    ->name('quizzes.answer');
 
     Route::get('/quizzes', [StudentDashboardController::class, 'quizzes'])->name('quizzes');
     Route::get('/messages', [StudentDashboardController::class, 'messages'])->name('messages');
