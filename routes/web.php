@@ -14,6 +14,8 @@ use App\Http\Controllers\Lecturer\LecturerCourseController;
 use App\Http\Controllers\Lecturer\LecturerAnnouncementController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\Student\StudentDashboardController;
+use App\Http\Controllers\Student\StudentDiscussionController;
+use App\Http\Controllers\Student\StudentQuizController;
 use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\Admin\GroupController as AdminGroupController;
 use App\Http\Controllers\GroupController;
@@ -125,7 +127,9 @@ Route::prefix('lecturer')->name('lecturer.')->middleware(['auth','role:lecturer'
         ->name('quizzes.edit');
     Route::put('/quizzes/{quiz}', [QuizController::class,'update'])
         ->name('quizzes.update');
-    Route::delete('/quizzes/{quiz}', [QuizController::class,'destroy'])
+        Route::post('/quizzes/{quiz}/publish', [QuizController::class, 'publish'])
+        ->name('lecturer.quizzes.publish');
+        Route::delete('/quizzes/{quiz}', [QuizController::class,'destroy'])
         ->name('quizzes.destroy');
 });
 
@@ -139,8 +143,16 @@ Route::prefix('student')->name('student.')->middleware(['auth','role:student'])-
     Route::get('/courses/{course}', [StudentDashboardController::class, 'course'])->name('course');
     Route::resource('/discussions', DiscussionController::class)->names('discussions');
     Route::get('/categories', [StudentDashboardController::class, 'categories'])->name('categories');
+    Route::get('/reports', [StudentDashboardController::class, 'reports'])
+    ->name('reports');
+   Route::get('/quizzes', [StudentQuizController::class, 'index'])
+    ->name('quizzes');
+    Route::get('/quizzes/{quiz}/attempt', [StudentQuizController::class, 'attempt'])
+    ->name('quizzes.attempt');
+    Route::post('/quizzes/{quiz}/answer', [StudentQuizController::class, 'answer'])
+    ->name('quizzes.answer');
 
-    Route::get('/quizzes',          [StudentDashboardController::class, 'quizzes'])->name('quizzes');
+//     Route::get('/quizzes',          [StudentDashboardController::class, 'quizzes'])->name('quizzes');
     Route::get('/messages',         [StudentDashboardController::class, 'messages'])->name('messages');
     Route::get('/settings',          [StudentDashboardController::class, 'settings'])->name('settings');
     Route::get('/reports', [StudentDashboardController::class, 'reports'])->name('reports');

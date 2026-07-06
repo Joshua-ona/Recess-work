@@ -163,6 +163,7 @@
             <a href="{{ route('student.saved') }}" class="sidebar-item">
                 <i class="ti ti-bookmark" aria-hidden="true"></i> Saved posts
             </a>
+        
             <a href="{{ route('student.quizzes') }}" class="sidebar-item">
                 <i class="ti ti-clipboard-check"></i> Quizzes
             </a>
