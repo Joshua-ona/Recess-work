@@ -159,6 +159,7 @@
             <a href="<?php echo e(route('student.saved')); ?>" class="sidebar-item">
                 <i class="ti ti-bookmark" aria-hidden="true"></i> Saved posts
             </a>
+        
             <a href="<?php echo e(route('student.quizzes')); ?>" class="sidebar-item">
                 <i class="ti ti-clipboard-check"></i> Quizzes
             </a>

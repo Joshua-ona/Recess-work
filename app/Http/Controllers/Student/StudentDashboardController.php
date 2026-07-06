@@ -123,7 +123,8 @@ class StudentDashboardController extends Controller
     }
     public function quizzes()
 {
-    return view('student.quizzes');
+    $quizzes = Quiz::all();
+    return view('student.quizzes', compact('quizzes'));
 }
 
 public function messages()

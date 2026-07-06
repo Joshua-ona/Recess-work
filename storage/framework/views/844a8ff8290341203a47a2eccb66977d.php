@@ -100,6 +100,13 @@
                                             <button class="text-xs border rounded px-2 py-1">Reinstate</button>
                                         </form>
                                     <?php else: ?>
+                                        
+                                        <?php if($user->role === 'lecturer' && $user->status === 'pending'): ?>
+                                            <form method="POST" action="<?php echo e(route('admin.lecturers.resend', $user)); ?>">
+                                                <?php echo csrf_field(); ?>
+                                                <button class="text-xs border rounded px-2 py-1 text-blue-600">Resend invite</button>
+                                            </form>
+                                        <?php endif; ?>
                                         <details>
                                             <summary class="text-xs border rounded px-2 py-1 inline-block cursor-pointer select-none">Warn</summary>
                                             <form method="POST" action="<?php echo e(route('admin.Users.warn', $user)); ?>" class="mt-2 space-y-1 w-48">
