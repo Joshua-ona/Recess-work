@@ -66,6 +66,13 @@
                class="sidebar-item {{ request()->routeIs('admin.settings') ? 'active' : '' }}">
                 <i class="ti ti-settings" aria-hidden="true"></i> Settings
             </a>
+            {{-- 🔐 Admin logout --}}
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="sidebar-item logout-btn">
+                    <i class="ti ti-logout" aria-hidden="true"></i> Logout
+                </button>
+            </form>
         </div>
 
     {{-- ── Lecturer nav ── --}}
@@ -78,34 +85,31 @@
             </a>
             
             <a href="{{ route('lecturer.discussions.index') }}" class="sidebar-item">
-    <i class="ti ti-messages"></i> Discussions
-</a>
+                <i class="ti ti-messages"></i> Discussions
+            </a>
 
-<a href="{{ route('lecturer.categories') }}" class="sidebar-item">
-    <i class="ti ti-category"></i> Categories
-</a>
+            <a href="{{ route('lecturer.categories') }}" class="sidebar-item">
+                <i class="ti ti-category"></i> Categories
+            </a>
 
-<a href="{{ route('lecturer.quizzes') }}" class="sidebar-item">
-    <i class="ti ti-clipboard-check"></i> Quizzes
-</a>
-<a href="{{ route('lecturer.performance') }}" class="sidebar-item">
-    <i class="ti ti-chart-bar"></i> Performance Reports
-</a>
+            <a href="{{ route('lecturer.quizzes') }}" class="sidebar-item">
+                <i class="ti ti-clipboard-check"></i> Quizzes
+            </a>
+            <a href="{{ route('lecturer.performance') }}" class="sidebar-item">
+                <i class="ti ti-chart-bar"></i> Performance Reports
+            </a>
 
-<a href="{{ route('lecturer.chats') }}" class="sidebar-item">
-    <i class="ti ti-message-circle"></i> Messages
-</a>
+            <a href="{{ route('chat') }}" class="sidebar-item">
+                <i class="ti ti-message-circle"></i> Messages
+            </a>
 
-<a href="{{ route('lecturer.notifications') }}" class="sidebar-item">
-    <i class="ti ti-bell"></i> Notifications
-</a>
+            <a href="{{ route('lecturer.notifications') }}" class="sidebar-item">
+                <i class="ti ti-bell"></i> Notifications
+            </a>
 
-<a href="{{ route('lecturer.pinned') }}" class="sidebar-item">
-    <i class="ti ti-bookmark"></i> Pinned Topics
-</a>
-
-
-
+            <a href="{{ route('lecturer.pinned') }}" class="sidebar-item">
+                <i class="ti ti-bookmark"></i> Pinned Topics
+            </a>
         </div>
         <div class="sidebar-section">
             <div class="sidebar-section-label">My courses</div>
@@ -132,6 +136,13 @@
                     <span class="sidebar-badge">{{ $flaggedCount }}</span>
                 @endif
             </a>
+            {{-- 🔐 Lecturer logout --}}
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="sidebar-item logout-btn">
+                    <i class="ti ti-logout" aria-hidden="true"></i> Logout
+                </button>
+            </form>
         </div>
 
     {{-- ── Student nav ── --}}
@@ -153,25 +164,16 @@
                 <i class="ti ti-bookmark" aria-hidden="true"></i> Saved posts
             </a>
             <a href="{{ route('student.quizzes') }}" class="sidebar-item">
-        <i class="ti ti-clipboard-check"></i> Quizzes
-    </a>
+                <i class="ti ti-clipboard-check"></i> Quizzes
+            </a>
 
-   {{-- 
-    <a href="{{ route('student.messages') }}" class="sidebar-item">
-        <i class="ti ti-message-circle"></i> Messages
-    </a> 
-    --}} 
+            <a href="{{ route('chat') }}" class="sidebar-item">
+                <i class="ti ti-message-circle"></i> Messages
+            </a>
 
-   <a href="{{ route('groups.index') }}" class="sidebar-item">
-    <i class="ti ti-users-group"></i> Groups
-</a>
-
-    <form method="POST" action="{{ route('logout') }}">
-        @csrf
-        <button type="submit" class="sidebar-item logout-btn">
-            <i class="ti ti-logout"></i> Logout
-        </button>
-    </form>
+            <a href="{{ route('groups.index') }}" class="sidebar-item">
+                <i class="ti ti-users-group"></i> Groups
+            </a>
         </div>
         <div class="sidebar-section">
             <div class="sidebar-section-label">Courses</div>
@@ -195,6 +197,13 @@
                     <span class="sidebar-badge">{{ $notifCount }}</span>
                 @endif
             </a>
+            {{-- 🔐 Student logout --}}
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="sidebar-item logout-btn">
+                    <i class="ti ti-logout" aria-hidden="true"></i> Logout
+                </button>
+            </form>
         </div>
     @endif
 

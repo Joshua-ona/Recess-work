@@ -10,17 +10,17 @@
             <div>
                 <div class="sidebar-logo-name">EduDiscuss</div>
                 <div class="sidebar-logo-sub">
-                    <?php if($role === 'admin'): ?> Administration
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($role === 'admin'): ?> Administration
                     <?php elseif($role === 'lecturer'): ?> Lecturer portal
                     <?php else: ?> Student portal
-                    <?php endif; ?>
+                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                 </div>
             </div>
         </div>
     </div>
 
     
-    <?php if($role === 'admin'): ?>
+    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($role === 'admin'): ?>
         <div class="sidebar-section">
             <div class="sidebar-section-label">Overview</div>
             <a href="<?php echo e(route('admin.dashboard')); ?>"
@@ -50,9 +50,9 @@
             <a href="<?php echo e(route('admin.reports')); ?>"
                class="sidebar-item <?php echo e(request()->routeIs('admin.reports*') ? 'active' : ''); ?>">
                 <i class="ti ti-flag" aria-hidden="true"></i> Reports
-                <?php if(($openReports ?? 0) > 0): ?>
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(($openReports ?? 0) > 0): ?>
                     <span class="sidebar-badge"><?php echo e($openReports); ?></span>
-                <?php endif; ?>
+                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
             </a>
         </div>
         <div class="sidebar-section">
@@ -108,14 +108,14 @@
         </div>
         <div class="sidebar-section">
             <div class="sidebar-section-label">My courses</div>
-            <?php $__currentLoopData = $myCourses ?? []; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $course): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $myCourses ?? []; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $course): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
                 <a href="<?php echo e(route('lecturer.courses.show', $course->id)); ?>"
                    class="sidebar-item <?php echo e(request()->is('lecturer/courses/'.$course->id.'*') ? 'active' : ''); ?>">
                     <i class="ti ti-calculator" aria-hidden="true"></i>
                     <?php echo e($course->code); ?> — <?php echo e(Str::limit($course->name, 18)); ?>
 
                 </a>
-            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
             <a href="<?php echo e(route('lecturer.courses.create')); ?>" class="sidebar-item">
                 <i class="ti ti-plus" aria-hidden="true"></i> Create course
             </a>
@@ -128,9 +128,9 @@
             <a href="<?php echo e(route('lecturer.flagged')); ?>"
                class="sidebar-item <?php echo e(request()->routeIs('lecturer.flagged') ? 'active' : ''); ?>">
                 <i class="ti ti-flag" aria-hidden="true"></i> Flagged posts
-                <?php if(($flaggedCount ?? 0) > 0): ?>
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(($flaggedCount ?? 0) > 0): ?>
                     <span class="sidebar-badge"><?php echo e($flaggedCount); ?></span>
-                <?php endif; ?>
+                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
             </a>
             
             <form method="POST" action="<?php echo e(route('logout')); ?>">
@@ -152,9 +152,9 @@
             <a href="<?php echo e(route('student.discussions.index')); ?>"
                class="sidebar-item <?php echo e(request()->routeIs('student.discussions.*') ? 'active' : ''); ?>">
                 <i class="ti ti-messages" aria-hidden="true"></i> My discussions
-                <?php if(($unreadCount ?? 0) > 0): ?>
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(($unreadCount ?? 0) > 0): ?>
                     <span class="sidebar-badge"><?php echo e($unreadCount); ?></span>
-                <?php endif; ?>
+                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
             </a>
             <a href="<?php echo e(route('student.saved')); ?>" class="sidebar-item">
                 <i class="ti ti-bookmark" aria-hidden="true"></i> Saved posts
@@ -173,14 +173,14 @@
         </div>
         <div class="sidebar-section">
             <div class="sidebar-section-label">Courses</div>
-            <?php $__currentLoopData = $enrolledCourses ?? []; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $course): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $enrolledCourses ?? []; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $course): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
                 <a href="<?php echo e(route('student.course', $course->id)); ?>"
                    class="sidebar-item <?php echo e(request()->is('student/courses/'.$course->id.'*') ? 'active' : ''); ?>">
                     <i class="ti ti-book" aria-hidden="true"></i>
                     <?php echo e($course->code); ?> — <?php echo e(Str::limit($course->name, 18)); ?>
 
                 </a>
-            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
             <a href="<?php echo e(route('student.courses.browse')); ?>" class="sidebar-item">
                 <i class="ti ti-plus" aria-hidden="true"></i> Browse all courses
             </a>
@@ -190,9 +190,9 @@
             
             <a href="<?php echo e(route('student.notifications')); ?>" class="sidebar-item">
                 <i class="ti ti-bell" aria-hidden="true"></i> Notifications
-                <?php if(($notifCount ?? 0) > 0): ?>
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(($notifCount ?? 0) > 0): ?>
                     <span class="sidebar-badge"><?php echo e($notifCount); ?></span>
-                <?php endif; ?>
+                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
             </a>
             
             <form method="POST" action="<?php echo e(route('logout')); ?>">
@@ -202,7 +202,7 @@
                 </button>
             </form>
         </div>
-    <?php endif; ?>
+    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
     <div class="sidebar-spacer"></div>
 
@@ -218,4 +218,4 @@
         </div>
     </div>
 
-</nav><?php /**PATH C:\Users\CORE i5\Desktop\RECESS\Recess-work\resources\views/layouts/sidebar.blade.php ENDPATH**/ ?>
+</nav><?php /**PATH C:\xampp\htdocs\fave\resources\views/layouts/sidebar.blade.php ENDPATH**/ ?>

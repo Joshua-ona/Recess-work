@@ -29,13 +29,7 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
 
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
-    Route::post('/register', [AuthController::class, 'register']);
-});
-
-Route::middleware('web')->group(function () {
-    Route::get('/verify', function(){return view('auth.verify');})->name('verification.notice');
-    Route::post('verify/send', [VerificationController::class, 'sendOtp'])->name('verification.send');
-    Route::post('verify/check', [VerificationController::class, 'verifyOtp'])->name('verification.check');
+    Route::post('/register',[AuthController::class, 'register']);
 });
 
 Route::get('/chat', function () {
@@ -43,6 +37,8 @@ Route::get('/chat', function () {
 })->name('chat');
 
 Route::get('/password/reset', fn() => view('auth.passwords.email'))->name('password.request');
+
+// ✅ Global logout – used by all dashboards
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
 // Lecturer account activation (reached via the emailed invite link — the
@@ -104,16 +100,45 @@ Route::prefix('lecturer')->name('lecturer.')->middleware(['auth', 'role:lecturer
     Route::resource('/courses', LecturerCourseController::class)->names('courses');
     Route::resource('/discussions', LecturerDiscussionController::class)->names('discussions');
     Route::resource('/announcements', \App\Http\Controllers\Lecturer\LecturerAnnouncementController::class)->names('announcements');
-    Route::get('/categories', [LecturerDashboardController::class, 'categories'])->name('categories');
+    Route::get('/categories', [LecturerDashboardController::class, 'categories'])
+        ->name('categories');
 
-    Route::get('/quizzes', [LecturerDashboardController::class, 'quizzes'])->name('quizzes');
-    Route::get('/performance', [LecturerDashboardController::class, 'performance'])->name('performance');
-    Route::post('/quizzes/{quiz}/upload', [QuizController::class, 'uploadQuiz'])->name('quizzes.upload');
+    Route::get('/quizzes', [LecturerDashboardController::class, 'quizzes'])
+        ->name('quizzes');
 
-    Route::get('/messages', [LecturerDashboardController::class, 'messages'])->name('messages');
-    Route::get('/notifications', [LecturerDashboardController::class, 'notifications'])->name('notifications');
-    Route::get('/settings', [LecturerDashboardController::class, 'settings'])->name('settings');
-    Route::get('/quizzes/create', [LecturerDashboardController::class, 'createQuiz'])->name('quizzes.create');
+    Route::get('/quizzes/create', [LecturerDashboardController::class, 'createQuiz'])
+        ->name('quizzes.create');
+
+    Route::post('/quizzes/{quiz}/upload', [QuizController::class,'uploadQuiz'])
+        ->name('quizzes.upload');
+
+    Route::get('/performance', [LecturerDashboardController::class, 'performance'])
+        ->name('performance');
+
+    Route::get('/messages', [LecturerDashboardController::class, 'messages'])
+        ->name('messages');
+
+    Route::get('/notifications', [LecturerDashboardController::class, 'notifications'])
+        ->name('notifications');
+
+    Route::get('/settings', [LecturerDashboardController::class, 'settings'])
+        ->name('settings');
+
+    Route::get('/quizzes', [QuizController::class,'index'])
+        ->name('quizzes');
+    Route::get('/quizzes/create', [QuizController::class,'create'])
+        ->name('quizzes.create');
+
+    Route::post('/quizzes', [QuizController::class,'store'])
+        ->name('quizzes.store');
+    Route::get('/quizzes/{quiz}', [QuizController::class,'show'])
+        ->name('quizzes.show');
+    Route::get('/quizzes/{quiz}/edit', [QuizController::class,'edit'])
+        ->name('quizzes.edit');
+    Route::put('/quizzes/{quiz}', [QuizController::class,'update'])
+        ->name('quizzes.update');
+    Route::delete('/quizzes/{quiz}', [QuizController::class,'destroy'])
+        ->name('quizzes.destroy');
 });
 
 // ── Student routes ─────────────────────────────────────────
@@ -131,33 +156,31 @@ Route::prefix('student')->name('student.')->middleware(['auth', 'role:student'])
     Route::get('/messages', [StudentDashboardController::class, 'messages'])->name('messages');
     Route::get('/settings', [StudentDashboardController::class, 'settings'])->name('settings');
     Route::get('/reports', [StudentDashboardController::class, 'reports'])->name('reports');
-    Route::get('/groups', [StudentDashboardController::class, 'index'])->name('groups.index');
-    Route::get('/groups/{group}', [StudentDashboardController::class, 'show'])->name('groups.show');
-
-    Route::post('/groups', [StudentDashboardController::class, 'store'])->name('groups.store');
+    Route::get('/groups',    [StudentDashboardController::class, 'index'])->name('groups.index');
+    Route::get('/groups/{group}',    [StudentDashboardController::class, 'show'])->name('groups.show');
+    Route::post('/groups', [StudentDashboardController::class, 'store'])
+    ->name('groups.store');
     Route::post('/groups/{group}/join', [StudentDashboardController::class, 'join'])->name('groups.join');
     Route::post('/groups/{group}/message', [StudentDashboardController::class, 'message'])->name('groups.message');
 });
 
-// ── Group routes ──────────────────────────────────────────
+// Group routes (outside role prefixes)
 Route::middleware('auth')->group(function () {
     Route::resource('/groups', GroupController::class);
 
-    // Join group route
     Route::post('/groups/{group}/join', [GroupController::class, 'join']);
-    
-    // Discussion routes
+
     Route::get('/groups/{group}/discussions', [DiscussionController::class, 'index']);
     Route::get('/groups/{group}/discussions/create', [DiscussionController::class, 'create']);
     Route::post('/groups/{group}/discussions', [DiscussionController::class, 'store']);
     Route::get('/groups/{group}/discussions/{discussion}', [DiscussionController::class, 'show']);
-    
-    // Reply route
+
     Route::post('/groups/{group}/discussions/{discussion}/replies', [DiscussionController::class, 'storeReply']);
 });
 
-// PDF Export Route
+// PDF Export
 Route::get('/groups/{group}/discussions/{discussion}/pdf', [DiscussionController::class, 'exportPdf']);
+
 Route::get('/groups/{group}/stats', [GroupController::class, 'stats']);
 
 /*

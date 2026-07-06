@@ -29,5 +29,19 @@ class UserSeeder extends Seeder
                 'is_enabled' => true,
                 'email_verified_at' => now(),
             ]);
+
+        User::updateOrcreate(
+            [
+                'email' => 'mark@mak.ac.ug', 
+            ],
+            [
+                'first_name' => 'mark',
+                'last_name' => 'lectures',
+                 
+                'password' => Hash::make('mark2004'),
+                'role' => 'lecturer',
+                'is_enabled' => true,
+                'email_verified_at' => now(),
+            ]);
     }
 }

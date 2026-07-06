@@ -844,6 +844,14 @@
 
     /* ================= CHAT ================= */
 
+   
+    :root {
+        --border: 1px solid #d1d5db;
+        --purple-800: #5b21b6;
+        --purple-600: #7c3aed;
+        --purple-50: #f5f3ff;
+    }
+
     .chat-wrapper {
         display: flex;
         height: calc(100vh - 70px);
@@ -868,10 +876,23 @@
         border-bottom: var(--border);
     }
 
+    .chat-search {
+        width: 100%;
+        padding: 10px 14px;
+        border: var(--border);
+        border-radius: 999px;
+        outline: none;
+        font-size: 14px;
+        margin-top: 4px;
+    }
+
     .chat-users-list {
         overflow-y: auto;
         flex: 1;
     }
+   .chat-messages {
+    scroll-behavior: smooth;
+}
 
     .chat-user {
         display: flex;
@@ -880,6 +901,10 @@
         padding: 14px 18px;
         cursor: pointer;
         transition: .2s;
+        background: none;
+        border: none;
+        width: 100%;
+        text-align: left;
     }
 
     .chat-user:hover {
@@ -900,6 +925,7 @@
         align-items: center;
         justify-content: center;
         font-weight: 600;
+        flex-shrink: 0;
     }
 
     .chat-user-name {
@@ -936,33 +962,41 @@
 
     .message-row {
         display: flex;
-        margin-bottom: 15px;
+        width: 100%;
+        margin-bottom: 12px;
     }
 
-    .message-row.me {
+    .message-row.sent {
         justify-content: flex-end;
     }
 
-    .message {
-        max-width: 65%;
+    .message-row.received {
+        justify-content: flex-start;
+    }
+
+    .message-bubble {
+        max-width: 420px;
         padding: 12px 16px;
-        border-radius: 12px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, .08);
+        border-radius: 18px;
+        font-size: 14px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, .12);
     }
 
-    .message.received {
-        background: #fff;
-    }
-
-    .message.sent {
+    .sent-bubble {
         background: #d9fdd3;
+        border-bottom-right-radius: 4px;
+    }
+
+    .received-bubble {
+        background: white;
+        border-bottom-left-radius: 4px;
     }
 
     .message-time {
+        margin-top: 5px;
+        text-align: right;
         font-size: 11px;
         color: #777;
-        text-align: right;
-        margin-top: 4px;
     }
 
     .chat-input {
@@ -994,6 +1028,7 @@
         background: var(--purple-600);
     }
 
+<<<<<<< HEAD
     .messages-container {
         height: 100%;
         overflow-y: auto;
@@ -1070,6 +1105,8 @@
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
     }
 
+=======
+>>>>>>> 4e5c328ab7bf9a09b27a3a11466cfaa25bfed141
     </style>
     @stack('styles')
 </head>

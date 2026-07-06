@@ -1,4 +1,17 @@
+@extends('layouts.app')
 
+@section('title', 'show')
+
+@section('body')
+
+{{-- Sidebar --}}
+    @include('layouts.sidebar', [
+        'role'            => 'student',
+        'user'            => auth()->user(),
+        'enrolledCourses' => $enrolledCourses ?? collect(),
+        'unreadCount'     => $unreadCount ?? 0,
+        'notifCount'      => $notifCount  ?? 0,
+    ])
 
 <div class="dash-body">
     @if(session('success'))
@@ -6,7 +19,7 @@
     @endif
 
     @php
-        $isMember = $group->members()->where('user_id', auth()->id())->exists();
+        $isMember = $group->users()->where('user_id', auth()->id())->exists();
     @endphp
 
     @if(!$isMember)
