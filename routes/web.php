@@ -149,7 +149,7 @@ Route::prefix('student')->name('student.')->middleware(['auth','role:student'])-
     ->name('quizzes');
     Route::get('/quizzes/{quiz}/attempt', [StudentQuizController::class, 'attempt'])
     ->name('quizzes.attempt');
-    Route::post('/quizzes/{quiz}/questions/{question}/answer', [StudentQuizController::class, 'answer'])
+    Route::post('/quizzes/{quiz}/answer', [StudentQuizController::class, 'answer'])
     ->name('quizzes.answer');
 
 //     Route::get('/quizzes',          [StudentDashboardController::class, 'quizzes'])->name('quizzes');
