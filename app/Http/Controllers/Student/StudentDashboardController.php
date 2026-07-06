@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Student;
 use App\Http\Controllers\Controller;
 use App\Services\{GroupService,GroupChatService};
-use Iluminate\Http\Request;
+use Illuminate\Http\Request;
 use App\Models\Group;
 use App\Models\PrivateComm;
 use App\Models\Quiz;

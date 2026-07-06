@@ -11,17 +11,15 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.4.0/tabler-icons.min.css" />
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
-    <style>
-    *,
-    *::before,
-    *::after {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-    }
+   
 
-    <link rel="stylesheet"href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">@vite(['resources/css/app.css', 'resources/js/app.js']) @livewireStyles <style>*,
+    <link rel="stylesheet"href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    @vite(['resources/css/app.css', 'resources/js/app.js']) 
+    @livewireStyles
+    
+    <style>,
     *::before,
+
     *::after {
         box-sizing: border-box;
         margin: 0;
@@ -699,6 +697,14 @@
         color: var(--muted);
         margin-top: 2px;
     }
+    .notification-card{
+        padding: 15px;
+        margin-top: 15px;
+        margin-bottom: 5px;
+        border: 2px, solid grey;
+        border-radius: 9px;
+        box-shadow: 3px 2px 10px black;
+    }
 
     /* ── Table ── */
     .table-scroll {
@@ -845,8 +851,7 @@
             grid-template-columns: 1fr;
         }
     }
-
-    =======
+    
     /* ================= CHAT ================= */
 
    
@@ -1032,6 +1037,22 @@
     .chat-send:hover {
         background: var(--purple-600);
     }
+    .header{
+        display: none;
+    }
+
+    /*responxive */
+    @media(max-width:768px){
+    .header{
+        display: block;
+        padding: 10px;
+
+    }
+    .sidebar-avatar{
+        margin-left: 0;
+        
+    }
+    }
 
     </style>
     @stack('styles')
@@ -1039,7 +1060,7 @@
 
 <body>
     @yield('body')
-    @livewireStyles
+    
     @stack('scripts')
 </body>
 

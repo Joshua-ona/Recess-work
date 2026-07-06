@@ -219,5 +219,35 @@
             <div class="sidebar-user-meta">{{ $user->email }}</div>
         </div>
     </div>
+     {{--icons--}}
+    <div class="header">
+           <a href="{{ route('student.dashboard') }}"
+               class="sidebar-item {{ request()->routeIs('student.dashboard') ? 'active' : '' }}">
+                <i class="ti ti-home" aria-hidden="true"></i> 
+            </a>
+            <a href="{{ route('student.discussions.index') }}"
+               class="sidebar-item {{ request()->routeIs('student.discussions.*') ? 'active' : '' }}">
+                <i class="ti ti-messages" aria-hidden="true"></i> 
+                @if(($unreadCount ?? 0) > 0)
+                    <span class="sidebar-badge">{{ $unreadCount }}</span>
+                @endif
+            </a>
+            <a href="{{ route('student.saved') }}" class="sidebar-item">
+                <i class="ti ti-bookmark" aria-hidden="true"></i>  
+            </a>
+             <a href="{{ route('student.quizzes') }}" class="sidebar-item">
+                <i class="ti ti-clipboard-check"></i> 
+            </a>
+            <a href="{{ route('chat') }}" class="sidebar-item">
+                <i class="ti ti-message-circle"></i> 
+            </a>
+            <a href="{{ route('groups.index') }}" class="sidebar-item">
+                <i class="ti ti-users-group"></i> 
+            </a>
+             <div class="sidebar-avatar" aria-hidden="true">
+            {{ strtoupper(substr($user->first_name ?? $user->name ?? 'U', 0, 1)) }}{{ strtoupper(substr($user->last_name ?? '', 0, 1)) }}
+        </div>
+
+    </div>
 
 </nav>
