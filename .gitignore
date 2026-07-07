@@ -23,6 +23,7 @@
 /storage/framework/sessions/*
 /storage/framework/testing/*
 /storage/framework/views/*
+/storage
 /vendor
 Homestead.json
 Homestead.yaml
