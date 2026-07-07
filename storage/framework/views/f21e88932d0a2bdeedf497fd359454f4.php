@@ -6,7 +6,7 @@ use App\Models\PrivateComm;
 use App\Events\MessageSent;
 ?>
 
-<div class="chat-wrapper">
+<div class="chat-wrapper" data-login-id="<?php echo e($loginId); ?>">
 
     
     <div class="chat-users">
@@ -114,6 +114,7 @@ use App\Events\MessageSent;
             <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
 
         </div>
+        <div id="typing-indicator" class=""></div>
 
         
         <form wire:submit.prevent="sendMessage" class="chat-input">
@@ -122,7 +123,8 @@ use App\Events\MessageSent;
                 type="text"
                 id="message"
                 name="message"
-                wire:model="message"
+                wire:model.live="message"
+                 wire:input="updateNewMessage"
                 placeholder="Type a message..."
                 autocomplete="off">
 
@@ -134,4 +136,6 @@ use App\Events\MessageSent;
 
     </div>
 
-</div><?php /**PATH C:\xampp\htdocs\fave\storage\framework\views/livewire/views/bb5fdb75.blade.php ENDPATH**/ ?>
+</div>
+
+;<?php /**PATH C:\xampp\htdocs\fave\storage\framework\views/livewire/views/bb5fdb75.blade.php ENDPATH**/ ?>

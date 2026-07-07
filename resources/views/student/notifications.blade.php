@@ -19,7 +19,7 @@
                 <div class="dash-header-title">Notifications</div>
                 <div class="dash-header-sub">
                     @if ($notifications->isNotEmpty())
-                        You have {{ $notifications->count() }} {{ Str::plural('warning', $notifications->count()) }} on file
+                        You have {{ $notifications->count() }} {{ Str::plural('notification', $notifications->count()) }} on file
                     @else
                         Nothing new
                     @endif
