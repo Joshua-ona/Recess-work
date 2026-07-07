@@ -837,7 +837,7 @@
             display: none;
         }
 
-        <<<<<<< HEAD .panel-grid {
+         .panel-grid {
             grid-template-columns: 1fr;
         }
 
@@ -846,7 +846,7 @@
         }
     }
 
-    =======
+    
     /* ================= CHAT ================= */
 
    

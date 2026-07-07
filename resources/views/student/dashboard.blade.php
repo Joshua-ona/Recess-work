@@ -56,7 +56,9 @@
             <div class="stat-grid">
                 <div class="stat-card">
                     <div class="stat-label">
-                        <i class="ti ti-messages" style="color:var(--purple-600)" aria-hidden="true"></i>
+                        <span class="stat-icon" style="background:var(--purple-50);">
+                            <i class="ti ti-messages" style="color:var(--purple-600)" aria-hidden="true"></i>
+                        </span>
                         Posts made
                     </div>
                     <div class="stat-value">{{ $postCount ?? 0 }}</div>
@@ -64,7 +66,9 @@
                 </div>
                 <div class="stat-card">
                     <div class="stat-label">
-                        <i class="ti ti-heart" style="color:var(--pink-600)" aria-hidden="true"></i>
+                        <span class="stat-icon" style="background:var(--pink-50);">
+                            <i class="ti ti-heart" style="color:var(--pink-600)" aria-hidden="true"></i>
+                        </span>
                         Upvotes received
                     </div>
                     <div class="stat-value">{{ $upcomingQuiz ?? 0 }}</div>
@@ -72,14 +76,18 @@
                 </div>
                 <div class="stat-card">
                     <div class="stat-label">
-                        <i class="ti ti-books" style="color:var(--teal-400)" aria-hidden="true"></i>
+                        <span class="stat-icon" style="background:var(--teal-50);">
+                            <i class="ti ti-books" style="color:var(--teal-400)" aria-hidden="true"></i>
+                        </span>
                         Enrolled courses
                     </div>
                     <div class="stat-value">{{ ($enrolledCourses ?? collect())->count() }}</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-label">
-                        <i class="ti ti-star" style="color:var(--amber-400)" aria-hidden="true"></i>
+                        <span class="stat-icon" style="background:var(--amber-50);">
+                            <i class="ti ti-star" style="color:var(--amber-400)" aria-hidden="true"></i>
+                        </span>
                         Participation Score
                     </div>
                     <div class="stat-value">{{ number_format($ParticipationScore ?? 0) }}</div>
@@ -88,97 +96,92 @@
             </div>
 
 
-            <div class="panel-grid" style="margin: 24px 0;">
+            <div class="panel-grid" style="grid-template-columns: 1fr 1fr 1fr; margin: 24px 0;">
                 {{-- PANEL 1: My Groups --}}
                 <div class="panel">
                     <div class="panel-head">
-                        <span class="panel-title"><i class="titi-users"></i> My Groups</span>
+                        <span class="panel-title"><i class="ti ti-users"></i> My Groups</span>
                     </div>
                     <div class="panel-body">
                         @if($myGroups->isEmpty())
                         <p style="font-size:13px;color:var(--muted);text-align:center;padding:1rem 0;">No groups
-                            yet.Request to create one.</p>
+                            yet. Request to create one.</p>
                         @else
                         @foreach($myGroups as $g)
                         <div class="disc-item">
                             <div
-                                style="width:8px; height:8px; border-radius:50%; background:{{ $g->status == 'approved' ? 'var(--green-600)' : 'var(--amber-600)' }};">
+                                style="width:8px; height:8px; border-radius:50%; margin-top:4px; background:{{ $g->status == 'approved' ? 'var(--green-600)' : 'var(--amber-600)' }};">
                             </div>
                             <div style="flex:1;">
-                                <a href="{{route('student.groups.show', $g)}}">
+                                <a href="{{route('student.groups.show', $g)}}" style="text-decoration:none;">
                                     <div class="disc-title">{{ $g->name }}</div>
                                 </a>
                             </div>
-
-                            @endforeach
                         </div>
+                        @endforeach
                         @endif
                     </div>
                 </div>
 
-
-
-                {{-- PANEL 1: All Groups --}}
+                {{-- PANEL 2: All Groups --}}
                 <div class="panel">
-                    <div class="panel-head"> <span class="panel-title"><i class="titi-users"></i> Browse All
-                            Groups</span>
+                    <div class="panel-head">
+                        <span class="panel-title"><i class="ti ti-users"></i> Browse All Groups</span>
                     </div>
                     <div class="panel-body">
                         @forelse($browseGroups as $g)
                         <div class="disc-item">
-                            <div style="width:8px; height:8px; border-radius:50%; background:var(--green-600)';">
+                            <div style="width:8px; height:8px; border-radius:50%; margin-top:4px; background:var(--green-600);">
                             </div>
-                            <div style="flex:1;">
-                                <div class="disc-title">{{ $g->name }}</div>
-                                <div class="disc-meta">
-                                    <span class="badge badge-green">approved</span>
+                            <div style="flex:1;display:flex;justify-content:space-between;align-items:center;gap:8px;">
+                                <div>
+                                    <div class="disc-title">{{ $g->name }}</div>
+                                    <div class="disc-meta">
+                                        <span class="badge badge-green">approved</span>
+                                    </div>
                                 </div>
 
-                                <form method="POST" action="{{ route('student.groups.join', $g) }}" class="disc-item"
-                                    style="display:flex;justify-content:space-between;align-items:center;">
+                                <form method="POST" action="{{ route('student.groups.join', $g) }}">
                                     @csrf
                                     <button type="submit" class="panel-action"
                                         style="border:none;background:none; color:var(--blue-600);cursor:pointer;">Join</button>
                                 </form>
-
                             </div>
-                            @empty
-                            <p style="font-size:13px;color:var(--muted);text-align:center;padding:1rem 0;">No
-                                Approved
-                                groups to join.</p>
-                            @endforelse
                         </div>
-                    </div>
-
-
-                    {{-- PANEL 2: Create / Join Groups --}}
-                    <div class="panel">
-                        <div class="panel-head">
-                            <span class="panel-title"><i class="titi-circle-plus"></i> Create / Join Groups</ span>
-                        </div>
-                        <div class="panel-body">
-                            @if(session('success'))
-                            <p
-                                style="font-size:13px;color:#065f46;background:#ecfdf5;padding:8px;border-radius:8px;margin-bottom:8px;">
-                                {{ session('success') }}</p>
-                            @endif
-                            <form method="POST" action="{{ route('student.groups.store') }}"
-                                style="margin-bottom: 16px;">
-                                @csrf
-                                <input name="name" value="{{ old('name') }}" placeholder="Groupname e.g. Java"
-                                    style="width:100%; padding:8px; border:1px solid #e5e7eb;border-radius:8px; font-size:14px;">
-                                @error('name')
-                                <p style="font-size:12px;color:#dc2626; margin-top:4px;">{{ $message }}</p>
-                                @enderror
-                                <button class="btn btn-primary" style="width:100%; margin-top:8px;">Request
-                                    Group</button>
-                                <p style="font-size:11px;color:var(--muted); margin-top:4px;">Needs admin approval.
-                                </p>
-                            </form>
-
-                        </div>
+                        @empty
+                        <p style="font-size:13px;color:var(--muted);text-align:center;padding:1rem 0;">No
+                            approved groups to join.</p>
+                        @endforelse
                     </div>
                 </div>
+
+                {{-- PANEL 3: Create / Join Groups --}}
+                <div class="panel">
+                    <div class="panel-head">
+                        <span class="panel-title"><i class="ti ti-circle-plus"></i> Create / Join Groups</span>
+                    </div>
+                    <div class="panel-body">
+                        @if(session('success'))
+                        <p
+                            style="font-size:13px;color:#065f46;background:#ecfdf5;padding:8px;border-radius:8px;margin-bottom:8px;">
+                            {{ session('success') }}</p>
+                        @endif
+                        <form method="POST" action="{{ route('student.groups.store') }}"
+                            style="margin-bottom: 16px;">
+                            @csrf
+                            <input name="name" value="{{ old('name') }}" placeholder="Group name e.g. Java"
+                                style="width:100%; padding:8px; border:1px solid #e5e7eb;border-radius:8px; font-size:14px;">
+                            @error('name')
+                            <p style="font-size:12px;color:#dc2626; margin-top:4px;">{{ $message }}</p>
+                            @enderror
+                            <button class="btn btn-primary" style="width:100%; margin-top:8px;">Request
+                                Group</button>
+                            <p style="font-size:11px;color:var(--muted); margin-top:4px;">Needs admin approval.
+                            </p>
+                        </form>
+                    </div>
+                </div>
+            </div>
 
 
                 {{-- Two-column panels --}}

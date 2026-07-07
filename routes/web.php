@@ -99,6 +99,9 @@ Route::prefix('lecturer')->name('lecturer.')->middleware(['auth','role:lecturer'
     Route::get('/quizzes/create', [LecturerDashboardController::class, 'createQuiz'])
         ->name('quizzes.create');
 
+        Route::get('/quizzes/{quiz}/upload', [QuizController::class, 'showUploadForm'])
+    ->name('quizzes.upload.form');
+
     Route::post('/quizzes/{quiz}/upload', [QuizController::class,'uploadQuiz'])
         ->name('quizzes.upload');
 
@@ -147,7 +150,7 @@ Route::prefix('student')->name('student.')->middleware(['auth','role:student'])-
     ->name('reports');
    Route::get('/quizzes', [StudentQuizController::class, 'index'])
     ->name('quizzes');
-    Route::get('/quizzes/{quiz}/attempt', [StudentQuizController::class, 'attempt'])
+    Route::get('/quizzes/{quiz}/attempt/{number?}', [StudentQuizController::class, 'attempt'])
     ->name('quizzes.attempt');
     Route::post('/quizzes/{quiz}/answer', [StudentQuizController::class, 'answer'])
     ->name('quizzes.answer');

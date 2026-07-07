@@ -10,7 +10,10 @@
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.4.0/tabler-icons.min.css" />
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
+    <?php echo \Livewire\Mechanisms\FrontendAssets\FrontendAssets::styles(); ?>
+
+
     <style>
     *,
     *::before,
@@ -19,15 +22,6 @@
         margin: 0;
         padding: 0;
     }
-
-    <link rel="stylesheet"href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"><?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?> <?php echo \Livewire\Mechanisms\FrontendAssets\FrontendAssets::styles(); ?> <style>*,
-    *::before,
-    *::after {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-    }
-
 
     :root {
         --purple-50: #EEEDFE;
@@ -543,15 +537,31 @@
         border: var(--border);
         border-radius: var(--radius-lg);
         padding: 1rem;
+        transition: box-shadow .15s, transform .15s;
+    }
+
+    .stat-card:hover {
+        box-shadow: 0 4px 16px rgba(0, 0, 0, .06);
+        transform: translateY(-1px);
     }
 
     .stat-label {
         font-size: 12px;
         color: var(--muted);
-        margin-bottom: 6px;
+        margin-bottom: 10px;
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 8px;
+    }
+
+    .stat-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
     }
 
     .stat-label i {
@@ -594,6 +604,11 @@
         background: var(--surface);
         border: var(--border);
         border-radius: var(--radius-lg);
+        transition: box-shadow .15s;
+    }
+
+    .panel:hover {
+        box-shadow: 0 4px 16px rgba(0, 0, 0, .05);
     }
 
     .panel-head {
@@ -837,25 +852,24 @@
             display: none;
         }
 
-        <<<<<<< HEAD .panel-grid {
+        .panel-grid {
             grid-template-columns: 1fr;
         }
 
         .form-row {
             grid-template-columns: 1fr;
         }
+
+        .stat-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .quiz-nav-grid {
+            grid-template-columns: repeat(6, 1fr);
+        }
     }
 
-    =======
     /* ================= CHAT ================= */
-
-   
-    :root {
-        --border: 1px solid #d1d5db;
-        --purple-800: #5b21b6;
-        --purple-600: #7c3aed;
-        --purple-50: #f5f3ff;
-    }
 
     .chat-wrapper {
         display: flex;
