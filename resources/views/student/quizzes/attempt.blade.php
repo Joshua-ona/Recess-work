@@ -225,6 +225,12 @@
 
             <form method="POST" action="{{ route('student.quizzes.answer', $quiz->quiz_id) }}" id="quiz-form">
                 @csrf
+                @csrf
+
+<input type="hidden"
+       id="auto_submitted"
+       name="auto_submitted"
+       value="0">
 
                 @foreach($questions as $qIndex => $question)
                     <div class="quiz-card">
@@ -283,7 +289,7 @@
 @push('scripts')
 <script>
 (function () {
-    // Highlight the selected option in each question card.
+    
     document.querySelectorAll('[data-quiz-option]').forEach(function (box) {
         var input = box.querySelector('input[type="radio"]');
         input.addEventListener('change', function () {
@@ -295,8 +301,7 @@
         });
     });
 
-    // Server tells us exactly how much time is left, so the timer keeps
-    // counting down across pages instead of resetting each time.
+   
     var seconds = {{ (int) $remainingSeconds }};
     var timerEl = document.getElementById('timer');
     var timerBox = document.getElementById('quiz-timer');
@@ -332,7 +337,36 @@
         }
     }, 1000);
 })();
+
+if (remainingSeconds <= 600 && !warned10) {
+    warned10 = true;
+
+    alert("⚠ Warning! Only 10 minutes left.");
+}
+
+
+if (remainingSeconds <= 420 && !warned7) {
+    warned7 = true;
+
+    alert("⚠ Final Warning! Only 7 minutes left.");
+}
+function submitQuiz() {
+
+    if (window.quizSubmitted) return;
+
+    window.quizSubmitted = true;
+
+    document.getElementById("auto_submitted").value = 1;
+
+    form.submit();
+}
+document.addEventListener('visibilitychange', function () {
+    if (document.hidden) {
+        submitQuiz();
+    }
+});
 </script>
+
 @endpush
 
 @endsection

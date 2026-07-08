@@ -136,4 +136,5 @@ private function scoreAnswers(Quiz $quiz, array $answers): int
 
     return $score;
 }
+
 }
