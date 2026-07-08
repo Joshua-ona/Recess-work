@@ -4,54 +4,71 @@
 
 @section('body')
 
-<div class="container mt-4">
+<div class="dash-wrap">
 
-    <h2>Available Quizzes</h2>
+    @include('layouts.sidebar',[
+        'role'=>'student',
+        'user'=>auth()->user()
+    ])
 
-    @if($quizzes->isEmpty())
-        <p>No quizzes available.</p>
-    @else
+    <div class="dash-main">
 
-        <table class="table table-bordered">
+        <div class="dash-header">
+            <div>
+                <div class="dash-header-title">Available quizzes</div>
+                <div class="dash-header-sub">
+                    {{ $quizzes->count() }} {{ Str::plural('quiz', $quizzes->count()) }} published
+                </div>
+            </div>
+        </div>
 
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Start Time</th>
-                    <th>Duration</th>
-                    <th></th>
-                </tr>
-            </thead>
+        <div class="dash-body">
 
-            <tbody>
+            @if($quizzes->isEmpty())
+                <div class="full-panel">
+                    <div class="panel-body" style="text-align:center; padding:2.5rem 1rem;">
+                        <i class="ti ti-clipboard-list" style="font-size:32px;color:var(--hint);" aria-hidden="true"></i>
+                        <p style="color:var(--muted); margin-top:10px;">No quizzes available right now.</p>
+                    </div>
+                </div>
+            @else
+                <div class="full-panel">
+                    <div class="table-scroll">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Start time</th>
+                                    <th>Duration</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($quizzes as $quiz)
+                                    <tr>
+                                        <td style="font-weight:500;">{{ $quiz->title }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($quiz->start_time)->format('M j, Y g:i A') }}</td>
+                                        <td>
+                                            <span class="badge badge-purple">
+                                                <i class="ti ti-clock" aria-hidden="true"></i>&nbsp;{{ $quiz->duration_mins }} mins
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a href="{{ route('student.quizzes.attempt', $quiz->quiz_id) }}"
+                                               class="btn btn-primary btn-sm" style="width:auto;">
+                                                Start quiz <i class="ti ti-arrow-right" aria-hidden="true"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            @endif
 
-            @foreach($quizzes as $quiz)
-
-                <tr>
-
-                    <td>{{ $quiz->title }}</td>
-
-                    <td>{{ $quiz->start_time }}</td>
-
-                    <td>{{ $quiz->duration_mins }} mins</td>
-
-                    <td>
-                       <a href="{{ route('student.quizzes.attempt', $quiz->quiz_id) }}"
-   class="btn btn-primary">
-    Start Quiz
-</a>
-                    </td>
-
-                </tr>
-
-            @endforeach
-
-            </tbody>
-
-        </table>
-
-    @endif
-
+        </div>
+    </div>
 </div>
 
 @endsection
