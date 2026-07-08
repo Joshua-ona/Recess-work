@@ -289,7 +289,7 @@
 @push('scripts')
 <script>
 (function () {
-    
+   
     document.querySelectorAll('[data-quiz-option]').forEach(function (box) {
         var input = box.querySelector('input[type="radio"]');
         input.addEventListener('change', function () {
@@ -307,6 +307,9 @@
     var timerBox = document.getElementById('quiz-timer');
     var form = document.getElementById('quiz-form');
     var submitted = false;
+    var warned10 = false;
+    var warned7 = false;
+    var timerInterval = null;
 
     function render() {
         var s = Math.max(0, seconds);
@@ -324,47 +327,130 @@
 
     render();
 
-    var interval = setInterval(function () {
+    timerInterval = setInterval(function () {
         seconds--;
         render();
 
+        // Timer warnings
+        if (seconds <= 600 && !warned10) {
+            warned10 = true;
+            alert("⚠ Warning! Only 10 minutes left.");
+        }
+
+        if (seconds <= 420 && !warned7) {
+            warned7 = true;
+            alert("⚠ Final Warning! Only 7 minutes left.");
+        }
+
+        // Time's up - submit quiz
         if (seconds <= 0 && !submitted) {
             submitted = true;
-            clearInterval(interval);
-            // Time's up — submit whatever is answered on this page.
-            // The server re-checks the deadline and finalizes the attempt.
-            form.submit();
+            clearInterval(timerInterval);
+            timerInterval = null;
+            
+            console.log("⏰ Time's up - auto-submitting quiz");
+            submitQuiz();
         }
     }, 1000);
-})();
 
-if (remainingSeconds <= 600 && !warned10) {
-    warned10 = true;
+    function submitQuiz() {
+        console.log("📨 submitQuiz() called");
+        
+        // Check if already submitted
+        if (submitted) {
+            console.log("⛔ Quiz already submitted, skipping");
+            return;
+        }
 
-    alert("⚠ Warning! Only 10 minutes left.");
-}
+        // Mark as submitted
+        submitted = true;
+        console.log("✅ Quiz marked as submitted");
 
+        // Set auto_submitted flag
+        var autoInput = document.getElementById('auto_submitted');
+        if (autoInput) {
+            autoInput.value = 1;
+            console.log("✅ auto_submitted set to 1");
+        } else {
+            console.warn("⚠️ auto_submitted input not found");
+        }
 
-if (remainingSeconds <= 420 && !warned7) {
-    warned7 = true;
+        // Clear timer to prevent double submission
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            console.log("✅ Timer cleared");
+        }
 
-    alert("⚠ Final Warning! Only 7 minutes left.");
-}
-function submitQuiz() {
-
-    if (window.quizSubmitted) return;
-
-    window.quizSubmitted = true;
-
-    document.getElementById("auto_submitted").value = 1;
-
-    form.submit();
-}
-document.addEventListener('visibilitychange', function () {
-    if (document.hidden) {
-        submitQuiz();
+        // Submit the form
+        if (form) {
+            console.log("📤 Submitting form...");
+            form.submit();
+            console.log("✅ Form submitted successfully");
+        } else {
+            console.error("❌ Form not found!");
+        }
     }
-});
+
+    // Make submitQuiz globally accessible
+    window.submitQuiz = submitQuiz;
+
+    // ============================================
+    // 4. AUTO-SUBMIT ON TAB/SWITCH SCREEN (FIXED)
+    // ============================================
+    document.addEventListener('visibilitychange', function () {
+        console.log("🔄 Visibility change detected");
+        console.log("📊 document.hidden:", document.hidden);
+        console.log("📊 submitted status:", submitted);
+        
+        if (document.hidden) {
+            console.log("🔴 TAB SWITCH DETECTED - auto-submitting quiz");
+            
+            // Only submit if not already submitted
+            if (!submitted) {
+                submitQuiz();
+                console.log("✅ Quiz auto-submitted due to tab switch");
+            } else {
+                console.log("⏭️ Quiz already submitted, skipping");
+            }
+        } else {
+            console.log("🟢 Page is visible again");
+        }
+    });
+
+    // ============================================
+    // 5. WINDOW BLUR (User clicks outside)
+    // ============================================
+    window.addEventListener('blur', function() {
+        if (!submitted) {
+            console.log("🔴 Window lost focus - auto-submitting");
+            submitQuiz();
+        }
+    });
+
+    // ============================================
+    // 6. PAGE CLOSE/REFRESH DETECTION
+    // ============================================
+    window.addEventListener('beforeunload', function(e) {
+        if (!submitted) {
+            console.log("⚠️ User attempting to leave page");
+            submitQuiz();
+            
+            // Show warning dialog
+            e.preventDefault();
+            e.returnValue = '⚠️ Your quiz will be submitted if you leave. Are you sure?';
+        }
+    });
+
+    // ============================================
+    // 7. DEBUGGING HELP
+    // ============================================
+    console.log("✅ Quiz script loaded successfully");
+    console.log("💡 Timer started:", seconds, "seconds remaining");
+    console.log("💡 Try switching tabs to test auto-submit");
+    console.log("💡 submitQuiz() function is available");
+
+})(); // End of IIFE
 </script>
 
 @endpush

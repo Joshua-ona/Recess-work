@@ -53,8 +53,7 @@ if ($remainingSeconds <= 0) {
     ]);
 }
 
-// Whatever the student already answered (on this page or earlier ones)
-// so we can pre-select those options when the page renders.
+
 $savedAnswers = session($answersKey, []);
 
    return view('student.quizzes.attempt', [
@@ -74,10 +73,7 @@ public function answer(Request $request, Quiz $quiz)
     $deadlineKey = 'quiz_deadline_' . $quiz->quiz_id;
     $answersKey = 'quiz_answers_' . $quiz->quiz_id;
 
-    // Merge this page's answers into whatever has already been answered
-    // on previous pages, so nothing gets lost when navigating back and forth.
-    // NOTE: array_merge() would renumber these since question_id keys are
-    // numeric — the + operator preserves the actual question_id keys.
+    
     $savedAnswers = $answers + session($answersKey, []);
     session([$answersKey => $savedAnswers]);
 
@@ -96,8 +92,8 @@ public function answer(Request $request, Quiz $quiz)
         ]);
     }
 
-    // Quiz finished (or time ran out) — score once from the full set of
-    // saved answers, then clear the session so the next attempt starts fresh.
+   
+    
     $score = $this->scoreAnswers($quiz, $savedAnswers);
 
     session()->forget($deadlineKey);
@@ -109,14 +105,11 @@ public function answer(Request $request, Quiz $quiz)
         'total' => $quiz->questions()->count(),
         'timedOut' => $timedOut,
     ]);
+    
 }
 
-/**
- * Score a full set of question_id => selected_option_id answers against
- * the quiz's correct answers. Kept as a single pass so re-visiting pages
- * or resubmitting never double-counts a question.
- */
-private function scoreAnswers(Quiz $quiz, array $answers): int
+
+public function scoreAnswers(Quiz $quiz, array $answers): int
 {
     $score = 0;
 
@@ -129,8 +122,9 @@ private function scoreAnswers(Quiz $quiz, array $answers): int
             continue;
         }
 
-        if ($selectedAnswer == $question->correct_answer) {
-            $score++;
+       if (strtolower($selectedAnswer) == strtolower($question->correct_answer)) {
+    $score++;
+
         }
     }
 
