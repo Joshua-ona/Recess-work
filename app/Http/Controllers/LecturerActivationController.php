@@ -10,30 +10,40 @@ use Illuminate\Support\Str;
 
 class LecturerActivationController extends Controller
 {
-    /**
-     * Show the "set your password" form, or an expired/invalid message.
-     */
     public function show(string $token)
     {
-        $user = $this->findByToken($token);
+        $user = User::where('invite_token', $token)->first();
 
+        // Token not found at all
+        if (! $user) {
+            return view('auth.activate-lecturer', [
+                'state' => 'invalid',
+                'token' => $token,
+            ]);
+        }
+
+        // Token found but expired — show resend form pre-filled with their email
+        if ($user->invite_token_expires_at < now()) {
+            return view('auth.activate-lecturer', [
+                'state'     => 'expired',
+                'token'     => $token,
+                'userEmail' => $user->email,
+            ]);
+        }
+
+        // Valid — show the set-password form
         return view('auth.activate-lecturer', [
-            'invalid' => ! $user,
-            'token'   => $token,
+            'state' => 'valid',
+            'token' => $token,
         ]);
     }
 
-    /**
-     * Set the password, activate the account, and burn the token.
-     */
     public function activate(Request $request, string $token)
     {
-        $user = $this->findByToken($token);
+        $user = User::where('invite_token', $token)->first();
 
-        if (! $user) {
-            return redirect()
-                ->route('lecturer.activate.show', ['token' => $token])
-                ->withErrors(['password' => 'This activation link is invalid or has expired.']);
+        if (! $user || $user->invite_token_expires_at < now()) {
+            return redirect('/lecturer/activate/' . $token);
         }
 
         $request->validate([
@@ -43,34 +53,24 @@ class LecturerActivationController extends Controller
         $user->update([
             'password'                => $request->input('password'),
             'status'                  => 'active',
+            'is_enabled'              => true,
             'email_verified_at'       => now(),
             'invite_token'            => null,
             'invite_token_expires_at' => null,
         ]);
 
-        return redirect()
-            ->route('login')
+        return redirect()->route('login')
             ->with('status', 'Your account is active — you can now sign in.');
     }
 
-    /**
-     * Show the self-service resend form (lecturer enters their email).
-     */
     public function resendForm()
     {
         return view('auth.resend-invite');
     }
 
-    /**
-     * Lecturer submits their email → regenerate token and resend the invite.
-     * Fails silently if the email doesn't match a pending lecturer account,
-     * to avoid leaking which emails are registered.
-     */
     public function resendSelf(Request $request)
     {
-        $request->validate([
-            'email' => ['required', 'email'],
-        ]);
+        $request->validate(['email' => ['required', 'email']]);
 
         $user = User::where('email', $request->input('email'))
             ->where('role', 'lecturer')
@@ -78,27 +78,19 @@ class LecturerActivationController extends Controller
             ->first();
 
         if ($user) {
-            $rawToken = Str::random(60);
+            $token = Str::random(32);
 
             $user->update([
-                'invite_token'            => hash('sha256', $rawToken),
+                'invite_token'            => $token,
                 'invite_token_expires_at' => now()->addDays(3),
             ]);
 
-            $activationUrl = route('lecturer.activate.show', ['token' => $rawToken]);
+            $activationUrl = url('/lecturer/activate/' . $token);
             Mail::to($user->email)->send(new LecturerInvitation($user, $activationUrl));
         }
 
-        // Always show the same message whether the email matched or not.
         return back()->with('status',
             'If that email matches a pending lecturer account, a new activation link has been sent.'
         );
-    }
-
-    private function findByToken(string $token): ?User
-    {
-        return User::where('invite_token', hash('sha256', $token))
-            ->where('invite_token_expires_at', '>', now())
-            ->first();
     }
 }
