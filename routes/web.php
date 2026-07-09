@@ -117,10 +117,44 @@ Route::prefix('lecturer')->name('lecturer.')->middleware(['auth', 'role:lecturer
     Route::get('/performance', [LecturerDashboardController::class, 'performance'])->name('performance');
     Route::post('/quizzes/{quiz}/upload', [QuizController::class, 'uploadQuiz'])->name('quizzes.upload');
 
-    Route::get('/messages', [LecturerDashboardController::class, 'messages'])->name('messages');
-    Route::get('/notifications', [LecturerDashboardController::class, 'notifications'])->name('notifications');
-    Route::get('/settings', [LecturerDashboardController::class, 'settings'])->name('settings');
-    Route::get('/quizzes/create', [LecturerDashboardController::class, 'createQuiz'])->name('quizzes.create');
+    Route::get('/quizzes/create', [LecturerDashboardController::class, 'createQuiz'])
+        ->name('quizzes.create');
+
+        Route::get('/quizzes/{quiz}/upload', [QuizController::class, 'showUploadForm'])
+    ->name('quizzes.upload.form');
+
+    Route::post('/quizzes/{quiz}/upload', [QuizController::class,'uploadQuiz'])
+        ->name('quizzes.upload');
+
+    Route::get('/performance', [LecturerDashboardController::class, 'performance'])
+        ->name('performance');
+
+    Route::get('/messages', [LecturerDashboardController::class, 'messages'])
+        ->name('messages');
+
+    Route::get('/notifications', [LecturerDashboardController::class, 'notifications'])
+        ->name('notifications');
+
+    Route::get('/settings', [LecturerDashboardController::class, 'settings'])
+        ->name('settings');
+
+    Route::get('/quizzes', [QuizController::class,'index'])
+        ->name('quizzes');
+    Route::get('/quizzes/create', [QuizController::class,'create'])
+        ->name('quizzes.create');
+
+    Route::post('/quizzes', [QuizController::class,'store'])
+        ->name('quizzes.store');
+    Route::get('/quizzes/{quiz}', [QuizController::class,'show'])
+        ->name('quizzes.show');
+    Route::get('/quizzes/{quiz}/edit', [QuizController::class,'edit'])
+        ->name('quizzes.edit');
+    Route::put('/quizzes/{quiz}', [QuizController::class,'update'])
+        ->name('quizzes.update');
+        Route::post('/quizzes/{quiz}/publish', [QuizController::class, 'publish'])
+        ->name('lecturer.quizzes.publish');
+        Route::delete('/quizzes/{quiz}', [QuizController::class,'destroy'])
+        ->name('quizzes.destroy');
 });
 
 // ── Student routes ─────────────────────────────────────────
@@ -137,7 +171,7 @@ Route::prefix('student')->name('student.')->middleware(['auth', 'role:student'])
     ->name('reports');
    Route::get('/quizzes', [StudentQuizController::class, 'index'])
     ->name('quizzes');
-    Route::get('/quizzes/{quiz}/attempt', [StudentQuizController::class, 'attempt'])
+    Route::get('/quizzes/{quiz}/attempt/{number?}', [StudentQuizController::class, 'attempt'])
     ->name('quizzes.attempt');
     Route::post('/quizzes/{quiz}/answer', [StudentQuizController::class, 'answer'])
     ->name('quizzes.answer');

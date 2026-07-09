@@ -57,7 +57,9 @@
             <div class="stat-grid">
                 <div class="stat-card">
                     <div class="stat-label">
-                        <i class="ti ti-messages" style="color:var(--purple-600)" aria-hidden="true"></i>
+                        <span class="stat-icon" style="background:var(--purple-50);">
+                            <i class="ti ti-messages" style="color:var(--purple-600)" aria-hidden="true"></i>
+                        </span>
                         Posts made
                     </div>
                     <div class="stat-value"><?php echo e($postCount ?? 0); ?></div>
@@ -65,7 +67,9 @@
                 </div>
                 <div class="stat-card">
                     <div class="stat-label">
-                        <i class="ti ti-heart" style="color:var(--pink-600)" aria-hidden="true"></i>
+                        <span class="stat-icon" style="background:var(--pink-50);">
+                            <i class="ti ti-heart" style="color:var(--pink-600)" aria-hidden="true"></i>
+                        </span>
                         Upvotes received
                     </div>
                     <div class="stat-value"><?php echo e($upcomingQuiz ?? 0); ?></div>
@@ -73,14 +77,18 @@
                 </div>
                 <div class="stat-card">
                     <div class="stat-label">
-                        <i class="ti ti-books" style="color:var(--teal-400)" aria-hidden="true"></i>
+                        <span class="stat-icon" style="background:var(--teal-50);">
+                            <i class="ti ti-books" style="color:var(--teal-400)" aria-hidden="true"></i>
+                        </span>
                         Enrolled courses
                     </div>
                     <div class="stat-value"><?php echo e(($enrolledCourses ?? collect())->count()); ?></div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-label">
-                        <i class="ti ti-star" style="color:var(--amber-400)" aria-hidden="true"></i>
+                        <span class="stat-icon" style="background:var(--amber-50);">
+                            <i class="ti ti-star" style="color:var(--amber-400)" aria-hidden="true"></i>
+                        </span>
                         Participation Score
                     </div>
                     <div class="stat-value"><?php echo e(number_format($ParticipationScore ?? 0)); ?></div>
@@ -89,104 +97,99 @@
             </div>
 
 
-            <div class="panel-grid" style="margin: 24px 0;">
+            <div class="panel-grid" style="grid-template-columns: 1fr 1fr 1fr; margin: 24px 0;">
                 
                 <div class="panel">
                     <div class="panel-head">
-                        <span class="panel-title"><i class="titi-users"></i> My Groups</span>
+                        <span class="panel-title"><i class="ti ti-users"></i> My Groups</span>
                     </div>
                     <div class="panel-body">
                         <?php if($myGroups->isEmpty()): ?>
                         <p style="font-size:13px;color:var(--muted);text-align:center;padding:1rem 0;">No groups
-                            yet.Request to create one.</p>
+                            yet. Request to create one.</p>
                         <?php else: ?>
                         <?php $__currentLoopData = $myGroups; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $g): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <div class="disc-item">
                             <div
-                                style="width:8px; height:8px; border-radius:50%; background:<?php echo e($g->status == 'approved' ? 'var(--green-600)' : 'var(--amber-600)'); ?>;">
+                                style="width:8px; height:8px; border-radius:50%; margin-top:4px; background:<?php echo e($g->status == 'approved' ? 'var(--green-600)' : 'var(--amber-600)'); ?>;">
                             </div>
                             <div style="flex:1;">
-                                <a href="<?php echo e(route('student.groups.show', $g)); ?>">
+                                <a href="<?php echo e(route('student.groups.show', $g)); ?>" style="text-decoration:none;">
                                     <div class="disc-title"><?php echo e($g->name); ?></div>
                                 </a>
                             </div>
-
-                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </div>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         <?php endif; ?>
                     </div>
                 </div>
 
-
-
                 
                 <div class="panel">
-                    <div class="panel-head"> <span class="panel-title"><i class="titi-users"></i> Browse All
-                            Groups</span>
+                    <div class="panel-head">
+                        <span class="panel-title"><i class="ti ti-users"></i> Browse All Groups</span>
                     </div>
                     <div class="panel-body">
                         <?php $__empty_1 = true; $__currentLoopData = $browseGroups; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $g): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                         <div class="disc-item">
-                            <div style="width:8px; height:8px; border-radius:50%; background:var(--green-600)';">
+                            <div style="width:8px; height:8px; border-radius:50%; margin-top:4px; background:var(--green-600);">
                             </div>
-                            <div style="flex:1;">
-                                <div class="disc-title"><?php echo e($g->name); ?></div>
-                                <div class="disc-meta">
-                                    <span class="badge badge-green">approved</span>
+                            <div style="flex:1;display:flex;justify-content:space-between;align-items:center;gap:8px;">
+                                <div>
+                                    <div class="disc-title"><?php echo e($g->name); ?></div>
+                                    <div class="disc-meta">
+                                        <span class="badge badge-green">approved</span>
+                                    </div>
                                 </div>
 
-                                <form method="POST" action="<?php echo e(route('student.groups.join', $g)); ?>" class="disc-item"
-                                    style="display:flex;justify-content:space-between;align-items:center;">
+                                <form method="POST" action="<?php echo e(route('student.groups.join', $g)); ?>">
                                     <?php echo csrf_field(); ?>
                                     <button type="submit" class="panel-action"
                                         style="border:none;background:none; color:var(--blue-600);cursor:pointer;">Join</button>
                                 </form>
-
                             </div>
-                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                            <p style="font-size:13px;color:var(--muted);text-align:center;padding:1rem 0;">No
-                                Approved
-                                groups to join.</p>
-                            <?php endif; ?>
                         </div>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                        <p style="font-size:13px;color:var(--muted);text-align:center;padding:1rem 0;">No
+                            approved groups to join.</p>
+                        <?php endif; ?>
                     </div>
+                </div>
 
-
-                    
-                    <div class="panel">
-                        <div class="panel-head">
-                            <span class="panel-title"><i class="titi-circle-plus"></i> Create / Join Groups</ span>
-                        </div>
-                        <div class="panel-body">
-                            <?php if(session('success')): ?>
-                            <p
-                                style="font-size:13px;color:#065f46;background:#ecfdf5;padding:8px;border-radius:8px;margin-bottom:8px;">
-                                <?php echo e(session('success')); ?></p>
-                            <?php endif; ?>
-                            <form method="POST" action="<?php echo e(route('student.groups.store')); ?>"
-                                style="margin-bottom: 16px;">
-                                <?php echo csrf_field(); ?>
-                                <input name="name" value="<?php echo e(old('name')); ?>" placeholder="Groupname e.g. Java"
-                                    style="width:100%; padding:8px; border:1px solid #e5e7eb;border-radius:8px; font-size:14px;">
-                                <?php $__errorArgs = ['name'];
+                
+                <div class="panel">
+                    <div class="panel-head">
+                        <span class="panel-title"><i class="ti ti-circle-plus"></i> Create / Join Groups</span>
+                    </div>
+                    <div class="panel-body">
+                        <?php if(session('success')): ?>
+                        <p
+                            style="font-size:13px;color:#065f46;background:#ecfdf5;padding:8px;border-radius:8px;margin-bottom:8px;">
+                            <?php echo e(session('success')); ?></p>
+                        <?php endif; ?>
+                        <form method="POST" action="<?php echo e(route('student.groups.store')); ?>"
+                            style="margin-bottom: 16px;">
+                            <?php echo csrf_field(); ?>
+                            <input name="name" value="<?php echo e(old('name')); ?>" placeholder="Group name e.g. Java"
+                                style="width:100%; padding:8px; border:1px solid #e5e7eb;border-radius:8px; font-size:14px;">
+                            <?php $__errorArgs = ['name'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
 $message = $__bag->first($__errorArgs[0]); ?>
-                                <p style="font-size:12px;color:#dc2626; margin-top:4px;"><?php echo e($message); ?></p>
-                                <?php unset($message);
+                            <p style="font-size:12px;color:#dc2626; margin-top:4px;"><?php echo e($message); ?></p>
+                            <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>
-                                <button class="btn btn-primary" style="width:100%; margin-top:8px;">Request
-                                    Group</button>
-                                <p style="font-size:11px;color:var(--muted); margin-top:4px;">Needs admin approval.
-                                </p>
-                            </form>
-
-                        </div>
+                            <button class="btn btn-primary" style="width:100%; margin-top:8px;">Request
+                                Group</button>
+                            <p style="font-size:11px;color:var(--muted); margin-top:4px;">Needs admin approval.
+                            </p>
+                        </form>
                     </div>
                 </div>
+            </div>
 
 
                 

@@ -218,5 +218,36 @@
             <div class="sidebar-user-meta"><?php echo e($user->email); ?></div>
         </div>
     </div>
+     
+    <div class="header">
+           <a href="<?php echo e(route('student.dashboard')); ?>"
+               class="sidebar-item <?php echo e(request()->routeIs('student.dashboard') ? 'active' : ''); ?>">
+                <i class="ti ti-home" aria-hidden="true"></i> 
+            </a>
+            <a href="<?php echo e(route('student.discussions.index')); ?>"
+               class="sidebar-item <?php echo e(request()->routeIs('student.discussions.*') ? 'active' : ''); ?>">
+                <i class="ti ti-messages" aria-hidden="true"></i> 
+                <?php if(($unreadCount ?? 0) > 0): ?>
+                    <span class="sidebar-badge"><?php echo e($unreadCount); ?></span>
+                <?php endif; ?>
+            </a>
+            <a href="<?php echo e(route('student.saved')); ?>" class="sidebar-item">
+                <i class="ti ti-bookmark" aria-hidden="true"></i>  
+            </a>
+             <a href="<?php echo e(route('student.quizzes')); ?>" class="sidebar-item">
+                <i class="ti ti-clipboard-check"></i> 
+            </a>
+            <a href="<?php echo e(route('chat')); ?>" class="sidebar-item">
+                <i class="ti ti-message-circle"></i> 
+            </a>
+            <a href="<?php echo e(route('groups.index')); ?>" class="sidebar-item">
+                <i class="ti ti-users-group"></i> 
+            </a>
+             <div class="sidebar-avatar" aria-hidden="true">
+            <?php echo e(strtoupper(substr($user->first_name ?? $user->name ?? 'U', 0, 1))); ?><?php echo e(strtoupper(substr($user->last_name ?? '', 0, 1))); ?>
+
+        </div>
+
+    </div>
 
 </nav><?php /**PATH C:\Users\CORE i5\Desktop\RECESS\Recess-work\resources\views/layouts/sidebar.blade.php ENDPATH**/ ?>

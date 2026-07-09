@@ -13,6 +13,7 @@ new class extends Component {
     public $message;
     public $messages = [];      
     public $loginId;
+    
 
     public function mount()
     {
@@ -59,7 +60,19 @@ new class extends Component {
 
         broadcast(new MessageSent($message))->toOthers();
     }
+   public function updateNewMessage()
+{
+    if (!$this->selectedUser) {
+        return;
+    }
 
+    $this->dispatch(
+        "userTyping",
+        userID: $this->loginId,
+        userName: Auth::user()->first_name,
+        selectedUserId: $this->selectedUser->id
+    );
+}
     public function getListeners()
     {
         return [
@@ -85,7 +98,7 @@ new class extends Component {
 
 };
 ?>
-<div class="chat-wrapper">
+<div class="chat-wrapper" data-login-id="{{ $loginId }}">
 
     {{-- Users --}}
     <div class="chat-users">
@@ -184,6 +197,7 @@ new class extends Component {
             @endforeach
 
         </div>
+        <div id="typing-indicator" class=""></div>
 
         {{-- Input --}}
         <form wire:submit.prevent="sendMessage" class="chat-input">
@@ -192,7 +206,8 @@ new class extends Component {
                 type="text"
                 id="message"
                 name="message"
-                wire:model="message"
+                wire:model.live="message"
+                 wire:input="updateNewMessage"
                 placeholder="Type a message..."
                 autocomplete="off">
 
@@ -207,8 +222,9 @@ new class extends Component {
 </div>
 
 <script>
-document.addEventListener('livewire:init', () => {
+    console.log('Script started');
 
+ console.log("Livewire object", window.Livewire);
     const chatBox = document.getElementById('chat-box');
 
     function isNearBottom() {
@@ -241,6 +257,48 @@ document.addEventListener('livewire:init', () => {
             scrollToBottom();
         }, 150);
     });
+  Livewire.on('userTyping', (event) => {
+    console.log(event);
 
+    window.Echo.private(`chat.${event.selectedUserId}`)
+        .whisper('typing', {
+            userID: event.userID,
+            userName: event.userName,
+        });
 });
-</script>
+console.log('Setting up Echo...');
+
+const loginId = document.querySelector('.chat-wrapper').dataset.loginId;
+
+console.log("Current login ID:", loginId);
+
+window.Echo.private(`chat.${loginId}`)
+    .listenForWhisper('typing', (event) => {
+
+        const t = document.getElementById('typing-indicator');
+
+        if (t) {
+            t.innerText = `${event.userName} is typing...`;
+
+            setTimeout(() => {
+                t.innerText = '';
+            }, 2000);
+        }
+
+        console.log(event);
+    });
+    Livewire.on('userTyping', (event) => {
+
+    console.log("Typing event received from Livewire:", event);
+
+    window.Echo.private(`chat.${event.selectedUserId}`)
+        .whisper('typing', {
+            userID: event.userID,
+            userName: event.userName,
+        });
+
+    console.log("Whisper sent to:", `chat.${event.selectedUserId}`);
+});
+
+console.log('Setting up done');
+</script>;
