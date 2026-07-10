@@ -11,12 +11,14 @@ use App\Http\Controllers\Lecturer\LecturerDiscussionController;
 use App\Http\Controllers\Lecturer\LecturerCourseController;
 use App\Http\Controllers\Student\StudentDashboardController;
 use App\Http\Controllers\Student\StudentDiscussionController;
+use App\Http\Controllers\Student\StudentQuizController;
 
 // ── Public routes ──────────────────────────────────────────
 use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\Admin\GroupController as AdminGroupController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\DiscussionController;
+use App\Http\Controllers\QuizController;
 
 /*
 |--------------------------------------------------------------------------

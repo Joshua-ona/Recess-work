@@ -9,12 +9,12 @@ use App\Models\User;
 
 class Group extends Model
 {
-    protected $fillable = ['name','description','admin_id','status'];
+    protected $fillable = ['name','description','status'];
 
-    public function admin(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'admin_id');
-    }
+     public function admin(): BelongsTo
+     {
+         return $this->belongsTo(User::class, 'admin_id');
+     }
 
     public function users(): BelongsToMany
     {
