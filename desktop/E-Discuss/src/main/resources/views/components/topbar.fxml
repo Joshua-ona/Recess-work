@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<HBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.edudiscuss.controllers.TopBarController"
+      alignment="CENTER_LEFT"
+      spacing="15"
+      prefHeight="70"
+      style="-fx-background-color:white;
+             -fx-padding:15;
+             -fx-border-color:#E5E7EB;
+             -fx-border-width:0 0 1 0;">
+
+    <!-- Page title -->
+    <Label fx:id="pageTitle"
+           text="Dashboard"
+           style="-fx-font-size:22px;
+                  -fx-font-weight:bold;" />
+
+    <!-- Push everything right -->
+    <Region HBox.hgrow="ALWAYS"/>
+
+    <!-- Notifications -->
+    <Button fx:id="notificationBtn"
+            text="🔔 0"
+            style="-fx-background-radius:20;" />
+
+    <!-- User info -->
+    <VBox alignment="CENTER_RIGHT">
+
+        <Label fx:id="nameLabel"
+               text="User Name"
+               style="-fx-font-weight:bold;" />
+
+        <Label fx:id="roleLabel"
+               text="Role"
+               style="-fx-text-fill:gray;" />
+
+    </VBox>
+
+    <!-- Profile Menu -->
+    <MenuButton text="⚙">
+
+        <items>
+
+            <MenuItem text="Profile"/>
+
+            <MenuItem text="Settings"/>
+
+            <SeparatorMenuItem/>
+
+            <MenuItem text="Logout"
+                      onAction="#logout"/>
+
+        </items>
+
+    </MenuButton>
+
+</HBox>
