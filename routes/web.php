@@ -154,6 +154,8 @@ Route::prefix('student')->name('student.')->middleware(['auth','role:student'])-
     ->name('quizzes.attempt');
     Route::post('/quizzes/{quiz}/answer', [StudentQuizController::class, 'answer'])
     ->name('quizzes.answer');
+    Route::post('/quizzes/{quiz}/submit-all', [StudentQuizController::class, 'submitAll'])->name('quizzes.submit-all');
+    Route::get('/quizzes/{quiz}/results', [StudentQuizController::class, 'results'])->name('quizzes.results'); 
 
 //     Route::get('/quizzes',          [StudentDashboardController::class, 'quizzes'])->name('quizzes');
     Route::get('/messages',         [StudentDashboardController::class, 'messages'])->name('messages');

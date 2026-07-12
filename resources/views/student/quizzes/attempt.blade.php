@@ -298,10 +298,12 @@
                 sibling.closest('[data-quiz-option]').classList.remove('is-selected');
             });
             box.classList.add('is-selected');
+            
+            // Save answer immediately when selected
+            saveCurrentAnswers();
         });
     });
 
-   
     var seconds = {{ (int) $remainingSeconds }};
     var timerEl = document.getElementById('timer');
     var timerBox = document.getElementById('quiz-timer');
@@ -310,6 +312,9 @@
     var warned10 = false;
     var warned7 = false;
     var timerInterval = null;
+    var quizId = {{ $quiz->quiz_id }};
+    var totalPages = {{ $totalPages }};
+    var currentPage = {{ $currentPage }};
 
     function render() {
         var s = Math.max(0, seconds);
@@ -331,7 +336,6 @@
         seconds--;
         render();
 
-        // Timer warnings
         if (seconds <= 600 && !warned10) {
             warned10 = true;
             alert("⚠ Warning! Only 10 minutes left.");
@@ -342,115 +346,275 @@
             alert("⚠ Final Warning! Only 7 minutes left.");
         }
 
-        // Time's up - submit quiz
         if (seconds <= 0 && !submitted) {
             submitted = true;
             clearInterval(timerInterval);
             timerInterval = null;
-            
             console.log("⏰ Time's up - auto-submitting quiz");
-            submitQuiz();
+            submitAllAnswers();
         }
     }, 1000);
 
-    function submitQuiz() {
-        console.log("📨 submitQuiz() called");
+    // Function to save current page answers
+    function saveCurrentAnswers() {
+        var currentAnswers = {};
+        document.querySelectorAll('input[type="radio"]:checked').forEach(function(input) {
+            var name = input.getAttribute('name');
+            var match = name.match(/answers\[(\d+)\]/);
+            if (match) {
+                currentAnswers[match[1]] = input.value;
+            }
+        });
         
-        // Check if already submitted
+        // Merge with existing saved answers
+        var savedData = localStorage.getItem('quiz_answers_' + quizId);
+        if (savedData) {
+            try {
+                var parsed = JSON.parse(savedData);
+                Object.assign(currentAnswers, parsed);
+            } catch(e) {
+                console.error("Error parsing saved answers:", e);
+            }
+        }
+        
+        localStorage.setItem('quiz_answers_' + quizId, JSON.stringify(currentAnswers));
+        console.log("💾 Current answers saved:", currentAnswers);
+    }
+
+    // Function to save ALL answers (current page + localStorage)
+    function saveAllAnswers() {
+        saveCurrentAnswers(); // This already merges with localStorage
+        console.log("💾 All answers saved to localStorage");
+    }
+
+    // Function to submit ALL answers
+    function submitAllAnswers() {
+        console.log("📨 submitAllAnswers() called");
+        
         if (submitted) {
             console.log("⛔ Quiz already submitted, skipping");
             return;
         }
 
-        // Mark as submitted
         submitted = true;
         console.log("✅ Quiz marked as submitted");
 
-        // Set auto_submitted flag
-        var autoInput = document.getElementById('auto_submitted');
-        if (autoInput) {
-            autoInput.value = 1;
-            console.log("✅ auto_submitted set to 1");
-        } else {
-            console.warn("⚠️ auto_submitted input not found");
+        // Get all answers from localStorage
+        var allAnswers = {};
+        var savedData = localStorage.getItem('quiz_answers_' + quizId);
+        if (savedData) {
+            try {
+                allAnswers = JSON.parse(savedData);
+                console.log("📦 Retrieved all answers from localStorage:", allAnswers);
+            } catch(e) {
+                console.error("Error parsing saved answers:", e);
+            }
         }
 
-        // Clear timer to prevent double submission
+        // Also get current page answers (in case localStorage failed)
+        document.querySelectorAll('input[type="radio"]:checked').forEach(function(input) {
+            var name = input.getAttribute('name');
+            var match = name.match(/answers\[(\d+)\]/);
+            if (match) {
+                allAnswers[match[1]] = input.value;
+            }
+        });
+
+        // Check if we have any answers
+        if (Object.keys(allAnswers).length === 0) {
+            console.warn("⚠️ No answers found to submit");
+            // Still submit empty quiz
+        }
+
+        // Clear timer
         if (timerInterval) {
             clearInterval(timerInterval);
             timerInterval = null;
             console.log("✅ Timer cleared");
         }
 
+        // Method 1: Submit via AJAX (Recommended)
+        submitViaAjax(allAnswers);
+        
+        // OR Method 2: Submit via form with hidden inputs
+        // submitViaForm(allAnswers);
+    }
+
+    // Method 1: AJAX Submission (Recommended)
+    function submitViaAjax(allAnswers) {
+        var formData = new FormData();
+        formData.append('_token', document.querySelector('input[name="_token"]').value);
+        formData.append('all_answers', JSON.stringify(allAnswers));
+        formData.append('auto_submitted', '1');
+        formData.append('quiz_id', quizId);
+        formData.append('current_page', currentPage);
+        formData.append('total_pages', totalPages);
+
+        console.log("📤 Submitting ALL answers via AJAX...");
+
+        fetch('{{ route("student.quizzes.submit-all", $quiz->quiz_id) }}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("✅ Quiz submitted successfully:", data);
+            // Clear localStorage after successful submission
+            localStorage.removeItem('quiz_answers_' + quizId);
+            
+            // Redirect to results page
+            if (data.redirect) {
+                window.location.href = data.redirect;
+            } else {
+                window.location.href = '{{ route("student.quizzes.results", $quiz->quiz_id) }}';
+            }
+        })
+        .catch(error => {
+            console.error("❌ Error submitting quiz:", error);
+            alert("Error submitting quiz. Please try again or contact support.");
+            submitted = false; // Allow retry
+            
+            // Fallback: Submit via form
+            submitViaForm(allAnswers);
+        });
+    }
+
+    // Method 2: Form Submission with hidden inputs
+    function submitViaForm(allAnswers) {
+        console.log("📤 Submitting ALL answers via form...");
+
+        // Set auto_submitted flag
+        var autoInput = document.getElementById('auto_submitted');
+        if (autoInput) {
+            autoInput.value = 1;
+        }
+
+        // Remove existing answer inputs (to avoid duplicates)
+        document.querySelectorAll('input[name^="answers["]').forEach(function(input) {
+            if (input.type === 'radio') {
+                input.remove();
+            }
+        });
+
+        // Add all answers as hidden inputs
+        for (var questionId in allAnswers) {
+            var input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'answers[' + questionId + ']';
+            input.value = allAnswers[questionId];
+            form.appendChild(input);
+        }
+
+        // Add submit_all_pages flag
+        var allPagesInput = document.createElement('input');
+        allPagesInput.type = 'hidden';
+        allPagesInput.name = 'submit_all_pages';
+        allPagesInput.value = '1';
+        form.appendChild(allPagesInput);
+
+        // Change the next value to indicate completion
+        var nextInput = document.querySelector('input[name="next"]');
+        if (nextInput) {
+            nextInput.value = '0';
+        }
+
         // Submit the form
-        if (form) {
-            console.log("📤 Submitting form...");
-            form.submit();
-            console.log("✅ Form submitted successfully");
-        } else {
-            console.error("❌ Form not found!");
+        form.submit();
+        console.log("✅ Form submitted successfully");
+    }
+
+    // Restore answers when page loads
+    function restoreAnswers() {
+        var savedData = localStorage.getItem('quiz_answers_' + quizId);
+        if (savedData) {
+            try {
+                var answers = JSON.parse(savedData);
+                console.log("🔄 Restoring saved answers:", answers);
+                
+                document.querySelectorAll('input[type="radio"]').forEach(function(input) {
+                    var name = input.getAttribute('name');
+                    var match = name.match(/answers\[(\d+)\]/);
+                    if (match) {
+                        var questionId = match[1];
+                        if (answers[questionId] && input.value == answers[questionId]) {
+                            input.checked = true;
+                            var optionBox = input.closest('[data-quiz-option]');
+                            if (optionBox) {
+                                optionBox.classList.add('is-selected');
+                            }
+                        }
+                    }
+                });
+                console.log("✅ Answers restored successfully");
+            } catch(e) {
+                console.error("Error restoring answers:", e);
+            }
         }
     }
 
-    // Make submitQuiz globally accessible
-    window.submitQuiz = submitQuiz;
+    // Call restore on page load
+    restoreAnswers();
 
-    // ============================================
-    // 4. AUTO-SUBMIT ON TAB/SWITCH SCREEN (FIXED)
-    // ============================================
+    // Save answers when leaving page (for pagination navigation)
+    window.addEventListener('beforeunload', function() {
+        saveCurrentAnswers();
+    });
+
+    // Intercept pagination links to save answers
+    document.querySelectorAll('.quiz-actions a, .quiz-actions button').forEach(function(el) {
+        if (el.closest('.quiz-actions')) {
+            el.addEventListener('click', function(e) {
+                // Save answers before navigating
+                saveCurrentAnswers();
+            });
+        }
+    });
+
+    // TAB SWITCH DETECTION - SUBMIT ALL ANSWERS
     document.addEventListener('visibilitychange', function () {
         console.log("🔄 Visibility change detected");
-        console.log("📊 document.hidden:", document.hidden);
-        console.log("📊 submitted status:", submitted);
-        
-        if (document.hidden) {
-            console.log("🔴 TAB SWITCH DETECTED - auto-submitting quiz");
-            
-            // Only submit if not already submitted
-            if (!submitted) {
-                submitQuiz();
-                console.log("✅ Quiz auto-submitted due to tab switch");
-            } else {
-                console.log("⏭️ Quiz already submitted, skipping");
-            }
+        if (document.hidden && !submitted) {
+            console.log("🔴 Tab switch detected - saving and submitting all answers");
+            // Save all answers first
+            saveAllAnswers();
+            // Submit all answers
+            submitAllAnswers();
         } else {
-            console.log("🟢 Page is visible again");
+            console.log("👁️ User returned to tab");
         }
     });
 
-    // ============================================
-    // 5. WINDOW BLUR (User clicks outside)
-    // ============================================
+    // Window blur as additional safety
     window.addEventListener('blur', function() {
         if (!submitted) {
-            console.log("🔴 Window lost focus - auto-submitting");
-            submitQuiz();
+            console.log("🔴 Window lost focus - saving answers");
+            saveCurrentAnswers();
         }
     });
 
-    // ============================================
-    // 6. PAGE CLOSE/REFRESH DETECTION
-    // ============================================
+    // Also submit if user tries to close the tab
     window.addEventListener('beforeunload', function(e) {
         if (!submitted) {
-            console.log("⚠️ User attempting to leave page");
-            submitQuiz();
-            
-            // Show warning dialog
-            e.preventDefault();
-            e.returnValue = '⚠️ Your quiz will be submitted if you leave. Are you sure?';
+            saveAllAnswers();
+            // Note: Can't prevent tab close, but we save answers
         }
     });
 
-    // ============================================
-    // 7. DEBUGGING HELP
-    // ============================================
     console.log("✅ Quiz script loaded successfully");
     console.log("💡 Timer started:", seconds, "seconds remaining");
-    console.log("💡 Try switching tabs to test auto-submit");
-    console.log("💡 submitQuiz() function is available");
+    console.log("💡 Answers will be saved to localStorage");
+    console.log("💡 Tab switching will auto-submit ALL answers");
+    console.log("💡 submitAllAnswers() function is available");
 
-})(); // End of IIFE
+})();
 </script>
 
 @endpush

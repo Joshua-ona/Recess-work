@@ -8,6 +8,15 @@ class QuizSubmission extends Model
 {
     protected $primaryKey = 'submission_id';
 
+    protected $fillable = [
+        'quiz_id',
+        'user_id',
+        'score',
+        'review_answers',
+        'auto_submitted',
+        'submitted_at',
+    ];
+
     protected $casts = [
         'review_answers' => 'array',
         'auto_submitted' => 'boolean',
