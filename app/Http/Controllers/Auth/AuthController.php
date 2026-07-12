@@ -31,7 +31,7 @@ class AuthController extends Controller
 {
     Auth::logout();
     $request->session()->invalidate();
-    //$request->session()->regenerateToken();
+    $request->session()->regenerateToken();
     return redirect()->route('login');
 }
 
@@ -58,8 +58,7 @@ class AuthController extends Controller
     $request->session()->regenerate();
     $user = Auth::user();
 
-    // Blacklisting still actually stops someone from logging back in;
-    // there's just no pending-approval gate before that point anymore.
+    // Blacklisting stops a login outright.
     if ($user->status === 'blacklisted') {
         Auth::logout();
         $request->session()->invalidate();
@@ -69,19 +68,26 @@ class AuthController extends Controller
         ])->onlyInput('email');
     }
 
+   if (!$user->is_enabled || is_null($user->email_verified_at)) {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        session(['temp_user_id' => $user->id]);
 
-    return match ($user->role){
-        'system_admin' => redirect()->route('admin.dashboard'),
-        'lecturer' => redirect()->route('lecturer.dashboard'),
-        'student' => redirect()->route('student.dashboard'),
-        //default => redirect()->route('home'),
+        return redirect()
+            ->route('verification.notice')
+            ->with('error', 'Please verify your email first.');
+    }
 
+    return match (true) {
+        in_array($user->role, ['admin', 'admin']) => redirect()->route('admin.dashboard'),
+        $user->role === 'lecturer'                        => redirect()->route('lecturer.dashboard'),
+        default                                           => redirect()->route('student.dashboard'),
     };
-    
-    
-        
 }
 
+
+    
 
     public function register(Request $request)
     {
@@ -95,13 +101,17 @@ class AuthController extends Controller
             'email',
             'max:255',
             'unique:users',
+            'regex:/^[a-zA-Z0-9._%+-]+@(students\.)?mak\.ac\.ug$/'
         ],
         'password' => 'required|string|min:8|confirmed',
         ]);
 
         $user = $this->registrationService->execute($data);
 
-        return redirect()->route('student.dashboard');
+
+        app(VerificationController::class)->sendOtpForUser($user);
+
+        return redirect()->route('verification.notice')->with('success','You have successfully registed.Please check your email to verify your account');
 
     }
   

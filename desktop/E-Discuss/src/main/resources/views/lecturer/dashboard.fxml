@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.edudiscuss.controllers.StudentDashboardController">
+
+    <left>
+        <fx:include source="../components/sidebar.fxml"/>
+    </left>
+
+    <center>
+
+        <VBox spacing="20"
+              style="-fx-padding:20;">
+
+            <Label text="Lecturer Dashboard"
+                   style="-fx-font-size:24;" />
+
+            <HBox spacing="20">
+
+                <VBox styleClass="card">
+                    <Label text="Total Groups"/>
+                    <Label fx:id="groupsLabel"/>
+                </VBox>
+
+                <VBox styleClass="card">
+                    <Label text="Discussions Created"/>
+                    <Label fx:id="quizLabel"/>
+                </VBox>
+
+                <VBox styleClass="card">
+                    <Label text="Notifications"/>
+                    <Label fx:id="notificationLabel"/>
+
+                </VBox>
+                <VBox styleClass="card">
+                    <Label text="Quizzes"/>
+                    <Label fx:id="qizzesLabel"/>
+
+                </VBox>
+
+            </HBox>
+
+        </VBox>
+
+    </center>
+
+</BorderPane>
