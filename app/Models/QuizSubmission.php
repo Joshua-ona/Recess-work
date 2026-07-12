@@ -6,18 +6,17 @@ use Illuminate\Database\Eloquent\Model;
 
 class QuizSubmission extends Model
 {
-
-
-
-protected $fillable = [
-    'quiz_id',
-    'user_id',
-    'score',
-    'submitted_at',
-    'review_answers',
-    'auto_submitted'
-];
-protected $primaryKey = 'submission_id';
+    protected $primaryKey = 'submission_id';
+    
+    // Keep ONLY ONE $fillable declaration
+    protected $fillable = [
+        'quiz_id',
+        'user_id',
+        'score',
+        'submitted_at',
+        'review_answers',
+        'auto_submitted'
+    ];
 
     protected $casts = [
         'review_answers' => 'array',
