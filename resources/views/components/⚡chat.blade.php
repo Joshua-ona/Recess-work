@@ -257,8 +257,7 @@ new class extends Component {
             scrollToBottom();
         }, 150);
     });
-  Livewire.on('userTyping', (event) => {
-    console.log(event);
+  
 
     window.Echo.private(`chat.${event.selectedUserId}`)
         .whisper('typing', {
