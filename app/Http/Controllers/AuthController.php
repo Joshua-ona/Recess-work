@@ -62,22 +62,22 @@ class AuthController extends Controller
         }
 
         // Super admin bypasses verification
-        if ($user->isSuperAdmin()) {
-            return $this->redirectBasedOnRole($user);
-        }
+        // if ($user->isSuperAdmin()) {
+        //     return $this->redirectBasedOnRole($user);
+        // }
 
         // Check if user needs verification
-        if ($user->needsVerification()) {
-            Auth::logout();
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
+        // if ($user->needsVerification()) {
+        //     Auth::logout();
+        //     $request->session()->invalidate();
+        //     $request->session()->regenerateToken();
             
-            session(['temp_user_id' => $user->id]);
+        //     session(['temp_user_id' => $user->id]);
             
-            return redirect()
-                ->route('verification.notice')
-                ->with('error', 'Please verify your email first.');
-        }
+        //     return redirect()
+        //         ->route('verification.notice')
+        //         ->with('error', 'Please verify your email first.');
+        // }
 
         return $this->redirectBasedOnRole($user);
     }
@@ -101,16 +101,11 @@ class AuthController extends Controller
 
         $user = $this->registrationService->execute($data);
 
-        // Don't send verification for super admin
-        if ($user->isSuperAdmin()) {
-            return redirect()->route('admin.dashboard')
-                ->with('success', 'Super admin account created successfully.');
-        }
+      
 
-        app(VerificationController::class)->sendOtpForUser($user);
+            Auth::login($user);
 
-        return redirect()->route('verification.notice')
-            ->with('success', 'You have successfully registered. Please check your email to verify your account');
+        return $this->redirectBasedOnRole($user);
     }
 
     private function redirectBasedOnRole($user)

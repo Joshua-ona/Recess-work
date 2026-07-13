@@ -34,11 +34,11 @@ Route::middleware('guest')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
 });
 
-Route::middleware('web')->group(function () {
-    Route::get('/verify', function(){return view('auth.verify');})->name('verification.notice');
-    Route::post('verify/send', [VerificationController::class, 'sendOtp'])->name('verification.send');
-    Route::post('verify/check', [VerificationController::class, 'verifyOtp'])->name('verification.check');
-});
+// Route::middleware('web')->group(function () {
+//     Route::get('/verify', function(){return view('auth.verify');})->name('verification.notice');
+//     Route::post('verify/send', [VerificationController::class, 'sendOtp'])->name('verification.send');
+//     Route::post('verify/check', [VerificationController::class, 'verifyOtp'])->name('verification.check');
+// });
 
 Route::get('/chat', function () {
     return view('chat');
