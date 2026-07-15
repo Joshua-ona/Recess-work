@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use App\Models\Group;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable implements MustVerifyEmail
+class User extends Authenticatable 
 {
     /** @use HasFactory<UserFactory> */
    use HasApiTokens, HasFactory, Notifiable;
@@ -109,13 +109,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function needsVerification(): bool
     {
-        // Super admin doesn't need verification
-        if ($this->isSuperAdmin()) {
-            return false;
-        }
-
-        // Check if user is enabled and email is verified
-        return !$this->is_enabled || is_null($this->email_verified_at);
+    return false;    
     }
 
     /**

@@ -68,16 +68,7 @@ class AuthController extends Controller
         ])->onlyInput('email');
     }
 
-   if (!$user->is_enabled || is_null($user->email_verified_at)) {
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-        session(['temp_user_id' => $user->id]);
-
-        return redirect()
-            ->route('verification.notice')
-            ->with('error', 'Please verify your email first.');
-    }
+  
 
     return match (true) {
         in_array($user->role, ['admin', 'admin']) => redirect()->route('admin.dashboard'),
@@ -109,10 +100,18 @@ class AuthController extends Controller
         $user = $this->registrationService->execute($data);
 
 
-        app(VerificationController::class)->sendOtpForUser($user);
+        Auth::login($user);
 
-        return redirect()->route('verification.notice')->with('success','You have successfully registed.Please check your email to verify your account');
+return match (true) {
+    in_array($user->role, ['admin']) =>
+        redirect()->route('admin.dashboard'),
 
+    $user->role === 'lecturer' =>
+        redirect()->route('lecturer.dashboard'),
+
+    default =>
+        redirect()->route('student.dashboard'),
+};
     }
   
 }
