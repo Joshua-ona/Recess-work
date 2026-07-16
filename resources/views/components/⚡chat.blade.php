@@ -14,13 +14,22 @@ new class extends Component {
     public $messages = [];      
     public $loginId;
     
+public function mount()
+{
+    $this->users = User::where('id', '!=', Auth::id())->get();
 
-    public function mount()
-    {
-        $this->users = User::where('id', '!=', Auth::id())->get();
-        $this->message = '';
-        $this->loginId = Auth::id();
+    foreach ($this->users as $user) {
+        $user->unread_count = PrivateComm::where('sender_id', $user->id)
+            ->where('receiver_id', Auth::id())
+            ->where('is_read', false)
+            ->count();
     }
+
+    $this->users = $this->users->sortByDesc('unread_count')->values();
+
+    $this->message = '';
+    $this->loginId = Auth::id();
+}
 
     public function selectUser($id)
     {
@@ -35,6 +44,13 @@ new class extends Component {
         })
         ->orderBy('created_at')
         ->get();
+  // Mark received messages as read
+    PrivateComm::where('sender_id', $id)
+        ->where('receiver_id', Auth::id())
+        ->where('is_read', false)
+        ->update([
+            'is_read' => true
+        ]);
 
         // Force scroll when opening a conversation
         $this->dispatch('force-scroll-to-bottom');
@@ -50,6 +66,7 @@ new class extends Component {
             'sender_id' => auth()->id(),
             'receiver_id' => $this->selectedUser->id,
             'content' => $this->message,
+                'is_read' => false,
         ]);
 
         $this->messages = $this->messages->push($message);
@@ -58,7 +75,7 @@ new class extends Component {
         // Auto‑scroll (only if near bottom)
         $this->dispatch('scroll-to-bottom');
 
-        broadcast(new MessageSent($message))->toOthers();
+        //broadcast(new MessageSent($message))->toOthers();
     }
    public function updateNewMessage()
 {
@@ -81,22 +98,29 @@ new class extends Component {
     }
 
     public function newChatMessageNotification($message)
-    {
-        if (!$this->selectedUser) {
-            return;
-        }
-
-        if ($message['sender_id'] == $this->selectedUser->id) {
-            $messageObj = PrivateComm::find($message['id']);
-            if ($messageObj) {
-                $this->messages = $this->messages->push($messageObj);
-                // Scroll on incoming message (only if near bottom)
-                $this->dispatch('scroll-to-bottom');
-            }
-        }
+{
+    if (!$this->selectedUser) {
+        return;
     }
 
-};
+    if ($message['sender_id'] == $this->selectedUser->id) {
+
+        $messageObj = PrivateComm::find($message['id']);
+
+        if ($messageObj) {
+
+            // Mark it as read immediately
+            $messageObj->update([
+                'is_read' => true
+            ]);
+
+            $this->messages = $this->messages->push($messageObj);
+
+            $this->dispatch('scroll-to-bottom');
+        }
+    }
+}
+}
 ?>
 <div class="chat-wrapper" data-login-id="{{ $loginId }}">
 
@@ -119,14 +143,21 @@ new class extends Component {
                         {{ strtoupper(substr($user->first_name, 0, 1)) }}
                     </div>
 
-                    <div style="flex:1; min-width:0;">
-                        <div class="chat-user-name">
-                            {{ $user->first_name }} {{ $user->last_name }}
-                        </div>
-                        <div class="chat-user-email">
-                            {{ $user->email }}
-                        </div>
-                    </div>
+                   <div style="flex:1; min-width:0;">
+    <div class="chat-user-name">
+        {{ $user->first_name }} {{ $user->last_name }}
+    </div>
+
+    <div class="chat-user-email">
+        {{ $user->email }}
+    </div>
+</div>
+
+@if($user->unread_count > 0)
+    <span class="sidebar-badge">
+        {{ $user->unread_count }}
+    </span>
+@endif
 
                 </button>
 
@@ -259,12 +290,7 @@ new class extends Component {
     });
   
 
-    window.Echo.private(`chat.${event.selectedUserId}`)
-        .whisper('typing', {
-            userID: event.userID,
-            userName: event.userName,
-        });
-});
+   
 console.log('Setting up Echo...');
 
 const loginId = document.querySelector('.chat-wrapper').dataset.loginId;
@@ -290,14 +316,10 @@ window.Echo.private(`chat.${loginId}`)
 
     console.log("Typing event received from Livewire:", event);
 
-    window.Echo.private(`chat.${event.selectedUserId}`)
-        .whisper('typing', {
-            userID: event.userID,
-            userName: event.userName,
-        });
 
-    console.log("Whisper sent to:", `chat.${event.selectedUserId}`);
-});
+
+    console.log("Whisper sent to:", `chat.${event.selectedUserId}`);});
+
 
 console.log('Setting up done');
-</script>;
+</script>

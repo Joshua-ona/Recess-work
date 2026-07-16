@@ -41,7 +41,7 @@
         style="background:
         {{ $notification['type'] == 'warning'
             ? 'var(--red-400)'
-            : ($notification['type'] == 'message'
+            : ($notification['type'] == 'group'
                 ? 'var(--green-400)'
                 : 'var(--blue-400)') }}">
     </div>
@@ -64,8 +64,8 @@
 
             @if($notification['type'] == 'warning')
                 <span class="badge badge-red">Warning</span>
-            @elseif($notification['type'] == 'message')
-                <span class="badge badge-green">Message</span>
+            @elseif($notification['type'] == 'group')
+                <span class="badge badge-green">Group</span>
             @else
                 <span class="badge badge-blue">Quiz</span>
             @endif

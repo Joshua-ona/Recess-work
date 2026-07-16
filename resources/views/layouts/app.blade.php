@@ -8,16 +8,12 @@
     <title>@yield('title', 'EduDiscuss') — E-Discussion Platform</title>
 
     {{-- Tabler Icons --}}
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.4.0/tabler-icons.min.css" />
-
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
-   
-
+ 
     <link rel="stylesheet"href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
     @vite(['resources/css/app.css', 'resources/js/app.js']) 
     @livewireStyles
     
-    <style>,
+    <style>
     *::before,
 
     *::after {
@@ -526,6 +522,7 @@
         padding: 1.5rem;
         flex: 1;
         overflow-y: auto;
+        display: flex;
     }
 
     /* ── Stat cards ── */
@@ -882,18 +879,19 @@
         .quiz-nav-grid {
             grid-template-columns: repeat(6, 1fr);
         }
-    }
+    
 
     /* ================= CHAT ================= */
 
-    .chat-wrapper {
-        display: flex;
-        height: calc(100vh - 70px);
-        background: #fff;
-        border-radius: 12px;
-        overflow: hidden;
-        border: var(--border);
-    }
+   .chat-wrapper{
+    display:flex;
+    height:75vh;
+    width:100%;
+    background:#fff;
+    border-radius:12px;
+    overflow:hidden;
+    border:var(--border);
+}
 
     .chat-users {
         width: 320px;
