@@ -12,6 +12,7 @@ use App\Http\Controllers\Lecturer\LecturerCourseController;
 use App\Http\Controllers\Student\StudentDashboardController;
 use App\Http\Controllers\Student\StudentDiscussionController;
 use App\Http\Controllers\Student\StudentQuizController;
+use App\Http\Controllers\RecommendationController;
 
 // ── Public routes ──────────────────────────────────────────
 
@@ -212,6 +213,12 @@ Route::middleware('auth')->group(function () {
 // PDF Export Route
 Route::get('/groups/{group}/discussions/{discussion}/pdf', [DiscussionController::class, 'exportPdf']);
 Route::get('/groups/{group}/stats', [GroupController::class, 'stats']);
+
+    //ML MODEL ROUTE
+//    Route::get(
+//         '/student/recommendations',
+//         [RecommendationController::class,'index']
+//     )->name('student.recommendations');
 
 /*
 |--------------------------------------------------------------------------
