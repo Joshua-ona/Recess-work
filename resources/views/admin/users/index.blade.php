@@ -9,14 +9,9 @@
             <span class="font-medium text-lg">Manage users</span>
             <span class="text-sm text-gray-500">{{ $users->total() }} total</span>
         </div>
-        <div class="flex gap-2">
-            <a href="{{ route('admin.lecturers.create') }}" class="text-sm border rounded px-3 py-1.5 hover:bg-gray-50">
-                + Add lecturer
-            </a>
-            <a href="{{ route('admin.dashboard') }}" class="text-sm border rounded px-3 py-1.5 hover:bg-gray-50">
-                ← Back to dashboard
-            </a>
-        </div>
+        <a href="{{ route('admin.dashboard') }}" class="text-sm border rounded px-3 py-1.5 hover:bg-gray-50">
+            ← Back to dashboard
+        </a>
     </div>
 
     <form method="GET" action="{{ route('admin.Users.index') }}" class="mb-4">
@@ -99,13 +94,6 @@
                                             <button class="text-xs border rounded px-2 py-1">Reinstate</button>
                                         </form>
                                     @else
-                                        {{-- Resend invite for pending lecturers who haven't activated yet --}}
-                                        @if ($user->role === 'lecturer' && $user->status === 'pending')
-                                            <form method="POST" action="{{ route('admin.lecturers.resend', $user) }}">
-                                                @csrf
-                                                <button class="text-xs border rounded px-2 py-1 text-blue-600">Resend invite</button>
-                                            </form>
-                                        @endif
                                         <details>
                                             <summary class="text-xs border rounded px-2 py-1 inline-block cursor-pointer select-none">Warn</summary>
                                             <form method="POST" action="{{ route('admin.Users.warn', $user) }}" class="mt-2 space-y-1 w-48">
