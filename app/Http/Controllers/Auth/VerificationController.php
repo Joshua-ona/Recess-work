@@ -8,7 +8,6 @@ use App\Models\Verification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Log;
 
 class VerificationController extends Controller
 {
@@ -49,7 +48,6 @@ class VerificationController extends Controller
     public function sendOtpForUser(User $user)
     {
         $otp = (string) random_int(100000, 999999);
-        Log::info("Generated OTP for user {$user->id}: {$otp}");
 
         Verification::updateOrCreate(
             ['user_id' => $user->id],
@@ -113,7 +111,7 @@ class VerificationController extends Controller
         $request->session()->regenerate();
 
         return match ($user->role) {
-            'admin' => redirect()->route('admin.dashboard'),
+            'system_admin' => redirect()->route('admin.dashboard'),
             'lecturer' => redirect()->route('lecturer.dashboard'),
             'student' => redirect()->route('student.dashboard'),
             default => redirect('/'),
