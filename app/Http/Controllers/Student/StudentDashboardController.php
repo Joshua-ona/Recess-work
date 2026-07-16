@@ -5,8 +5,10 @@ use App\Http\Controllers\Controller;
 use App\Services\{GroupService,GroupChatService};
 use Illuminate\Http\Request;
 use App\Models\Group;
+use App\Models\UserScore;
 use App\Models\PrivateComm;
 use App\Models\Quiz;
+use Illuminate\Support\Facades\Http;
 
 class StudentDashboardController extends Controller
 {
@@ -14,43 +16,44 @@ class StudentDashboardController extends Controller
     
     }
 
-    public function index()
-    {
-        $user = auth()->user();
-        $myGroupIds = $user->groups()->pluck('groups.id');
-        $joinedGroupIds = auth()->user()->groups()->pluck('groups.id')->toArray();
+public function index()
+{
+    $user = auth()->user();
+    $myGroups = $this->groupService->getMyGroups($user);
+    $myGroupIds = $user->groups()->pluck('groups.id')->toArray();
 
-        $myGroups = $this->groupService->getMyGroups($user);
-        $browseGroups = Group::where('status','approved')
-                            ->whereNotIn('id',$myGroupIds)
-                            ->latest('id')
-                            ->get();
+    // 1. BROWSE ALL: Show ALL approved groups. No filter
+    $browseGroups = Group::where('status', 'approved')
+        ->distinct()
+        ->orderBy('name')
+        ->get();
 
-        $discoverGroups = $this->groupService->getDiscoverableGroupsFor($user);
+    $discoverGroups = $this->groupService->getDiscoverableGroupsFor($user);
 
+    // 2. Recommended Discussions from Python
+    $response = Http::get('http://127.0.0.1:5001/recommendations/' . $user->id);
+    $recommendations = $response->successful() ? $response->json() : [];
 
-        $postsMade = 0;
-        $upvotesReceived = 0;
-        $enrolledCourses = collect();
-        $participationScore = 0;
+    // 3. NEW: Recommended Groups from Python - this already excludes joined groups
+    $responseGroups = Http::get('http://127.0.0.1:5001/recommend-groups/' . $user->id);
+    $recommendedGroups = $responseGroups->successful() ? $responseGroups->json() : [];
 
-        return view('student.dashboard',
-        [
-                    'myGroups' => $myGroups,
-                    'browseGroups' => $browseGroups,
-                    'joinedGroups' => $joinedGroupIds,
-                    'discoverGroups' =>  $discoverGroups, 
-                    'postsMade' =>  $postsMade,
-                    'upvotesReceived' =>  $upvotesReceived,
-                    'enrolledCourses' =>  $enrolledCourses,
-                    'participationScore' => $participationScore,
-                    'user' => $user,
-                    'activeGroup' => null,
-                    'admin' => null,
-        ]);
-                    
-       
-    }
+    $userScore = UserScore::where('user_id', $user->id)->first();
+    $score = $userScore ? round($userScore->score) : 0;
+
+    return view('student.dashboard', [
+        'myGroups' => $myGroups,
+        'browseGroups' => $browseGroups, // now shows ALL
+        'joinedGroups' => $myGroupIds,
+        'recommendations' =>  $recommendations,
+        'recommendedGroups' => $recommendedGroups, // AI picks, not joined
+        'discoverGroups' =>  $discoverGroups, 
+        'score' => $score,
+        'user' => $user,
+        'activeGroup' => null,
+        'admin' => null,
+    ]);
+}
 
      public function show(Group $group)
      {

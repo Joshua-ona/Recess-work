@@ -17,6 +17,8 @@ use App\Http\Controllers\Student\StudentDashboardController;
 use App\Http\Controllers\Student\StudentDiscussionController;
 use App\Http\Controllers\Student\StudentQuizController;
 use App\Http\Controllers\RecommendationController;
+
+// ── Public routes ──────────────────────────────────────────
 use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\Admin\GroupController as AdminGroupController;
 use App\Http\Controllers\GroupController;
@@ -189,7 +191,13 @@ Route::get('/groups/{group}/discussions/{discussion}/pdf', [DiscussionController
 
 Route::get('/groups/{group}/stats', [GroupController::class, 'stats']);
 
-   
+    //ML MODEL ROUTE
+//    Route::get(
+//         '/student/recommendations',
+//         [RecommendationController::class,'index']
+//     )->name('student.recommendations');
+
+/*
 |--------------------------------------------------------------------------
 | Root Redirect
 |--------------------------------------------------------------------------
