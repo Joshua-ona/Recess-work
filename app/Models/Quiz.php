@@ -18,6 +18,11 @@ class Quiz extends Model
         'is_published',
     ];
 
+    protected $casts = [
+        'start_time' => 'datetime',
+        'is_published' => 'boolean',
+    ];
+
     public function questions()
     {
         return $this->hasMany(Question::class, 'quiz_id', 'quiz_id');

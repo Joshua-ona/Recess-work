@@ -225,7 +225,6 @@
 
             <form method="POST" action="{{ route('student.quizzes.answer', $quiz->quiz_id) }}" id="quiz-form">
                 @csrf
-                @csrf
 
 <input type="hidden"
        id="auto_submitted"
@@ -315,6 +314,7 @@
     var quizId = {{ $quiz->quiz_id }};
     var totalPages = {{ $totalPages }};
     var currentPage = {{ $currentPage }};
+    var navigatingAway = false;
 
     function render() {
         var s = Math.max(0, seconds);
@@ -572,6 +572,9 @@
     document.querySelectorAll('.quiz-actions a, .quiz-actions button').forEach(function(el) {
         if (el.closest('.quiz-actions')) {
             el.addEventListener('click', function(e) {
+                // This is a legitimate in-app navigation (Previous / Save & Next),
+                // not a tab-switch — don't let visibilitychange treat it as cheating.
+                navigatingAway = true;
                 // Save answers before navigating
                 saveCurrentAnswers();
             });
@@ -581,6 +584,10 @@
     // TAB SWITCH DETECTION - SUBMIT ALL ANSWERS
     document.addEventListener('visibilitychange', function () {
         console.log("🔄 Visibility change detected");
+        if (navigatingAway) {
+            console.log("↪️ In-app navigation (Previous/Next/Submit) — not a tab switch, skipping auto-submit");
+            return;
+        }
         if (document.hidden && !submitted) {
             console.log("🔴 Tab switch detected - saving and submitting all answers");
             // Save all answers first

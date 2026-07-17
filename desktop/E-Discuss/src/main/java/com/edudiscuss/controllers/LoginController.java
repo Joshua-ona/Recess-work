@@ -36,6 +36,7 @@ public class LoginController {
 
             String response =
                     ApiClient.post("login", json);
+            System.out.println(response);
 
             Gson gson = new Gson();
 

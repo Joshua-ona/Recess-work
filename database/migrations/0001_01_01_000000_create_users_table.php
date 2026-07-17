@@ -19,8 +19,7 @@ return new class extends Migration
              $table->string('last_name');
             $table->string('email')->unique();
             $table->string('password');
-            $table->enum('role', ['admin', 'lecturer', 'student'])->default('student');
-            $table->boolean('is_enabled')->default(false);
+            $table->enum('role', ['system_admin', 'lecturer', 'student'])->default('student');
             $table->string('status')->default('active');
             $table->rememberToken();
             $table->unsignedTinyInteger('warning_count')->default(0);
