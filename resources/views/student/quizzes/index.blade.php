@@ -24,6 +24,10 @@
 
         <div class="dash-body">
 
+            @if(session('error'))
+                <div class="alert alert-danger">{{ session('error') }}</div>
+            @endif
+
             @if($quizzes->isEmpty())
                 <div class="full-panel">
                     <div class="panel-body" style="text-align:center; padding:2.5rem 1rem;">
@@ -45,19 +49,29 @@
                             </thead>
                             <tbody>
                                 @foreach($quizzes as $quiz)
+                                    @php
+                                        $opensAt = \Carbon\Carbon::parse($quiz->start_time);
+                                        $isLocked = now()->lessThan($opensAt);
+                                    @endphp
                                     <tr>
                                         <td style="font-weight:500;">{{ $quiz->title }}</td>
-                                        <td>{{ \Carbon\Carbon::parse($quiz->start_time)->format('M j, Y g:i A') }}</td>
+                                        <td>{{ $opensAt->format('M j, Y g:i A') }}</td>
                                         <td>
                                             <span class="badge badge-purple">
                                                 <i class="ti ti-clock" aria-hidden="true"></i>&nbsp;{{ $quiz->duration_mins }} mins
                                             </span>
                                         </td>
                                         <td>
-                                            <a href="{{ route('student.quizzes.attempt', $quiz->quiz_id) }}"
-                                               class="btn btn-primary btn-sm" style="width:auto;">
-                                                Start quiz <i class="ti ti-arrow-right" aria-hidden="true"></i>
-                                            </a>
+                                            @if($isLocked)
+                                                <span class="btn btn-outline btn-sm" style="width:auto; cursor:not-allowed; opacity:.7;" title="Opens {{ $opensAt->format('M j, Y g:i A') }}">
+                                                    <i class="ti ti-lock" aria-hidden="true"></i>&nbsp;Opens {{ $opensAt->diffForHumans() }}
+                                                </span>
+                                            @else
+                                                <a href="{{ route('student.quizzes.attempt', $quiz->quiz_id) }}"
+                                                   class="btn btn-primary btn-sm" style="width:auto;">
+                                                    Start quiz <i class="ti ti-arrow-right" aria-hidden="true"></i>
+                                                </a>
+                                            @endif
                                         </td>
                                     </tr>
                                 @endforeach

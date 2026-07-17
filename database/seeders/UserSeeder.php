@@ -25,7 +25,7 @@ class UserSeeder extends Seeder
                 'last_name' => 'Administrator',
                  
                 'password' => Hash::make(config('university.admin_password')),
-                'role' => 'admin',
+                'role' => 'system_admin',
                 'is_enabled' => true,
                 'email_verified_at' => now(),
             ]);
