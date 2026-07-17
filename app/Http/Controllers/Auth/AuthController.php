@@ -40,7 +40,6 @@ class AuthController extends Controller
     }
 
 
-
     public function login(Request $request)
 
     {
@@ -68,12 +67,12 @@ class AuthController extends Controller
         ])->onlyInput('email');
     }
 
-  
+
 
     return match (true) {
         in_array($user->role, ['admin', 'admin']) => redirect()->route('admin.dashboard'),
-        $user->role === 'lecturer'                        => redirect()->route('lecturer.dashboard'),
-        default                                           => redirect()->route('student.dashboard'),
+        $user->role === 'lecturer' => redirect()->route('lecturer.dashboard'),
+        default => redirect()->route('student.dashboard'),
     };
 }
 
@@ -92,7 +91,6 @@ class AuthController extends Controller
             'email',
             'max:255',
             'unique:users',
-            'regex:/^[a-zA-Z0-9._%+-]+@(students\.)?mak\.ac\.ug$/'
         ],
         'password' => 'required|string|min:8|confirmed',
         ]);
@@ -100,18 +98,12 @@ class AuthController extends Controller
         $user = $this->registrationService->execute($data);
 
 
-        Auth::login($user);
+         return match (true) {
+        in_array($user->role, ['admin', 'admin']) => redirect()->route('admin.dashboard'),
+        $user->role === 'lecturer' => redirect()->route('lecturer.dashboard'),
+        default => redirect()->route('student.dashboard'),
+    };
 
-return match (true) {
-    in_array($user->role, ['admin']) =>
-        redirect()->route('admin.dashboard'),
-
-    $user->role === 'lecturer' =>
-        redirect()->route('lecturer.dashboard'),
-
-    default =>
-        redirect()->route('student.dashboard'),
-};
     }
   
 }
