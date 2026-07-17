@@ -7,12 +7,17 @@ public class User {
     private String last_name;
     private String email;
     private String role;
+    private int unread_count;
 
     public User() {
     }
 
     public int getId() {
         return id;
+    }
+
+    public int getUnreadCount() {
+        return unread_count;
     }
 
     public String getFirst_name() {
@@ -33,5 +38,14 @@ public class User {
 
     public String getFullName() {
         return first_name + " " + last_name;
+    }
+    @Override
+    public String toString() {
+
+        if (unread_count > 0) {
+            return getFullName() + " (" + unread_count + ")";
+        }
+
+        return getFullName();
     }
 }

@@ -1,25 +1,70 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.*?>
 
-<VBox xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.edudiscuss.controllers.LoginController"
-      alignment="CENTER"
-      spacing="15">
+<StackPane xmlns:fx="http://javafx.com/fxml"
+           fx:controller="com.edudiscuss.controllers.LoginController"
+           styleClass="root">
 
-    <Label text="EduDiscuss Login"/>
+    <VBox spacing="18"
+          maxWidth="430"
+          styleClass="login-card"
+          alignment="CENTER_LEFT">
 
-    <TextField
-            fx:id="emailField"
-            promptText="Email"/>
+        <HBox spacing="12" alignment="CENTER_LEFT">
 
-    <PasswordField
-            fx:id="passwordField"
-            promptText="Password"/>
+            <StackPane prefWidth="45"
+                       prefHeight="45"
+                       styleClass="logo-box">
+                <Label text="💬" style="-fx-font-size:18;"/>
+            </StackPane>
 
-    <Button
-            text="Login"
-            onAction="#login"/>
+            <VBox spacing="2">
+                <Label text="EduDiscuss"
+                       styleClass="logo-title"/>
+                <Label text="Academic discussion platform"
+                       styleClass="logo-sub"/>
+            </VBox>
 
-</VBox>
+        </HBox>
+
+        <VBox spacing="5">
+            <Label text="Welcome back"
+                   styleClass="title"/>
+            <Label text="Sign in to continue your discussions"
+                   styleClass="subtitle"/>
+        </VBox>
+
+        <VBox spacing="8">
+            <Label text="Email address"/>
+            <TextField fx:id="emailField"
+                       promptText="Email"/>
+        </VBox>
+
+        <VBox spacing="8">
+            <Label text="Password"/>
+            <PasswordField fx:id="passwordField"
+                           promptText="Password"/>
+        </VBox>
+
+        <HBox alignment="CENTER_LEFT">
+            <CheckBox text="Remember me"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Hyperlink text="Forgot password?"/>
+        </HBox>
+
+        <Button text="Sign in"
+                onAction="#login"
+                maxWidth="Infinity"
+                styleClass="login-button"/>
+
+        <HBox alignment="CENTER">
+            <Label text="No account? "/>
+            <Hyperlink text="Create one"/>
+        </HBox>
+
+    </VBox>
+
+</StackPane>

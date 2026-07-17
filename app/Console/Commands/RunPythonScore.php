@@ -26,7 +26,7 @@ class RunPythonScore extends Command
    public function handle()
 {
     $this->info('Running Python score calculation...');
-    $output = shell_exec('python C:\xampp\htdocs\Recess-work\app\python_ml\calculate_score.py 2>&1');
+    $output = shell_exec('python C:\xampp\htdocs\Recess-work\app\recommendation_engine\calculate_score.py 2>&1');
     $this->info($output);
 }
 }
