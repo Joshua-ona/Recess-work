@@ -1,10 +1,63 @@
-.card {
-    -fx-background-color: white;
+.root{
+    -fx-background-color:#f5f4f0;
+}
+
+.content{
+    -fx-padding:25;
+}
+
+.page-title{
+    -fx-font-size:28;
+    -fx-font-weight:bold;
+}
+
+.page-subtitle{
+    -fx-text-fill:#666;
+}
+
+.card{
+    -fx-background-color:white;
+    -fx-background-radius:12;
+    -fx-border-radius:12;
+    -fx-border-color:#dddddd;
     -fx-padding:20;
-    -fx-background-radius:15;
-    -fx-effect: dropshadow(gaussian,
-            rgba(0,0,0,0.15),
-            10,0,0,3);
+    -fx-pref-width:250;
+    -fx-spacing:10;
+}
+
+.panel{
+    -fx-background-color:white;
+    -fx-background-radius:12;
+    -fx-border-radius:12;
+    -fx-border-color:#dddddd;
+    -fx-padding:20;
+    -fx-spacing:15;
+    -fx-pref-width:400;
+}
+
+.big-number{
+    -fx-font-size:34;
+    -fx-font-weight:bold;
+}
+
+.purple-btn{
+    -fx-background-color:#4b3ca7;
+    -fx-text-fill:white;
+    -fx-font-weight:bold;
+    -fx-background-radius:10;
+}
+.sidebar{
+    -fx-background-color:#2b236b;
+    -fx-pref-width:220;
+}
+.sidebar-button{
+    -fx-background-color:transparent;
+    -fx-text-fill:white;
+    -fx-padding:12 18;
+}
+
+.sidebar-button:hover{
+    -fx-background-color:#4537a0;
 }
 
 /* Palette matching the web app's :root CSS variables */

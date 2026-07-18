@@ -6,22 +6,17 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('private_comms', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+        Schema::table('private_comms', function (Blueprint $table) {
+            $table->boolean('is_read')->default(false)->after('content');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('private_comms');
+        Schema::table('private_comms', function (Blueprint $table) {
+            $table->dropColumn('is_read');
+        });
     }
 };

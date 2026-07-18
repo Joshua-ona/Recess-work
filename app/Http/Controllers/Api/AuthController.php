@@ -25,8 +25,7 @@ class AuthController extends Controller
         $user = Auth::user();
 
 
-        $token = $user->createToken('javafx-desktop')->plainTextToken;
-
+        
 
         return response()->json([
             'message'=>'Login successful',

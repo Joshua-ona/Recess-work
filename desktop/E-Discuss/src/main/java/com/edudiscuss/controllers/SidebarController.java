@@ -6,6 +6,9 @@ import com.edudiscuss.utils.Session;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import com.edudiscuss.utils.Session;
 
 public class SidebarController {
 
@@ -59,29 +62,83 @@ public class SidebarController {
         navigateIfUnlocked("/views/student/messages.fxml");
     }
 
-    @FXML
-    public void logout() {
-        Session.clear();
-        Navigator.goTo(logoutBtn, "/views/login.fxml");
+    private void setupSidebarNavigation() {
+        // Set up navigation buttons
+        homeBtn.setOnAction(e -> loadView("home"));
+        quizzesBtn.setOnAction(e -> loadView("quizzes"));
+        discussionsBtn.setOnAction(e -> loadView("discussions"));
+        savedBtn.setOnAction(e -> loadView("saved"));
+        messagesBtn.setOnAction(e -> loadView("messages"));
+        groupsBtn.setOnAction(e -> loadView("groups"));
+        logoutBtn.setOnAction(e -> handleLogout());
     }
 
-    /**
-     * Requirement #3: before leaving to any non-quiz screen, check the
-     * server for an active quiz. If locked, QuizLockService redirects to
-     * the attempt screen itself and we don't proceed with the original
-     * navigation.
-     */
-    private void navigateIfUnlocked(String fxmlPath) {
-        boolean isStudent = Session.getUser() != null && "student".equals(Session.getUser().getRole());
+    private void loadView(String view) {
+    try {
 
-        if (isStudent && QuizLockService.enforceLock(dashboardBtn)) {
-            return;
+        FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/views/" + view + ".fxml")
+        );
+
+        Parent root = loader.load();
+
+        contentArea.getChildren().clear();
+        contentArea.getChildren().add(root);
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
+    private void loadUserInfo() {
+
+    if (Session.getUser() != null) {
+
+        userName.setText(
+                Session.getUser().getFullName()
+        );
+
+        userEmail.setText(
+                Session.getUser().getEmail()
+        );
+
+        String name =
+                Session.getUser().getFullName();
+
+        String initials = "";
+
+        for (String part : name.split(" ")) {
+            if (!part.isEmpty()) {
+                initials +=
+                        part.substring(0, 1)
+                                .toUpperCase();
+            }
         }
-        Navigator.goTo(dashboardBtn, fxmlPath);
-    }
 
-    private String rolePath(String file) {
-        String role = Session.getUser() != null ? Session.getUser().getRole() : "student";
-        return "/views/" + role + "/" + file;
+        userInitials.setText(initials);
     }
+}
+private void loadDefaultView() {
+    loadView("home");
+}
+private void handleLogout() {
+
+    try {
+
+        Session.clear();
+
+        FXMLLoader loader =
+                new FXMLLoader(
+                        getClass().getResource(
+                                "/views/login.fxml"
+                        )
+                );
+
+        Parent root = loader.load();
+
+        logoutBtn.getScene().setRoot(root);
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
 }

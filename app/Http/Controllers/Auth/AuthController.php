@@ -40,7 +40,6 @@ class AuthController extends Controller
     }
 
 
-
     public function login(Request $request)
 
     {
@@ -70,11 +69,13 @@ class AuthController extends Controller
     }
 
 
-    return match ($user->role){
-        'system_admin' => redirect()->route('admin.dashboard'),
-        'lecturer' => redirect()->route('lecturer.dashboard'),
-        'student' => redirect()->route('student.dashboard'),
-        //default => redirect()->route('home'),
+
+
+    return match (true) {
+        in_array($user->role, ['admin', 'admin']) => redirect()->route('admin.dashboard'),
+        $user->role === 'lecturer' => redirect()->route('lecturer.dashboard'),
+        default => redirect()->route('student.dashboard'),
+
 
     };
     
@@ -103,9 +104,17 @@ class AuthController extends Controller
 
         return redirect()->route('student.dashboard');
 
+         return match (true) {
+        in_array($user->role, ['admin', 'admin']) => redirect()->route('admin.dashboard'),
+        $user->role === 'lecturer' => redirect()->route('lecturer.dashboard'),
+        default => redirect()->route('student.dashboard'),
+    };
+
+
     }
   
 }
+
 
     
  

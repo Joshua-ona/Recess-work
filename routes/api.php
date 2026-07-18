@@ -9,7 +9,12 @@ use App\Http\Controllers\Api\QuizController;
 use App\Http\Controllers\Api\LecturerQuizController;
 use App\Http\Controllers\Api\PrivateCommController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\StudentDashboardController;
 
+Route::get(
+    '/student/dashboard',
+    [StudentDashboardController::class, 'index']
+);
 Route::post('/login',[AuthController::class,'login']);
 Route::middleware('auth:sanctum')->get('/profile', function(Request $request){
 
@@ -121,6 +126,10 @@ Route::get(
     '/private-comms/{user}',
     [PrivateCommController::class,'conversation']
 );
+  Route::get(
+        '/student/dashboard',
+        [StudentDashboardController::class, 'index']
+    );
 
 Route::post(
     '/private-comms/{user}',

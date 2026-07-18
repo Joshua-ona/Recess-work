@@ -25,7 +25,7 @@ public function execute(array $data):User{
     $user->email = $email;
     $user->first_name = trim($data['first_name']);
     $user->last_name = trim($data['last_name']);
-
+    $user->warning_count = 0;
     $user->password = Hash::make($data['password']);
     $user->role = 'student';
 

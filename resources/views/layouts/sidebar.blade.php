@@ -99,43 +99,28 @@
                 <i class="ti ti-chart-bar"></i> Performance Reports
             </a>
 
-            <a href="{{ route('chat') }}" class="sidebar-item">
-                <i class="ti ti-message-circle"></i> Messages
-            </a>
+          <a href="{{ route('chat') }}" class="sidebar-item">
+    <i class="ti ti-message-circle"></i>
+    Messages
+
+    @if(($unreadMessages ?? 0) > 0)
+        <span class="sidebar-badge">
+            {{ $unreadMessages > 99 ? '99+' : $unreadMessages }}
+        </span>
+    @endif
+</a>
 
             <a href="{{ route('lecturer.notifications') }}" class="sidebar-item">
                 <i class="ti ti-bell"></i> Notifications
             </a>
 
-            <a href="{{ route('lecturer.pinned') }}" class="sidebar-item">
-                <i class="ti ti-bookmark"></i> Pinned Topics
-            </a>
+          
         </div>
+        
+          
+        
         <div class="sidebar-section">
-            <div class="sidebar-section-label">My courses</div>
-            @foreach($myCourses ?? [] as $course)
-                <a href="{{ route('lecturer.courses.show', $course->id) }}"
-                   class="sidebar-item {{ request()->is('lecturer/courses/'.$course->id.'*') ? 'active' : '' }}">
-                    <i class="ti ti-calculator" aria-hidden="true"></i>
-                    {{ $course->code }} — {{ Str::limit($course->name, 18) }}
-                </a>
-            @endforeach
-            <a href="{{ route('lecturer.courses.create') }}" class="sidebar-item">
-                <i class="ti ti-plus" aria-hidden="true"></i> Create course
-            </a>
-        </div>
-        <div class="sidebar-section">
-            <div class="sidebar-section-label">Tools</div>
-            <a href="{{ route('lecturer.pinned') }}" class="sidebar-item">
-                <i class="ti ti-pin" aria-hidden="true"></i> Pinned threads
-            </a>
-            <a href="{{ route('lecturer.flagged') }}"
-               class="sidebar-item {{ request()->routeIs('lecturer.flagged') ? 'active' : '' }}">
-                <i class="ti ti-flag" aria-hidden="true"></i> Flagged posts
-                @if(($flaggedCount ?? 0) > 0)
-                    <span class="sidebar-badge">{{ $flaggedCount }}</span>
-                @endif
-            </a>
+        
             {{-- 🔐 Lecturer logout --}}
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
@@ -168,26 +153,22 @@
                 <i class="ti ti-clipboard-check"></i> Quizzes
             </a>
 
-            <a href="{{ route('chat') }}" class="sidebar-item">
-                <i class="ti ti-message-circle"></i> Messages
-            </a>
+           <a href="{{ route('chat') }}" class="sidebar-item">
+    <i class="ti ti-message-circle"></i>
+    Messages
+
+    @if(($unreadMessages ?? 0) > 0)
+        <span class="sidebar-badge">
+            {{ $unreadMessages > 99 ? '99+' : $unreadMessages }}
+        </span>
+    @endif
+</a>
 
             <a href="{{ route('groups.index') }}" class="sidebar-item">
                 <i class="ti ti-users-group"></i> Groups
             </a>
-        </div>
-        <div class="sidebar-section">
-            <div class="sidebar-section-label">Courses</div>
-            @foreach($enrolledCourses ?? [] as $course)
-                <a href="{{ route('student.course', $course->id) }}"
-                   class="sidebar-item {{ request()->is('student/courses/'.$course->id.'*') ? 'active' : '' }}">
-                    <i class="ti ti-book" aria-hidden="true"></i>
-                    {{ $course->code }} — {{ Str::limit($course->name, 18) }}
-                </a>
-            @endforeach
-            <a href="{{ route('student.courses.browse') }}" class="sidebar-item">
-                <i class="ti ti-plus" aria-hidden="true"></i> Browse all courses
-            </a>
+        
+       
         </div>
         <div class="sidebar-section">
             <div class="sidebar-section-label">Account</div>

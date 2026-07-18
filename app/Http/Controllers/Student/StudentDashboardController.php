@@ -5,8 +5,11 @@ use App\Http\Controllers\Controller;
 use App\Services\{GroupService,GroupChatService};
 use Illuminate\Http\Request;
 use App\Models\Group;
+use App\Models\UserScore;
 use App\Models\PrivateComm;
 use App\Models\Quiz;
+use Illuminate\Support\Facades\Http;
+use App\Models\Notification;
 
 class StudentDashboardController extends Controller
 {
@@ -14,74 +17,119 @@ class StudentDashboardController extends Controller
     
     }
 
-    public function index()
-    {
-        $user = auth()->user();
-        $myGroupIds = $user->groups()->pluck('groups.id');
-        $joinedGroupIds = auth()->user()->groups()->pluck('groups.id')->toArray();
+public function index()
+{
+    $user = auth()->user();
+    $myGroups = $this->groupService->getMyGroups($user);
+    $myGroupIds = $user->groups()->pluck('groups.id')->toArray();
 
-        $myGroups = $this->groupService->getMyGroups($user);
-        $browseGroups = Group::where('status','approved')
-                            ->whereNotIn('id',$myGroupIds)
-                            ->latest('id')
-                            ->get();
+    // 1. BROWSE ALL: Show ALL approved groups. No filter
+    $browseGroups = Group::where('status', 'approved')
+        ->distinct()
+        ->orderBy('name')
+        ->get();
 
-        $discoverGroups = $this->groupService->getDiscoverableGroupsFor($user);
+    $discoverGroups = $this->groupService->getDiscoverableGroupsFor($user);
+
+    // 2. Recommended Discussions from Python
+    $response = Http::get('http://127.0.0.1:5001/recommendations/' . $user->id);
+    $recommendations = $response->successful() ? $response->json() : [];
+
+    // 3. NEW: Recommended Groups from Python - this already excludes joined groups
+    $responseGroups = Http::get('http://127.0.0.1:5001/recommend-groups/' . $user->id);
+    $recommendedGroups = $responseGroups->successful() ? $responseGroups->json() : [];
+
+    $userScore = UserScore::where('user_id', $user->id)->first();
+    $score = $userScore ? round($userScore->score) : 0;
+
+    $notifCount = Notification::where('user_id', $user->id)
+    ->whereNull('read_at')
+    ->count();
+
+    return view('student.dashboard', [
+        'myGroups' => $myGroups,
+        'browseGroups' => $browseGroups, // now shows ALL
+        'joinedGroups' => $myGroupIds,
+        'recommendations' =>  $recommendations,
+        'recommendedGroups' => $recommendedGroups, // AI picks, not joined
+        'discoverGroups' =>  $discoverGroups, 
+        'score' => $score,
+        'user' => $user,
+        'activeGroup' => null,
+        'admin' => null,
+    ]);
+}
+
+    //  public function show(Group $group)
+    //  {
+    //     $user = auth()->user();
+    //     //$this->authorize('view',$group);
+
+    //     $admin = $group->admin;
+    //     $members = $group->users()->where('user_id', '!=', $admin->id)->get();
+    //     $messages = $group->messages()->with('user')->latest()->get();
+
+    //     $browseGroups = Group::where('status','approved')
+    //                         ->whereNotIn('id',$user->groups()->pluck('groups.id'))
+    //                         ->latest('id')
+    //                         ->get();
+
+    //     return view('student.dashboard', [
+    //         'activeGroup' => $group,
+    //         'admin' => $admin,
+    //         'members' => $members,
+    //         'messages' => $messages,
+    //         'role' => 'student',
+    //         'browseGroups' => $browseGroups,
+    //         'user' => $user,
+    //         'discover' => $this->groupService->getDiscoverableGroupsFor($user),
+    //         'myGroups' => $this->groupService->getMyGroups($user),
+    //         'enrolledCourses' => collect(),
+    //         'unreadCount' => 0,
+    //         'notifCount' => 0,
+
+    //     ]);
+    // }
 
 
-        $postsMade = 0;
-        $upvotesReceived = 0;
-        $enrolledCourses = collect();
-        $participationScore = 0;
+    public function show(Group $group)
+{
+    $user = auth()->user();
+    $admin = $group->admin;
+    $members = $group->users()->where('user_id', '!=', $admin->id)->get();
+    $messages = $group->messages()->with('user')->latest()->get();
 
-        return view('student.dashboard',
-        [
-                    'myGroups' => $myGroups,
-                    'browseGroups' => $browseGroups,
-                    'joinedGroups' => $joinedGroupIds,
-                    'discoverGroups' =>  $discoverGroups, 
-                    'postsMade' =>  $postsMade,
-                    'upvotesReceived' =>  $upvotesReceived,
-                    'enrolledCourses' =>  $enrolledCourses,
-                    'participationScore' => $participationScore,
-                    'user' => $user,
-                    'activeGroup' => null,
-                    'admin' => null,
-        ]);
-                    
-       
-    }
+    $browseGroups = Group::where('status','approved')
+                        ->whereNotIn('id',$user->groups()->pluck('groups.id'))
+                        ->latest('id')
+                        ->get();
 
-     public function show(Group $group)
-     {
-        $user = auth()->user();
-        //$this->authorize('view',$group);
+    
+    $userScore = UserScore::where('user_id', $user->id)->first();
+    $score = $userScore ? round($userScore->score) : 0;
+    
+    $responseGroups = Http::get('http://127.0.0.1:5001/recommend-groups/' . $user->id);
+    $recommendedGroups = $responseGroups->successful() ? $responseGroups->json() : [];
 
-        $admin = $group->admin;
-        $members = $group->users()->where('user_id', '!=', $admin->id)->get();
-        $messages = $group->messages()->with('user')->latest()->get();
 
-        $browseGroups = Group::where('status','approved')
-                            ->whereNotIn('id',$user->groups()->pluck('groups.id'))
-                            ->latest('id')
-                            ->get();
+    return view('student.dashboard', [
+        'activeGroup' => $group,
+        'admin' => $admin,
+        'members' => $members,
+        'messages' => $messages,
+        'role' => 'student',
+        'browseGroups' => $browseGroups,
+        'user' => $user,
+        'discover' => $this->groupService->getDiscoverableGroupsFor($user),
+        'myGroups' => $this->groupService->getMyGroups($user),
+        'enrolledCourses' => collect(),
+        'unreadCount' => 0,
+        'notifCount' => 0,
+        'score' => $score, // ADD
+        'recommendedGroups' => $recommendedGroups, // ADD
+    ]);
+}
 
-        return view('student.dashboard', [
-            'activeGroup' => $group,
-            'admin' => $admin,
-            'members' => $members,
-            'messages' => $messages,
-            'role' => 'student',
-            'browseGroups' => $browseGroups,
-            'user' => $user,
-            'discover' => $this->groupService->getDiscoverableGroupsFor($user),
-            'myGroups' => $this->groupService->getMyGroups($user),
-            'enrolledCourses' => collect(),
-            'unreadCount' => 0,
-            'notifCount' => 0,
-
-        ]);
-    }
 
      public function store(Request $request)
         {
@@ -150,65 +198,17 @@ public function settings()
         return view('student.profile');
     }
 
-  public function notifications()
+ public function notifications()
 {
-    $notifications = collect();
-
-    // --------------------
-    // Warnings
-    // --------------------
-    $warnings = auth()->user()->warnings()->with('issuer')->get();
-
-    foreach ($warnings as $warning) {
-        $notifications->push([
-            'type' => 'warning',
-            'message' => $warning->message,
-            'sender' => $warning->issuer?->full_name ?? 'Admin',
-            'created_at' => $warning->created_at,
-        ]);
-    }
-
-    // --------------------
-    // Messages
-    // --------------------
-    $messages = PrivateComm::with('sender')
-        ->where('receiver_id', auth()->id())
+    $notifications = Notification::where('user_id', auth()->id())
         ->latest()
         ->get();
 
-    foreach ($messages as $message) {
-        $notifications->push([
-            'type' => 'message',
-            'message' => $message->content,
-           'sender' => $message->sender
-    ? $message->sender->first_name . ' ' . $message->sender->last_name
-    : 'Unknown',
-            'created_at' => $message->created_at,
-        ]);
-    }
+    $notifCount = Notification::where('user_id', auth()->id())
+        ->whereNull('read_at')
+        ->count();
 
-    // --------------------
-    // Quizzes
-    // --------------------
-$groupIds = auth()->user()
-    ->groups()
-    ->pluck('groups.id');
-
-$quizzes = Quiz::whereIn('group_id', $groupIds)
-    ->where('is_published', true)
-    ->latest()
-    ->get();
-
-foreach ($quizzes as $quiz) {
-    $notifications->push([
-        'type' => 'quiz',
-        'message' => "New quiz: {$quiz->title}",
-        'sender' => 'Course Quiz',
-        'created_at' => $quiz->created_at,]);
-}
-    $notifications = $notifications->sortByDesc('created_at');
-
-    auth()->user()->warnings()
+    Notification::where('user_id', auth()->id())
         ->whereNull('read_at')
         ->update([
             'read_at' => now(),
@@ -216,8 +216,10 @@ foreach ($quizzes as $quiz) {
 
     return view('student.notifications', [
         'notifications' => $notifications,
+        'notifCount' => $notifCount,
     ]);
 }
+
 
     public function browseCourses()
     {
