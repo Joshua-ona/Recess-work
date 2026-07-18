@@ -11,7 +11,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import com.edudiscuss.models.Quiz;
 
-public class QuizzesController {
+public class StudentQuizzesController {
     @FXML private TableView<Quiz> quizTable;
     @FXML private TableColumn<Quiz, String> titleColumn;
     @FXML private TableColumn<Quiz, String> startTimeColumn;
