@@ -191,17 +191,10 @@ Route::get('/groups/{group}/discussions/{discussion}/pdf', [DiscussionController
 
 Route::get('/groups/{group}/stats', [GroupController::class, 'stats']);
 
-    //ML MODEL ROUTE
-//    Route::get(
-//         '/student/recommendations',
-//         [RecommendationController::class,'index']
-//     )->name('student.recommendations');
+   
+ 
 
-/*
-|--------------------------------------------------------------------------
-| Root Redirect
-|--------------------------------------------------------------------------
-*/
+
 
 Route::get('/', function () {
     if (!auth()->check()) {

@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\ReplyController;
 use App\Http\Controllers\Api\GroupController;
 use App\Http\Controllers\Api\GroupMessageController;
 use App\Http\Controllers\Api\QuizController;
+use App\Http\Controllers\Api\LecturerQuizController;
 use App\Http\Controllers\Api\PrivateCommController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\StudentDashboardController;
@@ -15,13 +16,6 @@ Route::get(
     [StudentDashboardController::class, 'index']
 );
 Route::post('/login',[AuthController::class,'login']);
-Route::middleware('auth:sanctum')->get('/profile', function(Request $request){
-
-    return response()->json([
-        'user'=>$request->user()
-    ]);
-
-});
 Route::middleware('auth:sanctum')->get('/profile', function(Request $request){
 
     return response()->json([
@@ -88,6 +82,10 @@ Route::post(
 );
 Route::get('/quizzes',[QuizController::class,'index']);
 
+// Requirement #3: lock check — must come before {quiz} routes so
+// "active" isn't swallowed as a quiz ID.
+Route::get('/quizzes/active', [QuizController::class,'active']);
+
 Route::get('/quizzes/{quiz}',[QuizController::class,'show']);
 
 Route::get(
@@ -96,8 +94,23 @@ Route::get(
 );
 
 Route::post(
+    '/quizzes/{quiz}/start',
+    [QuizController::class,'start']
+);
+
+Route::post(
+    '/quizzes/{quiz}/save-answers',
+    [QuizController::class,'saveAnswers']
+);
+
+Route::post(
     '/quizzes/{quiz}/submit',
     [QuizController::class,'submit']
+);
+
+Route::get(
+    '/quizzes/{quiz}/results',
+    [QuizController::class,'results']
 );
 
 Route::get(
@@ -130,5 +143,20 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/notifications/count',
         [NotificationController::class,'count']);
+
+});
+
+// ── Lecturer quiz management (desktop client) ──────────────────────────
+Route::middleware('auth:sanctum')->prefix('lecturer')->group(function () {
+
+    Route::get('/quizzes', [LecturerQuizController::class, 'index']);
+    Route::post('/quizzes', [LecturerQuizController::class, 'store']);
+    Route::get('/quizzes/{quiz}', [LecturerQuizController::class, 'show']);
+    Route::put('/quizzes/{quiz}', [LecturerQuizController::class, 'update']);
+    Route::post('/quizzes/{quiz}/update', [LecturerQuizController::class, 'update']); // desktop-friendly alias
+    Route::post('/quizzes/{quiz}/publish', [LecturerQuizController::class, 'publish']);
+    Route::delete('/quizzes/{quiz}', [LecturerQuizController::class, 'destroy']);
+    Route::post('/quizzes/{quiz}/delete', [LecturerQuizController::class, 'destroy']); // desktop-friendly alias
+    Route::post('/quizzes/{quiz}/upload', [LecturerQuizController::class, 'uploadQuestions']);
 
 });

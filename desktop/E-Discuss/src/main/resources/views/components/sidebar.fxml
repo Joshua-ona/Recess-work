@@ -1,21 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.VBox?>
 
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.edudiscuss.controllers.SidebarController"
       spacing="10"
-      prefWidth="250"
-      style="-fx-background-color:#1E293B;
-             -fx-padding:20;">
+      prefWidth="190"
+      styleClass="sidebar">
 
-    <Button text="Dashboard"/>
-    <Button text="Groups"/>
-    <Button text="Discussions"/>
-    <Button text="Quizzes"/>
-    <Button text="Notifications"/>
-    <Button text="Messages"/>
-    <Button text="Logout"/>
+    <Button fx:id="dashboardBtn" text="Dashboard" onAction="#goToDashboard" maxWidth="Infinity"/>
+    <Button fx:id="groupsBtn" text="Groups" onAction="#goToGroups" maxWidth="Infinity"/>
+    <Button fx:id="discussionsBtn" text="Discussions" onAction="#goToDiscussions" maxWidth="Infinity"/>
+    <Button fx:id="quizzesBtn" text="Quizzes" onAction="#goToQuizzes" maxWidth="Infinity"/>
+    <Button fx:id="notificationsBtn" text="Notifications" onAction="#goToNotifications" maxWidth="Infinity"/>
+    <Button fx:id="messagesBtn" text="Messages" onAction="#goToMessages" maxWidth="Infinity"/>
+    <Button fx:id="logoutBtn" text="Logout" onAction="#logout" maxWidth="Infinity"/>
+
+    <Label fx:id="lockBanner"
+           text="Locked into active quiz. Other sections are disabled until you finish or time runs out."
+           wrapText="true"
+           visible="false"
+           managed="false"
+           styleClass="lock-banner"/>
 
 </VBox>
