@@ -60,36 +60,76 @@ public function index()
     ]);
 }
 
-     public function show(Group $group)
-     {
-        $user = auth()->user();
-        //$this->authorize('view',$group);
+    //  public function show(Group $group)
+    //  {
+    //     $user = auth()->user();
+    //     //$this->authorize('view',$group);
 
-        $admin = $group->admin;
-        $members = $group->users()->where('user_id', '!=', $admin->id)->get();
-        $messages = $group->messages()->with('user')->latest()->get();
+    //     $admin = $group->admin;
+    //     $members = $group->users()->where('user_id', '!=', $admin->id)->get();
+    //     $messages = $group->messages()->with('user')->latest()->get();
 
-        $browseGroups = Group::where('status','approved')
-                            ->whereNotIn('id',$user->groups()->pluck('groups.id'))
-                            ->latest('id')
-                            ->get();
+    //     $browseGroups = Group::where('status','approved')
+    //                         ->whereNotIn('id',$user->groups()->pluck('groups.id'))
+    //                         ->latest('id')
+    //                         ->get();
 
-        return view('student.dashboard', [
-            'activeGroup' => $group,
-            'admin' => $admin,
-            'members' => $members,
-            'messages' => $messages,
-            'role' => 'student',
-            'browseGroups' => $browseGroups,
-            'user' => $user,
-            'discover' => $this->groupService->getDiscoverableGroupsFor($user),
-            'myGroups' => $this->groupService->getMyGroups($user),
-            'enrolledCourses' => collect(),
-            'unreadCount' => 0,
-            'notifCount' => 0,
+    //     return view('student.dashboard', [
+    //         'activeGroup' => $group,
+    //         'admin' => $admin,
+    //         'members' => $members,
+    //         'messages' => $messages,
+    //         'role' => 'student',
+    //         'browseGroups' => $browseGroups,
+    //         'user' => $user,
+    //         'discover' => $this->groupService->getDiscoverableGroupsFor($user),
+    //         'myGroups' => $this->groupService->getMyGroups($user),
+    //         'enrolledCourses' => collect(),
+    //         'unreadCount' => 0,
+    //         'notifCount' => 0,
 
-        ]);
-    }
+    //     ]);
+    // }
+
+
+    public function show(Group $group)
+{
+    $user = auth()->user();
+    $admin = $group->admin;
+    $members = $group->users()->where('user_id', '!=', $admin->id)->get();
+    $messages = $group->messages()->with('user')->latest()->get();
+
+    $browseGroups = Group::where('status','approved')
+                        ->whereNotIn('id',$user->groups()->pluck('groups.id'))
+                        ->latest('id')
+                        ->get();
+
+    
+    $userScore = UserScore::where('user_id', $user->id)->first();
+    $score = $userScore ? round($userScore->score) : 0;
+    
+    $responseGroups = Http::get('http://127.0.0.1:5001/recommend-groups/' . $user->id);
+    $recommendedGroups = $responseGroups->successful() ? $responseGroups->json() : [];
+
+
+    return view('student.dashboard', [
+        'activeGroup' => $group,
+        'admin' => $admin,
+        'members' => $members,
+        'messages' => $messages,
+        'role' => 'student',
+        'browseGroups' => $browseGroups,
+        'user' => $user,
+        'discover' => $this->groupService->getDiscoverableGroupsFor($user),
+        'myGroups' => $this->groupService->getMyGroups($user),
+        'enrolledCourses' => collect(),
+        'unreadCount' => 0,
+        'notifCount' => 0,
+        'score' => $score, // ADD
+        'recommendedGroups' => $recommendedGroups, // ADD
+    ]);
+}
+
 
      public function store(Request $request)
         {
