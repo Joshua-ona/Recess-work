@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Auth;
 use App\Models\PrivateComm;
+use App\Models\Notification;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -30,8 +31,13 @@ class AppServiceProvider extends ServiceProvider
                 ->where('is_read', false)
                 ->count();
 
+            $notifCount = Notification::where('user_id', Auth::id())
+                ->whereNull('read_at')
+                ->count();
+
             $view->with([
                 'unreadMessages' => $unreadMessages,
+                'notifCount' => $notifCount,
             ]);
         }
 

@@ -27,4 +27,8 @@ class Quiz extends Model
     {
         return $this->hasMany(Question::class, 'quiz_id', 'quiz_id');
     }
+    public function group()
+{
+    return $this->belongsTo(Group::class, 'group_id');
+}
 }

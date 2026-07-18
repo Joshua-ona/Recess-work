@@ -9,7 +9,7 @@
         'user'            => auth()->user(),
         'enrolledCourses' => $enrolledCourses ?? collect(),
         'unreadCount'     => $unreadCount ?? 0,
-        'notifCount'      => $notifCount  ?? 0,
+        'notifCount'      => $notifCount ?? 0,
     ])
 
     <div class="dash-main">
@@ -19,7 +19,8 @@
                 <div class="dash-header-title">Notifications</div>
                 <div class="dash-header-sub">
                     @if ($notifications->isNotEmpty())
-                        You have {{ $notifications->count() }} {{ Str::plural('notification', $notifications->count()) }} on file
+                        You have {{ $notifications->count() }}
+                        {{ Str::plural('notification', $notifications->count()) }} on file
                     @else
                         Nothing new
                     @endif
@@ -29,60 +30,112 @@
 
         <div class="dash-body">
             <div class="full-panel">
+
                 <div class="panel-head">
                     <span class="panel-title">Get notified 😁</span>
                 </div>
+
                 <div class="panel-body">
- @forelse($notifications as $notification)
 
-<div class="activity-item notification-card">
+                    @forelse($notifications as $notification)
 
-    <div class="activity-dot"
-        style="background:
-        {{ $notification['type'] == 'warning'
-            ? 'var(--red-400)'
-            : ($notification['type'] == 'group'
-                ? 'var(--green-400)'
-                : 'var(--blue-400)') }}">
-    </div>
+                        <div class="activity-item notification-card">
 
-    <div>
+                            <div class="activity-dot"
+                                style="background:
+                                {{ $notification->type == 'warning'
+                                    ? 'var(--red-400)'
+                                    : ($notification->type == 'group'
+                                        ? 'var(--green-400)'
+                                        : 'var(--blue-400)') }}">
+                            </div>
 
-      <div class="activity-text">
-    @if($notification['type'] == 'message')
-        <strong> New message from {{ $notification['sender'] }}</strong>
+                            <div>
 
-    @elseif($notification['type'] == 'quiz')
-        {{ $notification['message'] }}
+                                <div class="activity-text">
 
-    @else
-        {{ $notification['message'] }}
-    @endif
-</div>
+                                    @if($notification->type == 'message')
 
-        <div class="activity-time">
+                                        <strong>
+                                            New message from {{ $notification->sender }}
+                                        </strong>
 
-            @if($notification['type'] == 'warning')
-                <span class="badge badge-red">Warning</span>
-            @elseif($notification['type'] == 'group')
-                <span class="badge badge-green">Group</span>
-            @else
-                <span class="badge badge-blue">Quiz</span>
-            @endif
+                                    @elseif($notification->type == 'quiz')
 
-    
-            · {{ $notification['created_at']->diffForHumans() }}
+                                        {{ $notification->message }}
 
+                                    @elseif($notification->type == 'group')
+
+                                        {{ $notification->message }}
+
+                                    @elseif($notification->type == 'warning')
+
+                                        {{ $notification->message }}
+
+                                    @else
+
+                                        {{ $notification->message }}
+
+                                    @endif
+
+                                </div>
+
+                                <div class="activity-time">
+
+                                    @if($notification->type == 'warning')
+
+                                        <span class="badge badge-red">
+                                            Warning
+                                        </span>
+
+                                    @elseif($notification->type == 'discussion')
+
+                                        <span class="badge badge-green">
+                                            Discussion
+                                        </span>
+
+                                    @elseif($notification->type == 'quiz')
+
+                                        <span class="badge badge-blue">
+                                            Quiz
+                                        </span>
+
+                                    @elseif($notification->type == 'message')
+
+                                        <span class="badge badge-blue">
+                                            Message
+                                        </span>
+
+                                    @else
+
+                                        <span class="badge badge-blue">
+                                            Notification
+                                        </span>
+
+                                    @endif
+
+                                    · {{ $notification->created_at->diffForHumans() }}
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    @empty
+
+                        <p style="font-size:13px;color:var(--muted);text-align:center;padding:1rem 0">
+                            No notifications.
+                        </p>
+
+                    @endforelse
+
+                </div>
+
+            </div>
         </div>
 
     </div>
 
 </div>
-
-@empty
-
-<p style="font-size:13px;color:var(--muted);text-align:center;padding:1rem 0">
-    No notifications.
-</p>
-
-@endforelse
+@endsection

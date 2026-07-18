@@ -6,6 +6,7 @@ use App\Models\Discussion;
 use App\Models\Group;
 use Illuminate\Http\Request;
 use App\Models\Reply;
+use App\Models\Notification;
 
 class DiscussionController extends Controller
 {
@@ -27,11 +28,26 @@ class DiscussionController extends Controller
             'body'  => 'required'
         ]);
 
-        $group->discussions()->create([
-            'user_id' => auth()->id(),
-            'title'   => $request->title,
-            'body'    => $request->body
-        ]);
+       $discussion = $group->discussions()->create([
+    'user_id' => auth()->id(),
+    'title'   => $request->title,
+    'body'    => $request->body
+]);
+foreach ($group->users as $student) {
+
+    // Don't notify the person who created the discussion
+    if ($student->id == auth()->id()) {
+        continue;
+    }
+
+    Notification::create([
+        'user_id'      => $student->id,
+        'type'         => 'discussion',
+        'reference_id' => $discussion->id,
+        'message'      => 'New discussion: ' . $discussion->title,
+        'sender'       => auth()->user()->first_name . ' ' . auth()->user()->last_name,
+    ]);
+}
 
         return redirect("/groups/{$group->id}/discussions")
             ->with('success', 'Discussion created!');
