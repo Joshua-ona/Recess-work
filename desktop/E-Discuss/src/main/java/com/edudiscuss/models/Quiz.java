@@ -10,6 +10,9 @@ public class Quiz {
     private int duration_mins;
     private String target_category;
     private boolean is_published;
+    private java.util.List<Question> questions; // only present when eager-loaded (lecturer show/upload)
+
+    public java.util.List<Question> getQuestions() { return questions; }
 
     public int getQuizId() { return quiz_id; }
     public int getCreatedBy() { return created_by; }

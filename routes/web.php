@@ -190,10 +190,10 @@ Route::get('/groups/{group}/discussions/{discussion}/pdf', [DiscussionController
 Route::get('/groups/{group}/stats', [GroupController::class, 'stats']);
 
    
-|--------------------------------------------------------------------------
-| Root Redirect
-|--------------------------------------------------------------------------
-*/
+
+
+
+
 
 Route::get('/', function () {
     if (!auth()->check()) {

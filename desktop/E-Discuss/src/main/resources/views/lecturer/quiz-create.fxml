@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.edudiscuss.controllers.LecturerQuizCreateController">
+
+    <left>
+        <fx:include source="../components/sidebar.fxml"/>
+    </left>
+
+    <center>
+        <VBox spacing="16" style="-fx-padding:24; -fx-max-width:520;" maxWidth="520">
+
+            <Label text="Create Quiz" styleClass="main-title"/>
+            <Label text="Sets up the quiz shell — upload questions afterwards from the edit screen." styleClass="main-sub"/>
+
+            <Label fx:id="errorLabel" styleClass="error-label" visible="false" managed="false"/>
+
+            <VBox spacing="4">
+                <Label text="Title" styleClass="form-label"/>
+                <TextField fx:id="titleField" promptText="e.g. Database Systems — CAT 2"/>
+            </VBox>
+
+            <VBox spacing="4">
+                <Label text="Group" styleClass="form-label"/>
+                <ComboBox fx:id="groupCombo" maxWidth="Infinity"/>
+            </VBox>
+
+            <VBox spacing="4">
+                <Label text="Target category" styleClass="form-label"/>
+                <ComboBox fx:id="categoryCombo" editable="true" maxWidth="Infinity"/>
+            </VBox>
+
+            <HBox spacing="16">
+                <VBox spacing="4" HBox.hgrow="ALWAYS">
+                    <Label text="Start date/time" styleClass="form-label"/>
+                    <DatePicker fx:id="startDatePicker" maxWidth="Infinity"/>
+                </VBox>
+                <VBox spacing="4">
+                    <Label text="Hour" styleClass="form-label"/>
+                    <Spinner fx:id="startHourSpinner" prefWidth="80"/>
+                </VBox>
+                <VBox spacing="4">
+                    <Label text="Min" styleClass="form-label"/>
+                    <Spinner fx:id="startMinuteSpinner" prefWidth="80"/>
+                </VBox>
+            </HBox>
+
+            <VBox spacing="4">
+                <Label text="Duration (minutes)" styleClass="form-label"/>
+                <Spinner fx:id="durationSpinner" editable="true"/>
+            </VBox>
+
+            <Button text="Save quiz" styleClass="btn-primary" onAction="#save"/>
+
+        </VBox>
+    </center>
+
+</BorderPane>

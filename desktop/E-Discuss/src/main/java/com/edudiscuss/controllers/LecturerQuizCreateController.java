@@ -36,7 +36,7 @@ public class LecturerQuizCreateController {
         startDatePicker.setValue(LocalDate.now());
 
         categoryCombo.setItems(FXCollections.observableArrayList(
-            "Level 100", "Level 200", "Level 300", "Level 400"));
+                "Level 100", "Level 200", "Level 300", "Level 400"));
 
         loadGroups();
     }
@@ -48,7 +48,7 @@ public class LecturerQuizCreateController {
             if (response.isOk()) {
                 GroupListResponse parsed = gson.fromJson(response.body, GroupListResponse.class);
                 groupCombo.setItems(FXCollections.observableArrayList(
-                    parsed.getGroups() != null ? parsed.getGroups() : java.util.List.of()));
+                        parsed.getGroups() != null ? parsed.getGroups() : java.util.List.of()));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -61,7 +61,7 @@ public class LecturerQuizCreateController {
         String title = titleField.getText();
         Group group = groupCombo.getValue();
         String category = categoryCombo.getEditor().getText() != null && !categoryCombo.getEditor().getText().isBlank()
-            ? categoryCombo.getEditor().getText() : categoryCombo.getValue();
+                ? categoryCombo.getEditor().getText() : categoryCombo.getValue();
         LocalDate date = startDatePicker.getValue();
 
         if (title == null || title.isBlank() || group == null || category == null || date == null) {
@@ -78,7 +78,7 @@ public class LecturerQuizCreateController {
             if (response.isOk()) {
                 QuizDetailResponse parsed = gson.fromJson(response.body, QuizDetailResponse.class);
                 LecturerQuizEditController controller = Navigator.goToWithController(
-                    titleField, "/views/lecturer/quiz-edit.fxml");
+                        titleField, "/views/lecturer/quiz-edit.fxml");
                 if (controller != null) {
                     controller.loadQuiz(parsed.getQuiz().getQuizId());
                 }
