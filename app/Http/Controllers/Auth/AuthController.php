@@ -31,14 +31,13 @@ class AuthController extends Controller
 {
     Auth::logout();
     $request->session()->invalidate();
-    $request->session()->regenerateToken();
+    //$request->session()->regenerateToken();
     return redirect()->route('login');
 }
 
     public function showRegister(){
             return view('auth.register');
     }
-
 
 
     public function login(Request $request)
@@ -58,7 +57,8 @@ class AuthController extends Controller
     $request->session()->regenerate();
     $user = Auth::user();
 
-    // Blacklisting stops a login outright.
+    // Blacklisting still actually stops someone from logging back in;
+    // there's just no pending-approval gate before that point anymore.
     if ($user->status === 'blacklisted') {
         Auth::logout();
         $request->session()->invalidate();
@@ -68,17 +68,21 @@ class AuthController extends Controller
         ])->onlyInput('email');
     }
 
-  
+
+
 
     return match (true) {
         in_array($user->role, ['admin', 'admin']) => redirect()->route('admin.dashboard'),
-        $user->role === 'lecturer'                        => redirect()->route('lecturer.dashboard'),
-        default                                           => redirect()->route('student.dashboard'),
+        $user->role === 'lecturer' => redirect()->route('lecturer.dashboard'),
+        default => redirect()->route('student.dashboard'),
+
+
     };
+    
+    
+        
 }
 
-
-    
 
     public function register(Request $request)
     {
@@ -92,29 +96,25 @@ class AuthController extends Controller
             'email',
             'max:255',
             'unique:users',
-            'regex:/^[a-zA-Z0-9._%+-]+@(students\.)?mak\.ac\.ug$/'
         ],
         'password' => 'required|string|min:8|confirmed',
         ]);
 
         $user = $this->registrationService->execute($data);
 
+        return redirect()->route('student.dashboard');
 
-        Auth::login($user);
+         return match (true) {
+        in_array($user->role, ['admin', 'admin']) => redirect()->route('admin.dashboard'),
+        $user->role === 'lecturer' => redirect()->route('lecturer.dashboard'),
+        default => redirect()->route('student.dashboard'),
+    };
 
-return match (true) {
-    in_array($user->role, ['admin']) =>
-        redirect()->route('admin.dashboard'),
 
-    $user->role === 'lecturer' =>
-        redirect()->route('lecturer.dashboard'),
-
-    default =>
-        redirect()->route('student.dashboard'),
-};
     }
   
 }
+
 
     
  

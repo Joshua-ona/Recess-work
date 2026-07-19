@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Quiz;
 use App\Models\Question;
+use App\Models\Notification;
 
 class QuizController extends Controller
 {
@@ -94,6 +95,21 @@ public function update(Request $request, Quiz $quiz)
     $quiz->is_published = 1;
 
     $quiz->save();
+   foreach ($quiz->group->users as $student) {
+
+    Notification::firstOrCreate(
+        [
+            'user_id'      => $student->id,
+            'type'         => 'quiz',
+            'reference_id' => $quiz->quiz_id,
+        ],
+        [
+            'message' => 'New quiz: ' . $quiz->title,
+            'sender'  => 'Course Quiz',
+        ]
+    );
+
+}
 
     return back()->with('success', 'Quiz published successfully.');
 }

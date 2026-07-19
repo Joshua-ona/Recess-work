@@ -12,29 +12,30 @@ class PrivateCommController extends Controller
 {
     // Users I have chatted with
     public function users()
-    {
-        $myId = Auth::id();
+{
+    $myId = Auth::id();
 
-        $users = User::whereIn(
-            'id',
-            function($q) use ($myId) {
-                $q->select('sender_id')
-                  ->from('private_comms')
-                  ->where('receiver_id',$myId)
+    $users = User::where('id', '!=', $myId)->get();
 
-                  ->union(
+    foreach ($users as $user) {
 
-                      PrivateComm::select('receiver_id')
-                          ->where('sender_id',$myId)
-
-                  );
-            }
-        )->get();
-
-        return response()->json([
-            'users'=>$users
-        ]);
+        $user->unread_count = PrivateComm::where(
+                'sender_id',
+                $user->id
+            )
+            ->where(
+                'receiver_id',
+                $myId
+            )
+            ->where(
+                'is_read',
+                false
+            )
+            ->count();
     }
+
+    return response()->json($users);
+}
 
 
     // Conversation with one user
@@ -62,9 +63,7 @@ class PrivateCommController extends Controller
         ->oldest()
         ->get();
 
-        return response()->json([
-            'messages'=>$messages
-        ]);
+       return response()->json($messages);
     }
 
 

@@ -11,15 +11,57 @@ class StudentQuizController extends Controller
 {
     public function index()
     {
+        $userId = auth()->id();
+
+        $attemptedQuizIds = QuizSubmission::where('user_id', $userId)->pluck('quiz_id');
+
         $quizzes = Quiz::where('is_published', 1)
+                        ->whereNotIn('quiz_id', $attemptedQuizIds)
                         ->orderBy('start_time')
-                        ->get();
+                        ->get()
+                        // A quiz disappears entirely once its scheduled window has closed,
+                        // whether or not the student ever attempted it.
+                        ->filter(function ($quiz) {
+                            return now()->lessThan($this->quizWindowEnd($quiz));
+                        })
+                        ->values();
 
         return view('student.quizzes.index', compact('quizzes'));
     }
 
+    private function quizWindowEnd(Quiz $quiz)
+    {
+        return \Carbon\Carbon::parse($quiz->start_time)->addMinutes($quiz->duration_mins ?? 90);
+    }
+
     public function attempt(Quiz $quiz, $number = 1)
     {
+        $userId = auth()->id();
+
+        // Block re-entry once the student already has a submission for this quiz.
+        $alreadySubmitted = QuizSubmission::where('quiz_id', $quiz->quiz_id)
+            ->where('user_id', $userId)
+            ->exists();
+
+        if ($alreadySubmitted) {
+            return redirect()->route('student.quizzes')
+                ->with('error', 'You have already attempted "' . $quiz->title . '".');
+        }
+
+        // Block access before the scheduled start time.
+        if (now()->lessThan($quiz->start_time)) {
+            return redirect()->route('student.quizzes')
+                ->with('error', '"' . $quiz->title . '" opens at ' . \Carbon\Carbon::parse($quiz->start_time)->format('M j, Y g:i A') . '. You can\'t attempt it yet.');
+        }
+
+        $quizWindowEnd = $this->quizWindowEnd($quiz);
+
+        // Block access once the scheduled window has fully closed.
+        if (now()->greaterThanOrEqualTo($quizWindowEnd)) {
+            return redirect()->route('student.quizzes')
+                ->with('error', 'The window for "' . $quiz->title . '" has closed.');
+        }
+
         $perPage = 5;
         $questions = $quiz->questions->values();
         $pageQuestions = $questions->slice(($number - 1) * $perPage, $perPage);
@@ -28,16 +70,24 @@ class StudentQuizController extends Controller
         $answersKey = 'quiz_answers_' . $quiz->quiz_id;
 
         if (!session()->has($deadlineKey)) {
-            session([$deadlineKey => now()->addMinutes($quiz->duration_mins ?? 90)]);
+           
+            session([$deadlineKey => $quizWindowEnd]);
         }
+
+        // Lock the student into this quiz: any other dashboard route will
+        // bounce them back here until they finish or the window closes.
+        session(['active_quiz_id' => $quiz->quiz_id]);
 
         $remainingSeconds = max(0, session($deadlineKey)->getTimestamp() - now()->getTimestamp());
 
         // Time already ran out
         if ($remainingSeconds <= 0) {
             session()->forget($deadlineKey);
+            session()->forget('active_quiz_id');
             $savedAnswers = session()->pull($answersKey, []);
             $score = $this->scoreAnswers($quiz, $savedAnswers);
+
+            $this->saveQuizSubmission($quiz, $savedAnswers, $score, true);
 
             return view('student.quizzes.result', [
                 'quiz' => $quiz,
@@ -88,9 +138,10 @@ class StudentQuizController extends Controller
 
         session()->forget($deadlineKey);
         session()->forget($answersKey);
+        session()->forget('active_quiz_id');
 
         // Save to database using QuizSubmission
-        $this->saveQuizSubmission($quiz, $savedAnswers, $score, false);
+        $this->saveQuizSubmission($quiz, $savedAnswers, $score, $timedOut);
 
         return view('student.quizzes.result', [
             'quiz' => $quiz,
@@ -165,12 +216,16 @@ class StudentQuizController extends Controller
     public function submitAll(Request $request, $quizId)
     {
         try {
-            $answers = json_decode($request->all_answers, true);
+            $answers = json_decode($request->all_answers, true) ?: [];
             $autoSubmitted = $request->auto_submitted;
             $userId = auth()->id();
 
             // Get the quiz
             $quiz = Quiz::findOrFail($quizId);
+
+            
+            $sessionAnswers = session('quiz_answers_' . $quizId, []);
+            $answers = $answers + $sessionAnswers;
 
             // Calculate score
             $score = $this->scoreAnswers($quiz, $answers);
@@ -181,6 +236,7 @@ class StudentQuizController extends Controller
             // Clear session data
             session()->forget('quiz_answers_' . $quizId);
             session()->forget('quiz_deadline_' . $quizId);
+            session()->forget('active_quiz_id');
 
             return response()->json([
                 'success' => true,
