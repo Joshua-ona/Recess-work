@@ -46,7 +46,7 @@ public class LoginController {
                             LoginResponse.class
                     );
             Session.setUser(login.getUser());
-            Session.setToken(login.getToken());
+Session.setToken(login.getToken());
 
             redirectByRole(login.getUser().getRole());
 

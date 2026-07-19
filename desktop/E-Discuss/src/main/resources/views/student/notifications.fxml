@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.edudiscuss.controllers.NotificationController">
+     
+     <left>
+        <fx:include source="../components/sidebar.fxml"/>
+    </left>
+
+    <top>
+        <Label text="Notifications"
+               style="-fx-font-size:24px;
+                      -fx-font-weight:bold;
+                      -fx-padding:20;" />
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true">
+            <content>
+                <VBox fx:id="notificationBox"
+                      spacing="12"
+                      style="-fx-padding:20;" />
+            </content>
+        </ScrollPane>
+    </center>
+
+</BorderPane>

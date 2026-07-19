@@ -6,15 +6,13 @@ public class Session {
 
     private static User user;
     private static String token;
-    private static int userId;
+    
 
     public static int getUserId() {
-        return userId;
-    }
+    return user != null ? user.getId() : 0;
+}
 
-    public static void setUserId(int id) {
-        userId = id;
-    }
+  
 
     public static void setUser(User user) {
         Session.user = user;

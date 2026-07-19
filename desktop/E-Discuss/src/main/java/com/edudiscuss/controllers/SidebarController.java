@@ -1,14 +1,11 @@
 package com.edudiscuss.controllers;
 
 import com.edudiscuss.utils.Navigator;
-import com.edudiscuss.utils.QuizLockService;
 import com.edudiscuss.utils.Session;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import com.edudiscuss.api.NotificationService;
 import javafx.scene.control.Label;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import com.edudiscuss.utils.Session;
 
 public class SidebarController {
 
@@ -21,124 +18,132 @@ public class SidebarController {
     @FXML private Button logoutBtn;
     @FXML private Label lockBanner;
 
+
+    @FXML
+    public void initialize() {
+
+        // Hide groups for lecturers
+        if (isLecturer() && groupsBtn != null) {
+            groupsBtn.setVisible(false);
+            groupsBtn.setManaged(false);
+        }
+        updateNotificationBadge();
+    }
+
+
     @FXML
     public void goToDashboard() {
-        navigateIfUnlocked(rolePath("dashboard.fxml"));
+
+        Navigator.goTo(
+                dashboardBtn,
+                "/views/" + roleFolder() + "/dashboard.fxml"
+        );
     }
+
 
     @FXML
     public void goToGroups() {
-        navigateIfUnlocked("/views/student/groups.fxml");
-    }
 
-    @FXML
-    public void goToDiscussions() {
-        navigateIfUnlocked("/views/student/discussions.fxml");
-    }
-
-    @FXML
-    public void goToQuizzes() {
-        boolean isLecturer = Session.getUser() != null && "lecturer".equals(Session.getUser().getRole());
-
-        if (isLecturer) {
-            // Lecturers have no active-quiz lock concept — go straight there.
-            Navigator.goTo(quizzesBtn, "/views/lecturer/quiz-list.fxml");
+        // Lecturers don't access groups
+        if (isLecturer()) {
             return;
         }
 
-        // Quizzes is always reachable for students — if locked, the lock
-        // check inside enforceLock just bounces to the attempt screen
-        // anyway, which is the correct outcome either way.
-        Navigator.goTo(quizzesBtn, "/views/student/quiz-list.fxml");
+        Navigator.goTo(
+                groupsBtn,
+                "/views/student/groups.fxml"
+        );
     }
+
+
+    @FXML
+    public void goToDiscussions() {
+
+        Navigator.goTo(
+                discussionsBtn,
+                "/views/" + roleFolder() + "/discussions.fxml"
+        );
+    }
+
+
+@FXML
+public void goToQuizzes() {
+
+    String path;
+
+    if (isLecturer()) {
+        path = "/views/lecturer/quiz-list.fxml";
+    } else {
+        path = "/views/student/quizzes.fxml"; // your student fxml
+    }
+
+    Navigator.goTo(quizzesBtn, path);
+}
 
     @FXML
     public void goToNotifications() {
-        navigateIfUnlocked("/views/student/notifications.fxml");
+
+        Navigator.goTo(
+                notificationsBtn,
+                "/views/" + roleFolder() + "/notifications.fxml"
+        );
     }
 
+    
     @FXML
     public void goToMessages() {
-        navigateIfUnlocked("/views/student/messages.fxml");
-    }
 
-    private void setupSidebarNavigation() {
-        // Set up navigation buttons
-        homeBtn.setOnAction(e -> loadView("home"));
-        quizzesBtn.setOnAction(e -> loadView("quizzes"));
-        discussionsBtn.setOnAction(e -> loadView("discussions"));
-        savedBtn.setOnAction(e -> loadView("saved"));
-        messagesBtn.setOnAction(e -> loadView("messages"));
-        groupsBtn.setOnAction(e -> loadView("groups"));
-        logoutBtn.setOnAction(e -> handleLogout());
-    }
-
-    private void loadView(String view) {
-    try {
-
-        FXMLLoader loader = new FXMLLoader(
-                getClass().getResource("/views/" + view + ".fxml")
+        Navigator.goTo(
+                messagesBtn,
+                "/views/messages.fxml"
         );
-
-        Parent root = loader.load();
-
-        contentArea.getChildren().clear();
-        contentArea.getChildren().add(root);
-
-    } catch (Exception e) {
-        e.printStackTrace();
     }
-}
-    private void loadUserInfo() {
 
-    if (Session.getUser() != null) {
 
-        userName.setText(
-                Session.getUser().getFullName()
-        );
-
-        userEmail.setText(
-                Session.getUser().getEmail()
-        );
-
-        String name =
-                Session.getUser().getFullName();
-
-        String initials = "";
-
-        for (String part : name.split(" ")) {
-            if (!part.isEmpty()) {
-                initials +=
-                        part.substring(0, 1)
-                                .toUpperCase();
-            }
-        }
-
-        userInitials.setText(initials);
-    }
-}
-private void loadDefaultView() {
-    loadView("home");
-}
-private void handleLogout() {
-
-    try {
+    @FXML
+    public void logout() {
 
         Session.clear();
 
-        FXMLLoader loader =
-                new FXMLLoader(
-                        getClass().getResource(
-                                "/views/login.fxml"
-                        )
+        Navigator.goTo(
+                logoutBtn,
+                "/views/login.fxml"
+        );
+    }
+
+
+    private boolean isLecturer() {
+
+        return Session.getUser() != null
+                && "lecturer".equalsIgnoreCase(
+                        Session.getUser().getRole()
                 );
+    }
 
-        Parent root = loader.load();
 
-        logoutBtn.getScene().setRoot(root);
+    private String roleFolder() {
+
+        return isLecturer()
+                ? "lecturer"
+                : "student";
+    }
+    private void updateNotificationBadge() {
+
+    try {
+
+        int unread = NotificationService.getUnreadCount();
+
+        if (unread > 0) {
+            notificationsBtn.setText("Notifications (" + unread + ")");
+        } else {
+            notificationsBtn.setText("Notifications");
+        }
 
     } catch (Exception e) {
+
         e.printStackTrace();
+        notificationsBtn.setText("Notifications");
+
     }
 }
 }

@@ -10,10 +10,15 @@ use App\Http\Controllers\Api\LecturerQuizController;
 use App\Http\Controllers\Api\PrivateCommController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\StudentDashboardController;
+use App\Http\Controllers\Api\LecturerDashboardApiController;
 
 Route::get(
     '/student/dashboard',
     [StudentDashboardController::class, 'index']
+);
+Route::get(
+    '/lecturer/dashboard',
+    [LecturerDashboardApiController::class, 'index']
 );
 Route::post('/login',[AuthController::class,'login']);
 Route::middleware('auth:sanctum')->get('/profile', function(Request $request){
@@ -136,13 +141,19 @@ Route::post(
     [PrivateCommController::class,'send']
 );
 });
+
+
+
 Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/notifications',
-        [NotificationController::class,'index']);
+        [NotificationController::class, 'index']);
 
     Route::get('/notifications/count',
-        [NotificationController::class,'count']);
+        [NotificationController::class, 'count']);
+
+    Route::put('/notifications/{id}/read',
+        [NotificationController::class, 'markRead']);
 
 });
 

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/24"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.edudiscuss.controllers.MessagesController"
+            stylesheets="@../css/chat.css">
+
+    <!-- Main Sidebar -->
+    <left>
+        <fx:include source="components/sidebar.fxml"/>
+    </left>
+
+    <!-- Chat Section -->
+    <center>
+
+        <HBox>
+
+            <!-- ================= USERS ================= -->
+
+            <VBox prefWidth="320"
+                  styleClass="users-panel">
+
+                <TextField fx:id="searchField"
+                           promptText="Search users..."
+                           styleClass="search-field"/>
+
+                <ListView fx:id="usersList"
+                          VBox.vgrow="ALWAYS"
+                          styleClass="users-list"/>
+
+            </VBox>
+
+            <!-- ================= CHAT ================= -->
+
+            <BorderPane HBox.hgrow="ALWAYS">
+
+                <!-- Header -->
+
+                <top>
+
+                    <HBox fx:id="chatHeader"
+                          spacing="15"
+                          alignment="CENTER_LEFT"
+                          styleClass="chat-header">
+
+                        <StackPane fx:id="avatarPane"
+                                   prefWidth="45"
+                                   prefHeight="45"/>
+
+                        <VBox>
+
+                            <Label fx:id="chatName"
+                                   text="Select a user"
+                                   styleClass="chat-name"/>
+
+                            <Label fx:id="statusLabel"
+                                   text=""
+                                   styleClass="chat-status"/>
+
+                        </VBox>
+
+                    </HBox>
+
+                </top>
+
+                <!-- Messages -->
+
+                <center>
+
+                    <ScrollPane fitToWidth="true"
+                                hbarPolicy="NEVER"
+                                styleClass="chat-scroll">
+
+                        <VBox fx:id="messagesBox"
+                              spacing="12"
+                              styleClass="messages-box"/>
+
+                    </ScrollPane>
+
+                </center>
+
+                <!-- Input -->
+
+                <bottom>
+
+                    <HBox spacing="12"
+                          alignment="CENTER_LEFT"
+                          styleClass="message-input">
+
+                        <TextField fx:id="messageField"
+                                   promptText="Type a message..."
+                                   HBox.hgrow="ALWAYS"
+                                   styleClass="message-field"/>
+
+                        <Button text="Send"
+                                onAction="#sendMessage"
+                                styleClass="send-button"/>
+
+                    </HBox>
+
+                </bottom>
+
+            </BorderPane>
+
+        </HBox>
+
+    </center>
+
+</BorderPane>
