@@ -1,93 +1,173 @@
 @extends('layouts.app')
 
-@section('title', 'Groups')
+@section('title', 'Discussion Groups')
 
 @section('body')
-<div style="display:flex; min-height:100vh; ">
 
+<div style="display:flex; min-height:100vh;" class="group-page">
 
-       {{-- Sidebar --}}
+    {{-- Sidebar --}}
     @include('layouts.sidebar', [
         'role'            => 'student',
         'user'            => auth()->user(),
         'enrolledCourses' => $enrolledCourses ?? collect(),
         'unreadCount'     => $unreadCount ?? 0,
-        'notifCount'      => $notifCount  ?? 0,
+        'notifCount'      => $notifCount ?? 0,
     ])
 
+    {{-- Main Content --}}
+    <div class="dash-main" style="flex:1; width:100%;">
 
-    {{-- MAIN --}}
-    <div class="dash-main" style="flex:1; width:100%; >
-
-        {{-- HEADER --}}
-        <div class="dash-header" style="width:100%;" >
+        {{-- Header --}}
+        <div class="dash-header">
             <div>
-                <div class="dash-header-title">Discussion Groups</div>
-                <div class="dash-header-sub">Join a group to start discussing</div>
+                <div class="dash-header-title">
+                    <i class="ti ti-users-group"></i>
+                    Discussion Groups
+                </div>
+                <div class="dash-header-sub">
+                    Join groups, collaborate with classmates and participate in discussions.
+                </div>
             </div>
             <div class="dash-header-actions">
-                <a href="/groups/create" class="btn btn-primary btn-sm">
-                    <i class="ti ti-plus"></i> New Group
+                <a href="/groups/create" class="group-btn group-btn-primary group-btn-sm">
+                    <i class="ti ti-plus"></i>
+                    Create Group
                 </a>
             </div>
         </div>
 
-        {{-- BODY --}}
-        <div class="dash-body">
+        <div class="group-dash-body">
 
             @if(session('success'))
-                <div class="alert alert-success">{{ session('success') }}</div>
+                <div class="alert alert-success">
+                    {{ session('success') }}
+                </div>
             @endif
 
-            {{-- MY GROUPS --}}
-            <div class="dash-header-title" style="margin-bottom:12px;">My Groups</div>
-            <div class="stat-grid" style="margin-bottom:30px;">
-                @forelse($myGroups as $group)
-                <div class="stat-card">
-                    <div class="stat-label">
-                        <i class="ti ti-users-group"></i> Group
-                    </div>
-                    <div class="stat-value" style="font-size:17px; margin-bottom:6px;">
-                        {{ $group->name }}
-                    </div>
-                    <div class="text-muted" style="font-size:12px; margin-bottom:12px;">
-                        {{ $group->description ?? 'No description' }}
-                    </div>
-                    <a href="/groups/{{ $group->id }}" 
-                       class="btn btn-outline btn-sm" style="width:100%; justify-content:center;">
-                        <i class="ti ti-arrow-right"></i> Open Group
-                    </a>
-                </div>
-                @empty
-                <p class="text-muted">You haven't joined any groups yet.</p>
-                @endforelse
+            {{-- Search --}}
+            <div class="group-search-bar">
+                <input
+                    type="text"
+                    placeholder="🔍 Search groups..."
+                    class="form-control"
+                    style="max-width:420px;">
             </div>
 
-            {{-- AVAILABLE GROUPS --}}
-            <div class="dash-header-title" style="margin-bottom:12px;">Available Groups</div>
-            <div class="stat-grid">
-                @forelse($availableGroups as $group)
-                <div class="stat-card">
-                    <div class="stat-label">
-                        <i class="ti ti-users-group"></i> Group
-                    </div>
-                    <div class="stat-value" style="font-size:17px; margin-bottom:6px;">
-                        {{ $group->name }}
-                    </div>
-                    <div class="text-muted" style="font-size:12px; margin-bottom:12px;">
-                        {{ $group->description ?? 'No description' }}
-                    </div>
-                    <a href="/groups/{{ $group->id }}" 
-                       class="btn btn-primary btn-sm" style="width:100%; justify-content:center;">
-                        <i class="ti ti-door-enter"></i> View & Join
-                    </a>
+            {{-- ================= MY GROUPS ================= --}}
+            <div style="margin-bottom:40px;">
+                <div class="dash-header-title" style="margin-bottom:20px;">
+                    <i class="ti ti-users"></i>
+                    My Groups
                 </div>
-                @empty
-                <p class="text-muted">No new groups available.</p>
-                @endforelse
+
+                <div class="group-vertical-stack">
+                    @forelse($myGroups as $group)
+                        <div class="group-card">
+                            <div class="group-card-header">
+                                <div class="group-card-title">
+                                    <div class="avatar">
+                                        <i class="ti ti-users-group"></i>
+                                    </div>
+                                    <h3>{{ $group->name }}</h3>
+                                </div>
+                                <div class="group-card-meta">
+                                    <span class="group-badge group-badge-primary">
+                                        <i class="ti ti-users"></i> {{ $group->users->count() }} members
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="group-card-body">
+                                <p>{{ $group->description ?: 'No description available.' }}</p>
+                            </div>
+
+                            <div class="group-card-footer">
+                                <div class="stats">
+                                    <span>
+                                        <i class="ti ti-message-circle"></i>
+                                        {{ $group->discussions->count() }} Discussions
+                                    </span>
+                                    <span>
+                                        <i class="ti ti-clock"></i>
+                                        {{ $group->created_at->diffForHumans() }}
+                                    </span>
+                                </div>
+                                <div class="group-card-actions">
+                                    <a href="/groups/{{ $group->id }}" class="group-btn group-btn-primary group-btn-sm">
+                                        Open Group <i class="ti ti-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="group-card" style="text-align:center; padding:60px;">
+                            <i class="ti ti-users-group" style="font-size:48px; color:var(--gray-300);"></i>
+                            <h3 style="margin-top:16px;">No Joined Groups</h3>
+                            <p class="text-muted">Join one of the available groups below to begin participating.</p>
+                        </div>
+                    @endforelse
+                </div>
             </div>
 
+            {{-- ================= AVAILABLE GROUPS ================= --}}
+            <div>
+                <div class="dash-header-title" style="margin-bottom:20px;">
+                    <i class="ti ti-door-enter"></i>
+                    Available Groups
+                </div>
+
+                <div class="group-vertical-stack">
+                    @forelse($availableGroups as $group)
+                        <div class="group-card">
+                            <div class="group-card-header">
+                                <div class="group-card-title">
+                                    <div class="avatar" style="background:#ECFDF5; color:#16A34A;">
+                                        <i class="ti ti-users-group"></i>
+                                    </div>
+                                    <h3>{{ $group->name }}</h3>
+                                </div>
+                                <div class="group-card-meta">
+                                    <span class="group-badge group-badge-success">
+                                        <i class="ti ti-door-enter"></i> Available to Join
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="group-card-body">
+                                <p>{{ $group->description ?: 'No description available.' }}</p>
+                            </div>
+
+                            <div class="group-card-footer">
+                                <div class="stats">
+                                    <span>
+                                        <i class="ti ti-users"></i>
+                                        {{ $group->users->count() }} Members
+                                    </span>
+                                    <span>
+                                        <i class="ti ti-message-circle"></i>
+                                        {{ $group->discussions->count() }} Discussions
+                                    </span>
+                                </div>
+                                <div class="group-card-actions">
+                                    <a href="/groups/{{ $group->id }}" class="group-btn group-btn-primary group-btn-sm">
+                                        <i class="ti ti-door-enter"></i>
+                                        View & Join
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="group-card" style="text-align:center; padding:60px;">
+                            <i class="ti ti-circle-check" style="font-size:48px; color:#22C55E;"></i>
+                            <h3 style="margin-top:16px;">You're all caught up!</h3>
+                            <p class="text-muted">There are no additional groups available at the moment.</p>
+                        </div>
+                    @endforelse
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
 @endsection
