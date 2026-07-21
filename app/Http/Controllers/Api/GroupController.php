@@ -10,12 +10,21 @@ use Illuminate\Support\Facades\Auth;
 
 class GroupController extends Controller
 {
-    public function index()
-    {
-        return response()->json([
-            'groups' => Group::latest()->get()
-        ]);
-    }
+   public function index()
+{
+    $userId = Auth::id();
+    $groups = Group::latest()->get()->map(function($group) use ($userId) {
+        $isMember = GroupMember::where('group_id', $group->id)
+            ->where('user_id', $userId)
+            ->exists();
+        $group->is_member = $isMember;
+        return $group;
+    });
+
+    return response()->json([
+        'groups' => $groups
+    ]);
+}
 
     public function show($id)
     {

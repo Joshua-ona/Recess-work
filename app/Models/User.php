@@ -58,6 +58,16 @@ class User extends Authenticatable
         return $this->hasOne(Verification::class);
 
     }
+
+    public function discussions()
+{
+    return $this->hasMany(Discussion::class);
+}
+
+public function replies()
+{
+    return $this->hasMany(Reply::class);
+}
     
          /* Warning messages issued to this user, newest first.
      */

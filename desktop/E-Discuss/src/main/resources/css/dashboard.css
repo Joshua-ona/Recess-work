@@ -229,3 +229,15 @@
     -fx-background-radius: 999;
     -fx-padding: 4 11;
 }
+
+.btn-success {
+    -fx-background-color: #22c55e;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 8 20 8 20;
+    -fx-background-radius: 8;
+}
+
+.btn-success:hover {
+    -fx-background-color: #16a34a;
+}

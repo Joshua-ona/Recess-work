@@ -138,8 +138,8 @@
                class="sidebar-item {{ request()->routeIs('student.dashboard') ? 'active' : '' }}">
                 <i class="ti ti-home" aria-hidden="true"></i> Home
             </a>
-            <a href="{{ route('student.discussions.index') }}"
-               class="sidebar-item {{ request()->routeIs('student.discussions.*') ? 'active' : '' }}">
+            <a href="{{ route('student.my-discussions') }}"
+               class="sidebar-item {{ request()->routeIs('student.my-discussions') ? 'active' : '' }}">
                 <i class="ti ti-messages" aria-hidden="true"></i> My discussions
                 @if(($unreadCount ?? 0) > 0)
                     <span class="sidebar-badge">{{ $unreadCount }}</span>
@@ -207,8 +207,8 @@
                class="sidebar-item {{ request()->routeIs('student.dashboard') ? 'active' : '' }}">
                 <i class="ti ti-home" aria-hidden="true"></i> 
             </a>
-            <a href="{{ route('student.discussions.index') }}"
-               class="sidebar-item {{ request()->routeIs('student.discussions.*') ? 'active' : '' }}">
+            <a href="{{ route('student.my-discussions') }}"
+               class="sidebar-item {{ request()->routeIs('student.my-discussions') ? 'active' : '' }}">
                 <i class="ti ti-messages" aria-hidden="true"></i> 
                 @if(($unreadCount ?? 0) > 0)
                     <span class="sidebar-badge">{{ $unreadCount }}</span>

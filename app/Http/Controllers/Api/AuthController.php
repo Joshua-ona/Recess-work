@@ -21,11 +21,9 @@ class AuthController extends Controller
             ],401);
         }
 
-
         $user = Auth::user();
 
-
-        
+        $token = $user->createToken('desktop-app')->plainTextToken;
 
         return response()->json([
             'message'=>'Login successful',

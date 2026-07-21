@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.edudiscuss.controllers.DiscussionsController">
+
+    <left>
+        <fx:include source="../components/sidebar.fxml"/>
+    </left>
+
+    <center>
+        <VBox spacing="16" style="-fx-padding:20;">
+            <Label fx:id="groupTitle" text="Discussions" style="-fx-font-size:22; -fx-font-weight:bold;"/>
+            <ListView fx:id="discussionsList" prefHeight="400"/>
+            <Button text="+ New Discussion" onAction="#handleCreateDiscussion"/>
+            <Button text="📝 Reply" onAction="#handleReply"/>
+        </VBox>
+    </center>
+
+</BorderPane>

@@ -1,144 +1,116 @@
 package com.edudiscuss.controllers;
 
-import com.edudiscuss.utils.Navigator;
-import com.edudiscuss.utils.QuizLockService;
-import com.edudiscuss.utils.Session;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import com.edudiscuss.utils.Session;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.stage.Stage;
+
+import java.io.IOException;
 
 public class SidebarController {
 
-    @FXML private Button dashboardBtn;
-    @FXML private Button groupsBtn;
-    @FXML private Button discussionsBtn;
-    @FXML private Button quizzesBtn;
-    @FXML private Button notificationsBtn;
-    @FXML private Button messagesBtn;
-    @FXML private Button logoutBtn;
-    @FXML private Label lockBanner;
+    @FXML
+    private Button dashboardButton;
 
     @FXML
-    public void goToDashboard() {
-        navigateIfUnlocked(rolePath("dashboard.fxml"));
+    private Button groupsButton;
+
+    @FXML
+    private Button discussionsButton;
+
+    @FXML
+    private Button quizzesButton;
+
+    @FXML
+    private Button notificationsButton;
+
+    @FXML
+    private Button messagesButton;
+
+    @FXML
+    private Button logoutButton;
+
+    @FXML
+    public void initialize() {
+        System.out.println("✅ Sidebar loaded successfully!");
     }
 
     @FXML
-    public void goToGroups() {
-        navigateIfUnlocked("/views/student/groups.fxml");
-    }
-
-    @FXML
-    public void goToDiscussions() {
-        navigateIfUnlocked("/views/student/discussions.fxml");
-    }
-
-    @FXML
-    public void goToQuizzes() {
-        boolean isLecturer = Session.getUser() != null && "lecturer".equals(Session.getUser().getRole());
-
-        if (isLecturer) {
-            // Lecturers have no active-quiz lock concept — go straight there.
-            Navigator.goTo(quizzesBtn, "/views/lecturer/quiz-list.fxml");
-            return;
+    private void handleDashboard() {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/views/student/dashboard.fxml")
+            );
+            Scene scene = new Scene(loader.load());
+            Stage stage = (Stage) dashboardButton.getScene().getWindow();
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-
-        // Quizzes is always reachable for students — if locked, the lock
-        // check inside enforceLock just bounces to the attempt screen
-        // anyway, which is the correct outcome either way.
-        Navigator.goTo(quizzesBtn, "/views/student/quiz-list.fxml");
     }
 
     @FXML
-    public void goToNotifications() {
-        navigateIfUnlocked("/views/student/notifications.fxml");
-    }
-
-    @FXML
-    public void goToMessages() {
-        navigateIfUnlocked("/views/student/messages.fxml");
-    }
-
-    private void setupSidebarNavigation() {
-        // Set up navigation buttons
-        homeBtn.setOnAction(e -> loadView("home"));
-        quizzesBtn.setOnAction(e -> loadView("quizzes"));
-        discussionsBtn.setOnAction(e -> loadView("discussions"));
-        savedBtn.setOnAction(e -> loadView("saved"));
-        messagesBtn.setOnAction(e -> loadView("messages"));
-        groupsBtn.setOnAction(e -> loadView("groups"));
-        logoutBtn.setOnAction(e -> handleLogout());
-    }
-
-    private void loadView(String view) {
-    try {
-
-        FXMLLoader loader = new FXMLLoader(
-                getClass().getResource("/views/" + view + ".fxml")
-        );
-
-        Parent root = loader.load();
-
-        contentArea.getChildren().clear();
-        contentArea.getChildren().add(root);
-
-    } catch (Exception e) {
-        e.printStackTrace();
-    }
-}
-    private void loadUserInfo() {
-
-    if (Session.getUser() != null) {
-
-        userName.setText(
-                Session.getUser().getFullName()
-        );
-
-        userEmail.setText(
-                Session.getUser().getEmail()
-        );
-
-        String name =
-                Session.getUser().getFullName();
-
-        String initials = "";
-
-        for (String part : name.split(" ")) {
-            if (!part.isEmpty()) {
-                initials +=
-                        part.substring(0, 1)
-                                .toUpperCase();
-            }
+    private void handleGroups() {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/views/student/groups.fxml")
+            );
+            Scene scene = new Scene(loader.load());
+            Stage stage = (Stage) groupsButton.getScene().getWindow();
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+    }
 
-        userInitials.setText(initials);
+    @FXML
+    private void handleDiscussions() {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/views/student/my-discussions.fxml")
+            );
+            Scene scene = new Scene(loader.load());
+            Stage stage = (Stage) discussionsButton.getScene().getWindow();
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void handleQuizzes() {
+        System.out.println("Quizzes button clicked");
+    }
+
+    @FXML
+    private void handleNotifications() {
+        System.out.println("Notifications button clicked");
+    }
+
+    @FXML
+    private void handleMessages() {
+        System.out.println("Messages button clicked");
+    }
+
+    @FXML
+    private void handleLogout() {
+        try {
+            com.edudiscuss.utils.Session.clear();
+
+            FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/views/login.fxml")
+            );
+            Scene scene = new Scene(loader.load());
+            Stage stage = (Stage) logoutButton.getScene().getWindow();
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
-private void loadDefaultView() {
-    loadView("home");
-}
-private void handleLogout() {
 
-    try {
-
-        Session.clear();
-
-        FXMLLoader loader =
-                new FXMLLoader(
-                        getClass().getResource(
-                                "/views/login.fxml"
-                        )
-                );
-
-        Parent root = loader.load();
-
-        logoutBtn.getScene().setRoot(root);
-
-    } catch (Exception e) {
-        e.printStackTrace();
-    }
-}
-}

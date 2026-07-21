@@ -1,68 +1,84 @@
 package com.edudiscuss.controllers;
 
-import com.edudiscuss.models.StudentDashboard;
-import com.edudiscuss.models.User;
-import com.edudiscuss.services.ApiService;
-import com.edudiscuss.utils.Session;
-import com.edudiscuss.utils.QuizLockService;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import com.edudiscuss.models.Quiz;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.stage.Stage;
 
-public class StudentQuizzesController {
-    @FXML private TableView<Quiz> quizTable;
-    @FXML private TableColumn<Quiz, String> titleColumn;
-    @FXML private TableColumn<Quiz, String> startTimeColumn;
-    @FXML private TableColumn<Quiz, String> durationColumn;
-    @FXML private Button startQuizBtn;
-    @FXML private Label availableQuizzesLabel;
+import java.io.IOException;
 
-    private ObservableList<Quiz> quizList = FXCollections.observableArrayList();
-    private ApiService apiService = new ApiService();
+public class StudentDashboardController {
+
+    @FXML
+    private Button groupsButton;
+
+    @FXML
+    private Button discussionsButton;
+
+    @FXML
+    private Button quizzesButton;
+
+    @FXML
+    private Button notificationsButton;
+
+    @FXML
+    private Button logoutButton;
 
     @FXML
     public void initialize() {
-        setupTableColumns();
-        loadQuizzes();
-        setupTableSelection();
-    }
-
-    private void setupTableColumns() {
-        titleColumn.setCellValueFactory(cellData -> cellData.getValue().titleProperty());
-        startTimeColumn.setCellValueFactory(cellData -> cellData.getValue().formattedStartTimeProperty());
-        durationColumn.setCellValueFactory(cellData -> cellData.getValue().durationProperty());
-    }
-
-    private void loadQuizzes() {
-        // Fetch from Laravel API
-        apiService.getQuizzes(response -> {
-            if (response.isSuccess()) {
-                quizList.setAll(response.getQuizzes());
-                quizTable.setItems(quizList);
-                availableQuizzesLabel.setText(quizList.size() + " quizzes published");
-            } else {
-                showAlert("Error", "Failed to load quizzes");
-            }
-        });
-    }
-
-    private void setupTableSelection() {
-        quizTable.getSelectionModel().selectedItemProperty().addListener(
-            (obs, oldSelection, newSelection) -> {
-                startQuizBtn.setDisable(newSelection == null);
-            }
-        );
+        System.out.println("Student Dashboard Loaded!");
     }
 
     @FXML
-    private void startQuiz() {
-        Quiz selected = quizTable.getSelectionModel().getSelectedItem();
-        if (selected != null) {
-            // Navigate to quiz taking view
-            loadQuizAttempt(selected);
+    private void handleGroups() {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/views/student/groups.fxml")
+            );
+            Scene scene = new Scene(loader.load());
+            Stage stage = (Stage) groupsButton.getScene().getWindow();
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void handleDiscussions() {
+        System.out.println("Discussions button clicked");
+        // TODO: Load discussions view
+    }
+
+    @FXML
+    private void handleQuizzes() {
+        System.out.println("Quizzes button clicked");
+        // TODO: Load quizzes view
+    }
+
+    @FXML
+    private void handleNotifications() {
+        System.out.println("Notifications button clicked");
+        // TODO: Load notifications view
+    }
+
+    @FXML
+    private void handleLogout() {
+        try {
+            // Clear session
+            com.edudiscuss.utils.Session.clear();
+
+            // Load login screen
+            FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/views/login.fxml")
+            );
+            Scene scene = new Scene(loader.load());
+            Stage stage = (Stage) logoutButton.getScene().getWindow();
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
-

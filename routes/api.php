@@ -37,6 +37,21 @@ Route::middleware('auth:sanctum')->group(function(){
         DiscussionController::class
     );
 
+    Route::get(
+    '/groups/{group}/discussions',
+    [DiscussionController::class, 'index']
+);
+
+Route::get(
+    '/my-discussions',
+    [DiscussionController::class, 'myDiscussions']
+);
+
+Route::post(
+    '/groups/{group}/discussions',
+    [DiscussionController::class, 'store']
+);
+
 });
 Route::middleware('auth:sanctum')->group(function(){
 
@@ -65,6 +80,11 @@ Route::post(
     '/groups/{group}/join',
     [GroupController::class,'join']
 );
+
+Route::post(
+    '/discussions/{discussion}/replies', 
+    [DiscussionController::class, 'addReply']
+    );
 
 Route::get(
     '/groups/{group}/members',
