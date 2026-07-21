@@ -2,56 +2,41 @@ package com.edudiscuss.api;
 
 import com.edudiscuss.utils.Session;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.io.IOException;
 
 public class ApiClient {
 
-    private static final String BASE_URL = "http://127.0.0.1:8000/api/";
-    private static final HttpClient client = HttpClient.newHttpClient();
+    private static final String BASE_URL =
+        "http://127.0.0.1:8000/api/";
 
-    public static String get(String endpoint) throws IOException, InterruptedException {
-        String token = Session.getToken();
-        System.out.println("🔑 Token: " + (token != null ? token.substring(0, Math.min(20, token.length())) + "..." : "null"));
+    private static final HttpClient client =
+        HttpClient.newHttpClient();
 
-        HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(BASE_URL + endpoint))
-            .header("Accept", "application/json")
-            .header("Authorization", "Bearer " + token)
-            .GET()
-            .build();
+    public static String post(String endpoint,
+                              String json)
+        throws IOException, InterruptedException {
 
-        HttpResponse<String> response = client.send(
-            request,
-            HttpResponse.BodyHandlers.ofString()
-        );
+        HttpRequest request =
+            HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL + endpoint))
+                .header("Accept", "application/json")
+                .header("Content-Type", "application/json")
+                .POST(
+                    HttpRequest.BodyPublishers
+                        .ofString(json)
+                )
+                .build();
 
-        System.out.println("📥 GET Response Code: " + response.statusCode());
-        return response.body();
-    }
+        HttpResponse<String> response =
+            client.send(
+                request,
+                HttpResponse.BodyHandlers.ofString()
+            );
 
-    public static String post(String endpoint, String json) throws IOException, InterruptedException {
-        String token = Session.getToken();
-        System.out.println("🔑 Token: " + (token != null ? token.substring(0, Math.min(20, token.length())) + "..." : "null"));
-
-        HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(BASE_URL + endpoint))
-            .header("Accept", "application/json")
-            .header("Content-Type", "application/json")
-            .header("Authorization", "Bearer " + token)
-            .POST(HttpRequest.BodyPublishers.ofString(json))
-            .build();
-
-        HttpResponse<String> response = client.send(
-            request,
-            HttpResponse.BodyHandlers.ofString()
-        );
-
-        System.out.println("📥 POST Response Code: " + response.statusCode());
-        System.out.println("📥 POST Response Body: " + response.body());
         return response.body();
     }
 

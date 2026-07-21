@@ -1,84 +1,88 @@
 package com.edudiscuss.controllers;
 
+import com.edudiscuss.models.StudentDashboard;
+import com.edudiscuss.models.User;
+import com.edudiscuss.services.ApiService;
+import com.edudiscuss.utils.Session;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.stage.Stage;
+import javafx.scene.control.Label;
 
-import java.io.IOException;
+import java.time.LocalTime;
 
 public class StudentDashboardController {
 
     @FXML
-    private Button groupsButton;
+    private Label greetingLabel;
 
     @FXML
-    private Button discussionsButton;
+    private Label postsLabel;
 
     @FXML
-    private Button quizzesButton;
+    private Label quizLabel;
 
     @FXML
-    private Button notificationsButton;
+    private Label groupsLabel;
 
     @FXML
-    private Button logoutButton;
+    private Label scoreLabel;
+
+    private final ApiService apiService = new ApiService();
 
     @FXML
     public void initialize() {
-        System.out.println("Student Dashboard Loaded!");
+        loadGreeting();
+        loadDashboard();
     }
 
-    @FXML
-    private void handleGroups() {
+    private void loadGreeting() {
+
+        User user = Session.getUser();
+
+        if (user == null) {
+            greetingLabel.setText("Welcome");
+            return;
+        }
+
+        int hour = LocalTime.now().getHour();
+
+        String greeting;
+
+        if (hour < 12) {
+            greeting = "Good morning";
+        } else if (hour < 17) {
+            greeting = "Good afternoon";
+        } else {
+            greeting = "Good evening";
+        }
+
+        greetingLabel.setText(greeting + ", " + user.getFirst_name());
+    }
+
+    private void loadDashboard() {
+
         try {
-            FXMLLoader loader = new FXMLLoader(
-                getClass().getResource("/views/student/groups.fxml")
-            );
-            Scene scene = new Scene(loader.load());
-            Stage stage = (Stage) groupsButton.getScene().getWindow();
-            stage.setScene(scene);
-            stage.show();
-        } catch (IOException e) {
+
+            StudentDashboard dashboard = apiService.getStudentDashboard();
+
+            updateDashboard(dashboard);
+
+        } catch (Exception e) {
+
             e.printStackTrace();
+
+            postsLabel.setText("0");
+            quizLabel.setText("0");
+            groupsLabel.setText("0");
+            scoreLabel.setText("0.0");
         }
     }
 
-    @FXML
-    private void handleDiscussions() {
-        System.out.println("Discussions button clicked");
-        // TODO: Load discussions view
-    }
+    private void updateDashboard(StudentDashboard dashboard) {
 
-    @FXML
-    private void handleQuizzes() {
-        System.out.println("Quizzes button clicked");
-        // TODO: Load quizzes view
-    }
+        postsLabel.setText(String.valueOf(dashboard.getPosts()));
+        quizLabel.setText(String.valueOf(dashboard.getQuizzes()));
+        groupsLabel.setText(String.valueOf(dashboard.getGroups()));
+        scoreLabel.setText(String.format("%.1f", dashboard.getParticipation()));
 
-    @FXML
-    private void handleNotifications() {
-        System.out.println("Notifications button clicked");
-        // TODO: Load notifications view
-    }
-
-    @FXML
-    private void handleLogout() {
-        try {
-            // Clear session
-            com.edudiscuss.utils.Session.clear();
-
-            // Load login screen
-            FXMLLoader loader = new FXMLLoader(
-                getClass().getResource("/views/login.fxml")
-            );
-            Scene scene = new Scene(loader.load());
-            Stage stage = (Stage) logoutButton.getScene().getWindow();
-            stage.setScene(scene);
-            stage.show();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }
