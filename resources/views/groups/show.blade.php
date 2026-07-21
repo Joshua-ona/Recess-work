@@ -3,7 +3,6 @@
 @section('title', $group->name)
 
 @section('body')
-
 <div style="display:flex; min-height:100vh;" class="group-page">
 
     {{-- Sidebar --}}
@@ -17,6 +16,8 @@
 
     @php
         $isMember = $group->users()->where('user_id', auth()->id())->exists();
+        $creator = $group->users()->first();
+        $members = $group->users()->get();
     @endphp
 
     {{-- Main --}}
@@ -114,7 +115,7 @@
                 </div>
             @else
                 {{-- Member Actions --}}
-                <div class="group-stat-card" style="padding:30px;">
+                <div class="group-stat-card" style="padding:30px; margin-bottom:30px;">
                     <h3 style="margin-bottom:10px;">Welcome back 👋</h3>
                     <p class="text-muted">You're already a member of this discussion group.</p>
                     <div style="margin-top:25px; display:flex; gap:15px; flex-wrap:wrap;">
@@ -128,6 +129,29 @@
                     </div>
                 </div>
             @endif
+
+            {{-- Members List --}}
+            <div class="group-stat-card" style="padding:30px;">
+                <h3 style="margin-bottom:20px;"><i class="ti ti-users"></i> Members ({{ $members->count() }})</h3>
+                @forelse($members as $member)
+                <div style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid #f3f4f6;">
+                    <div style="background:var(--primary-bg); border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; font-weight:600; color:var(--primary); font-size:14px;">
+                        {{ strtoupper(substr($member->first_name, 0, 1)) }}
+                    </div>
+                    <div>
+                        <div style="font-size:14px; font-weight:500;">{{ $member->first_name }} {{ $member->last_name }}</div>
+                        <div style="font-size:12px; color:#6b7280;">{{ $member->email }}</div>
+                    </div>
+                    @if($creator && $creator->id === $member->id)
+                    <span style="margin-left:auto; background:var(--primary-bg); color:var(--primary); font-size:11px; padding:2px 8px; border-radius:20px; font-weight:500;">
+                        Moderator
+                    </span>
+                    @endif
+                </div>
+                @empty
+                <p style="color:#9ca3af; font-size:14px;">No members yet.</p>
+                @endforelse
+            </div>
         </div>
     </div>
 </div>

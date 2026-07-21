@@ -127,8 +127,8 @@
                    class="sidebar-item {{ request()->routeIs('student.dashboard') ? 'active' : '' }}">
                     <i class="ti ti-home" aria-hidden="true"></i> <span>Home</span>
                 </a>
-                <a href="{{ route('student.discussions.index') }}"
-                   class="sidebar-item {{ request()->routeIs('student.discussions.*') ? 'active' : '' }}">
+                <a href="{{ route('student.my-discussions') }}"
+                   class="sidebar-item {{ request()->routeIs('student.my-discussions') ? 'active' : '' }}">
                     <i class="ti ti-messages" aria-hidden="true"></i> <span>My discussions</span>
                     @if(($unreadCount ?? 0) > 0)
                         <span class="sidebar-badge">{{ $unreadCount }}</span>
@@ -191,7 +191,7 @@
             MOBILE NAVIGATION - ICONS ONLY (visible on mobile)
             ============================================================ --}}
         <div class="sidebar-mobile-nav">
-            
+
             {{-- Dashboard / Home --}}
             <a href="{{ route('student.dashboard') }}"
                class="mobile-nav-item {{ request()->routeIs('student.dashboard') ? 'active' : '' }}">
@@ -200,8 +200,8 @@
             </a>
 
             {{-- Discussions --}}
-            <a href="{{ route('student.discussions.index') }}"
-               class="mobile-nav-item {{ request()->routeIs('student.discussions.*') ? 'active' : '' }}">
+            <a href="{{ route('student.my-discussions') }}"
+               class="mobile-nav-item {{ request()->routeIs('student.my-discussions') ? 'active' : '' }}">
                 <i class="ti ti-messages" aria-hidden="true"></i>
                 <span>Disc</span>
                 @if(($unreadCount ?? 0) > 0)

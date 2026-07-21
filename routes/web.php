@@ -151,6 +151,7 @@ Route::prefix('student')->name('student.')->middleware(['auth','role:student','r
     Route::get('/courses/browse',   [StudentDashboardController::class, 'browseCourses'])->name('courses.browse');
     Route::get('/courses/{course}', [StudentDashboardController::class, 'course'])->name('course');
     Route::resource('/discussions', DiscussionController::class)->names('discussions');
+    Route::get('/my-discussions', [DiscussionController::class, 'myDiscussions'])->name('my-discussions');
     Route::get('/categories', [StudentDashboardController::class, 'categories'])->name('categories');
     Route::get('/reports', [StudentDashboardController::class, 'reports'])
     ->name('reports');

@@ -49,6 +49,8 @@
             <div class="group-search-bar">
                 <input
                     type="text"
+                    id="groupSearch"
+                    onkeyup="filterGroups()"
                     placeholder="🔍 Search groups..."
                     class="form-control"
                     style="max-width:420px;">
@@ -63,7 +65,7 @@
 
                 <div class="group-vertical-stack">
                     @forelse($myGroups as $group)
-                        <div class="group-card">
+                        <div class="group-card" data-name="{{ $group->name }}">
                             <div class="group-card-header">
                                 <div class="group-card-title">
                                     <div class="avatar">
@@ -119,55 +121,6 @@
 
                 <div class="group-vertical-stack">
                     @forelse($availableGroups as $group)
-                        <div class="group-card">
+                        <div class="group-card" data-name="{{ $group->name }}">
                             <div class="group-card-header">
                                 <div class="group-card-title">
-                                    <div class="avatar" style="background:#ECFDF5; color:#16A34A;">
-                                        <i class="ti ti-users-group"></i>
-                                    </div>
-                                    <h3>{{ $group->name }}</h3>
-                                </div>
-                                <div class="group-card-meta">
-                                    <span class="group-badge group-badge-success">
-                                        <i class="ti ti-door-enter"></i> Available to Join
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div class="group-card-body">
-                                <p>{{ $group->description ?: 'No description available.' }}</p>
-                            </div>
-
-                            <div class="group-card-footer">
-                                <div class="stats">
-                                    <span>
-                                        <i class="ti ti-users"></i>
-                                        {{ $group->users->count() }} Members
-                                    </span>
-                                    <span>
-                                        <i class="ti ti-message-circle"></i>
-                                        {{ $group->discussions->count() }} Discussions
-                                    </span>
-                                </div>
-                                <div class="group-card-actions">
-                                    <a href="/groups/{{ $group->id }}" class="group-btn group-btn-primary group-btn-sm">
-                                        <i class="ti ti-door-enter"></i>
-                                        View & Join
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    @empty
-                        <div class="group-card" style="text-align:center; padding:60px;">
-                            <i class="ti ti-circle-check" style="font-size:48px; color:#22C55E;"></i>
-                            <h3 style="margin-top:16px;">You're all caught up!</h3>
-                            <p class="text-muted">There are no additional groups available at the moment.</p>
-                        </div>
-                    @endforelse
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-@endsection

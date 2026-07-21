@@ -1,149 +1,115 @@
 package com.edudiscuss.controllers;
 
-import com.edudiscuss.utils.Navigator;
-import com.edudiscuss.utils.Session;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import com.edudiscuss.api.NotificationService;
-import javafx.scene.control.Label;
+import javafx.stage.Stage;
+
+import java.io.IOException;
 
 public class SidebarController {
 
-    @FXML private Button dashboardBtn;
-    @FXML private Button groupsBtn;
-    @FXML private Button discussionsBtn;
-    @FXML private Button quizzesBtn;
-    @FXML private Button notificationsBtn;
-    @FXML private Button messagesBtn;
-    @FXML private Button logoutBtn;
-    @FXML private Label lockBanner;
+    @FXML
+    private Button dashboardButton;
 
+    @FXML
+    private Button groupsButton;
+
+    @FXML
+    private Button discussionsButton;
+
+    @FXML
+    private Button quizzesButton;
+
+    @FXML
+    private Button notificationsButton;
+
+    @FXML
+    private Button messagesButton;
+
+    @FXML
+    private Button logoutButton;
 
     @FXML
     public void initialize() {
+        System.out.println("✅ Sidebar loaded successfully!");
+    }
 
-        // Hide groups for lecturers
-        if (isLecturer() && groupsBtn != null) {
-            groupsBtn.setVisible(false);
-            groupsBtn.setManaged(false);
+    @FXML
+    private void handleDashboard() {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/views/student/dashboard.fxml")
+            );
+            Scene scene = new Scene(loader.load());
+            Stage stage = (Stage) dashboardButton.getScene().getWindow();
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        updateNotificationBadge();
     }
 
-
     @FXML
-    public void goToDashboard() {
-
-        Navigator.goTo(
-                dashboardBtn,
-                "/views/" + roleFolder() + "/dashboard.fxml"
-        );
-    }
-
-
-    @FXML
-    public void goToGroups() {
-
-        // Lecturers don't access groups
-        if (isLecturer()) {
-            return;
+    private void handleGroups() {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/views/student/groups.fxml")
+            );
+            Scene scene = new Scene(loader.load());
+            Stage stage = (Stage) groupsButton.getScene().getWindow();
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-
-        Navigator.goTo(
-                groupsBtn,
-                "/views/student/groups.fxml"
-        );
     }
-
 
     @FXML
-    public void goToDiscussions() {
-
-        Navigator.goTo(
-                discussionsBtn,
-                "/views/" + roleFolder() + "/discussions.fxml"
-        );
-    }
-
-
-@FXML
-public void goToQuizzes() {
-
-    String path;
-
-    if (isLecturer()) {
-        path = "/views/lecturer/quiz-list.fxml";
-    } else {
-        path = "/views/student/quizzes.fxml"; // your student fxml
-    }
-
-    Navigator.goTo(quizzesBtn, path);
-}
-
-    @FXML
-    public void goToNotifications() {
-
-        Navigator.goTo(
-                notificationsBtn,
-                "/views/" + roleFolder() + "/notifications.fxml"
-        );
-    }
-
-    
-    @FXML
-    public void goToMessages() {
-
-        Navigator.goTo(
-                messagesBtn,
-                "/views/messages.fxml"
-        );
-    }
-
-
-    @FXML
-    public void logout() {
-
-        Session.clear();
-
-        Navigator.goTo(
-                logoutBtn,
-                "/views/login.fxml"
-        );
-    }
-
-
-    private boolean isLecturer() {
-
-        return Session.getUser() != null
-                && "lecturer".equalsIgnoreCase(
-                        Session.getUser().getRole()
-                );
-    }
-
-
-    private String roleFolder() {
-
-        return isLecturer()
-                ? "lecturer"
-                : "student";
-    }
-    private void updateNotificationBadge() {
-
-    try {
-
-        int unread = NotificationService.getUnreadCount();
-
-        if (unread > 0) {
-            notificationsBtn.setText("Notifications (" + unread + ")");
-        } else {
-            notificationsBtn.setText("Notifications");
+    private void handleDiscussions() {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/views/student/my-discussions.fxml")
+            );
+            Scene scene = new Scene(loader.load());
+            Stage stage = (Stage) discussionsButton.getScene().getWindow();
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-
-    } catch (Exception e) {
-
-        e.printStackTrace();
-        notificationsBtn.setText("Notifications");
-
     }
-}
+
+    @FXML
+    private void handleQuizzes() {
+        System.out.println("Quizzes button clicked");
+    }
+
+    @FXML
+    private void handleNotifications() {
+        System.out.println("Notifications button clicked");
+    }
+
+    @FXML
+    private void handleMessages() {
+        System.out.println("Messages button clicked");
+    }
+
+    @FXML
+    private void handleLogout() {
+        try {
+            com.edudiscuss.utils.Session.clear();
+
+            FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/views/login.fxml")
+            );
+            Scene scene = new Scene(loader.load());
+            Stage stage = (Stage) logoutButton.getScene().getWindow();
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
