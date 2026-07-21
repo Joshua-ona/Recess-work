@@ -89,11 +89,25 @@
                 <div class="card shadow-sm border-primary">
                     <div class="card-body">
                         <h6 class="text-muted">Participation Score</h6>
-                        <h2 class="fw-bold text-primary">{{ $score }}/100</h2>
+                        <h2 id="participation-score" class="fw-bold text-primary">
+                            {{ $score }}/100
+                        </h2>
 
-                        <div class="progress mb-2" style="height: 8px;">
-                            <div class="progress-bar bg-primary" style="width: {{ $score }}%"></div>
+                        <div class="progress mb-2" style="height:8px;">
+                            <div id="score-progress" class="progress-bar bg-primary" style="width: {{ $score }}%">
+                            </div>
                         </div>
+
+                        <span id="score-badge">
+                            @if($score >= 70)
+                            <span class="badge bg-success">Leader</span>
+                            @elseif($score >= 30)
+                            <span class="badge bg-primary">Contributor</span>
+                            @else
+                            <span class="badge bg-secondary">Newcomer</span>
+                            @endif
+                        </span>
+
 
                         @if($score >= 70) <span class="badge bg-success">Leader</span>
                         @elseif($score >= 30) <span class="badge bg-primary">Contributor</span>
@@ -106,206 +120,6 @@
         </div>
 
 
-        <!-- <div class="panel-grid" style="grid-template-columns: 1fr 1fr 1fr; margin: 24px 0;">
-            {{-- PANEL 1: My Groups --}}
-            <div class="panel">
-                <div class="panel-head">
-                    <span class="panel-title"><i class="ti ti-users"></i> My Groups</span>
-                </div>
-                <div class="panel-body">
-                    @if($myGroups->isEmpty())
-                    <p style="font-size:13px;color:var(--muted);text-align:center;padding:1rem 0;">No groups
-                        yet. Request to create one.</p>
-                    @else
-                    @foreach($myGroups as $g)
-                    <div class="disc-item">
-                        <div
-                            style="width:8px; height:8px; border-radius:50%; margin-top:4px; background:{{ $g->status == 'approved' ? 'var(--green-600)' : 'var(--amber-600)' }};">
-                        </div>
-                        <div style="flex:1;">
-                            <a href="{{route('student.groups.show', $g)}}" style="text-decoration:none;">
-                                <div class="disc-title">{{ $g->name }}</div>
-                            </a>
-                        </div>
-                    </div>
-                    @endforeach
-                    @endif
-                </div>
-            </div>
-
-            {{-- PANEL 2: All Groups --}}
-            <div class="panel">
-                <div class="panel-head">
-                    <span class="panel-title"><i class="ti ti-users"></i> Browse All Groups</span>
-                </div>
-                <div class="panel-body">
-                    @forelse($browseGroups as $g)
-                    <div class="disc-item">
-                        <div
-                            style="width:8px; height:8px; border-radius:50%; margin-top:4px; background:var(--green-600);">
-                        </div>
-                        <div style="flex:1;display:flex;justify-content:space-between;align-items:center;gap:8px;">
-                            <div>
-                                <div class="disc-title">{{ $g->name }}</div>
-                                <div class="disc-meta">
-                                    <span class="badge badge-green">approved</span>
-                                </div>
-                            </div>
-
-                            <form method="POST" action="{{ route('student.groups.join', $g) }}">
-                                @csrf
-                                <button type="submit" class="panel-action"
-                                    style="border:none;background:none; color:var(--blue-600);cursor:pointer;">Join</button>
-                            </form>
-                        </div>
-                    </div>
-                    @empty
-                    <p style="font-size:13px;color:var(--muted);text-align:center;padding:1rem 0;">No
-                        approved groups to join.</p>
-                    @endforelse
-                </div>
-            </div>
-
-            {{-- PANEL 3: Create / Join Groups --}}
-            <div class="panel">
-                <div class="panel-head">
-                    <span class="panel-title"><i class="ti ti-circle-plus"></i> Create / Join Groups</span>
-                </div>
-                <div class="panel-body">
-                    @if(session('success'))
-                    <p
-                        style="font-size:13px;color:#065f46;background:#ecfdf5;padding:8px;border-radius:8px;margin-bottom:8px;">
-                        {{ session('success') }}</p>
-                    @endif
-                    <form method="POST" action="{{ route('student.groups.store') }}" style="margin-bottom: 16px;">
-                        @csrf
-                        <input name="name" value="{{ old('name') }}" placeholder="Group name e.g. Java"
-                            style="width:100%; padding:8px; border:1px solid #e5e7eb;border-radius:8px; font-size:14px;">
-                        @error('name')
-                        <p style="font-size:12px;color:#dc2626; margin-top:4px;">{{ $message }}</p>
-                        @enderror
-                        <button class="btn btn-primary" style="width:100%; margin-top:8px;">Request
-                            Group</button>
-                        <p style="font-size:11px;color:var(--muted); margin-top:4px;">Needs admin approval.
-                        </p>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-
-        {{-- Two-column panels --}}
-        <div class="panel-grid">
-
-            {{-- Activity --}}
-            <div class="panel">
-                <div class="panel-head">
-                    <span class="panel-title">Recent activity</span>
-                    <a href="{{ route('student.discussions.index') }}" class="panel-action">See all</a>
-                </div>
-                <div class="panel-body">
-                    @forelse($recentActivity ?? [] as $activity)
-                    <div class="activity-item">
-                        <div class="activity-dot" style="background:{{ $activity->color ?? 'var(--purple-600)' }}">
-                        </div>
-                        <div>
-                            <div class="activity-text">{!! $activity->description !!}</div>
-                            <div class="activity-time">
-                                <span class="badge badge-{{ $activity->badge_color ?? 'purple' }}">
-                                    {{ $activity->course_code ?? '' }}
-                                </span>
-                                {{ $activity->created_at->diffForHumans() }}
-                            </div>
-                        </div>
-                    </div>
-                    @empty
-                    <p style="font-size:13px;color:var(--muted);text-align:center;padding:1rem 0">No
-                        activity
-                        yet. Start a discussion!</p>
-                    @endforelse
-                </div>
-            </div>
-
-            {{-- Course discussions --}}
-            <div class="panel">
-                <div class="panel-head">
-                    <span class="panel-title">Course discussions</span>
-                    <a href="{{ route('student.discussions.index') }}" class="panel-action">View all</a>
-                </div>
-                <div class="panel-body">
-                    @forelse($courseDiscussions ?? [] as $disc)
-                    <a href="{{ route('student.discussions.show', $disc->id) }}"
-                        style="text-decoration:none;display:block">
-                        <div class="disc-item">
-                            <div style="flex:1;min-width:0">
-                                <div class="disc-title">{{ $disc->title }}</div>
-                                <div class="disc-meta">
-                                    <span class="badge badge-purple">{{ $disc->course->code ?? 'N/A' }}</span>
-                                    {{ $disc->replies_count ?? 0 }} replies
-                                </div>
-                                <div class="progress-bar" style="margin-top:6px">
-                                    <div class="progress-fill" style="width:{{ min(100, $disc->engagement_pct ?? 0) }}%;
-                                                        background:{{ $disc->bar_color ?? 'var(--purple-600)' }}">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-                    @empty
-                    <p style="font-size:13px;color:var(--muted);text-align:center;padding:1rem 0">
-                        No discussions in your courses yet.
-                    </p>
-                    @endforelse
-                </div>
-            </div>
-
-        </div>
-
-
-        {{-- NEW: RECOMMENDED GROUPS YOU'RE NOT IN --}}
-        @if(!empty($recommendedGroups) && count($recommendedGroups) > 0)
-        <div class="full-panel">
-            <div class="panel-head">
-                <span class="panel-title"><i class="ti ti-compass"></i> Groups You Might Like</span>
-                <span class="panel-action">Based on your activity</span>
-            </div>
-            <div class="panel-body">
-                <div class="row">
-                    @foreach($recommendedGroups as $group)
-                    <div class="card mb-3 w-100">
-                        <div class="card-body d-flex justify-content-between align-items-center">
-
-                            <div style="flex:1;">
-                                <h5 class="mb-1">{{ $group['name'] }}</h5>
-                                <p class="text-muted mb-2" style="font-size:13px;">
-                                    {{ Str::limit($group['description'], 120) }}
-                                </p>
-                                <div class="d-flex gap-2">
-                                    <span class="badge badge-info">{{ $group['reason'] }}</span>
-                                    <span class="badge badge-purple">{{ $group['discussion_count'] }} discussions</span>
-                                </div>
-                            </div>
-
-                            <div class="text-end">
-                                <span class="badge badge-green fs-6 mb-2">{{ $group['score'] }}% match</span>
-                                <br>
-                                <form method="POST" action="{{ route('student.groups.join', $group['id']) }}">
-                                    @csrf
-                                    <button type="submit" class="btn btn-sm btn-primary">
-                                        <i class="ti ti-user-plus"></i> Join
-                                    </button>
-                                </form>
-                            </div>
-
-                        </div>
-                    </div>
-                    @endforeach
-                </div>
-            </div>
-        </div>
-        @endif
-
-    </div> -->
 
 
         {{-- 3-COLUMN TOP SECTION --}}
@@ -400,7 +214,7 @@
         <div class="full-panel">
             <div class="panel-head">
                 <span class="panel-title"><i class="ti ti-compass"></i> Groups You Might Like</span>
-                <span class="panel-action">75%+ match only</span>
+
             </div>
             <div class="panel-body">
                 @if(!empty($recommendedGroups) && count($recommendedGroups) > 0)
@@ -434,8 +248,9 @@
                 @else
                 <p style="text-align:center;color:var(--muted);padding:1.5rem 0;">
                     <i class="ti ti-robot"></i><br>
-                    No strong matches yet. <br>
-                    <small>Post more in discussions to get 75%+ recommendations</small>
+                    No recommendations yet. <br>
+                    <b> <small> Post more in groups to get recommended </small> </b>
+
                 </p>
                 @endif
             </div>
@@ -445,4 +260,61 @@
     </div>{{-- /dash-body --}}
 </div>{{-- /dash-main --}}
 </div>{{-- /dash-wrap --}}
+
+</div>{{-- /dash-wrap --}}
+
+
+@push('scripts')
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+    function updateScore() {
+        fetch("{{ url('/student/score') }}")
+            .then(response => response.json())
+            .then(data => {
+
+                let score = data.score ?? 0;
+
+                // Update number
+                document.getElementById('participation-score').innerText =
+                    score + "/100";
+
+                // Update progress bar
+                document.getElementById('score-progress').style.width =
+                    score + "%";
+
+
+                // Update badge
+                let badge = document.getElementById('score-badge');
+
+                if (score >= 70) {
+                    badge.innerHTML =
+                        '<span class="badge bg-success">Leader</span>';
+                } else if (score >= 30) {
+                    badge.innerHTML =
+                        '<span class="badge bg-primary">Contributor</span>';
+                } else {
+                    badge.innerHTML =
+                        '<span class="badge bg-secondary">Newcomer</span>';
+                }
+
+            })
+            .catch(error => {
+                console.error("Score update failed:", error);
+            });
+    }
+
+
+    // First load
+    updateScore();
+
+    //2 minutes
+
+    setInterval(updateScore, 120000);
+
+
+});
+</script>
+@endpush
+
 @endsection

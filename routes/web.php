@@ -7,6 +7,9 @@ use App\Http\Controllers\Auth\RegisterController;
 
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminUserController;
+use Illuminate\Support\Facades\Auth;
+use App\Models\UserScore;
+
 
 use App\Http\Controllers\Lecturer\LecturerDashboardController;
 use App\Http\Controllers\Lecturer\LecturerDiscussionController;
@@ -190,6 +193,17 @@ Route::middleware('auth')->group(function () {
 Route::get('/groups/{group}/discussions/{discussion}/pdf', [DiscussionController::class, 'exportPdf']);
 
 Route::get('/groups/{group}/stats', [GroupController::class, 'stats']);
+
+Route::get('/student/score', function () {
+
+    $score = UserScore::where('user_id', Auth::id())
+        ->value('score') ?? 0;
+
+    return response()->json([
+        'score' => $score
+    ]);
+
+})->middleware('auth');
 
    
  

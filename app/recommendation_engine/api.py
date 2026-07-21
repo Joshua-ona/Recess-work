@@ -14,7 +14,7 @@ app = Flask(__name__)
 run_batch_scoring() # run on boot
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(func=run_batch_scoring, trigger="interval", minutes=15)
+scheduler.add_job(func=run_batch_scoring, trigger="interval", minutes=2)
 scheduler.start()
 atexit.register(lambda: scheduler.shutdown())
 

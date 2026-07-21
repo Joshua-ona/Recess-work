@@ -6,10 +6,10 @@ import os
 
 
 DB_CONFIG = {
-    'host': os.getenv('DB_HOST', 'localhost'),
-    'user': os.getenv('DB_USER', 'root'),
-    'password': os.getenv('DB_PASSWORD', ''),
-    'database': os.getenv('DB_NAME', 'fave')
+    'host': os.getenv('DB_HOST'),
+    'user': os.getenv('DB_USER'),
+    'password': os.getenv('DB_PASSWORD'),
+    'database': os.getenv('DB_NAME')
 }
 
 WEIGHTS = {'discussion': 1,'reply': 1,'group_join': 2,'group_message': 2}
@@ -57,7 +57,15 @@ def run_batch_scoring(): # <-- renamed from main()
         score = round(base * math.exp(-DECAY_RATE * max(0, days_inactive)), 2)
         
         cursor.execute("INSERT INTO user_scores (user_id, score, updated_at) VALUES (%s, %s, NOW()) ON DUPLICATE KEY UPDATE score = %s, updated_at = NOW()", (user['id'], score, score))
+
+        print(f"User: {user['id']}")
+        print(f"Last Active: {last_active}")
+        print(f"Days inactive: {days_inactive}")
+        print(f"Base score: {base}")
+        print(f"Final score: {score}")
+        print("-" * 30)
     
+
     conn.commit()
     cursor.close()
     conn.close()
