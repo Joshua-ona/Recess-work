@@ -33,6 +33,15 @@ public class QuizListController {
     private static final Gson gson = new Gson();
     private static final DateTimeFormatter DISPLAY_FORMAT = DateTimeFormatter.ofPattern("MMM d, yyyy h:mm a");
 
+
+    @FXML
+    public void goToCreate() {
+
+        Navigator.goTo(
+                quizTable,
+                "/views/lecturer/quiz-create.fxml"
+        );
+    }
     @FXML
     public void goToCreate() {
         Navigator.goTo(quizTable, "/views/lecturer/quiz-create.fxml");

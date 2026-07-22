@@ -10,6 +10,7 @@
             stylesheets="@../css/style.css">
 
     <!-- Top Navigation -->
+    
     <VBox styleClass="top-nav" AnchorPane.topAnchor="0"
           AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
         <HBox alignment="CENTER_LEFT" spacing="20">

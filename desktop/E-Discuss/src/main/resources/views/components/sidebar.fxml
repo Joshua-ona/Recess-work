@@ -8,22 +8,15 @@
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.edudiscuss.controllers.SidebarController"
       spacing="10"
-      prefWidth="190"
-      styleClass="sidebar">
+      prefWidth="250"
+      style="-fx-background-color:#1E293B; -fx-padding:20;">
 
-    <Button fx:id="dashboardBtn" text="Dashboard" onAction="#goToDashboard" maxWidth="Infinity"/>
-    <Button fx:id="groupsBtn" text="Groups" onAction="#goToGroups" maxWidth="Infinity"/>
-    <Button fx:id="discussionsBtn" text="Discussions" onAction="#goToDiscussions" maxWidth="Infinity"/>
-    <Button fx:id="quizzesBtn" text="Quizzes" onAction="#goToQuizzes" maxWidth="Infinity"/>
-    <Button fx:id="notificationsBtn" text="Notifications" onAction="#goToNotifications" maxWidth="Infinity"/>
-    <Button fx:id="messagesBtn" text="Messages" onAction="#goToMessages" maxWidth="Infinity"/>
-    <Button fx:id="logoutBtn" text="Logout" onAction="#logout" maxWidth="Infinity"/>
-
-    <Label fx:id="lockBanner"
-           text="Locked into active quiz. Other sections are disabled until you finish or time runs out."
-           wrapText="true"
-           visible="false"
-           managed="false"
-           styleClass="lock-banner"/>
+    <Button fx:id="dashboardButton" text="Dashboard" onAction="#goToDashboard"/>
+    <Button fx:id="groupsButton" text="Groups" onAction="#handleGroups"/>
+    <Button fx:id="discussionsButton" text="Discussions" onAction="#handleDiscussions"/>
+    <Button fx:id="quizzesButton" text="Quizzes" onAction="#handleQuizzes"/>
+    <Button fx:id="notificationsButton" text="Notifications" onAction="#handleNotifications"/>
+    <Button fx:id="messagesButton" text="Messages" onAction="#handleMessages"/>
+    <Button fx:id="logoutButton" text="Logout" onAction="#handleLogout"/>
 
 </VBox>

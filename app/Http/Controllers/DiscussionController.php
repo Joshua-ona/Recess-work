@@ -21,6 +21,22 @@ class DiscussionController extends Controller
         return view('groups.discussions-create', compact('group'));
     }
 
+    public function myDiscussions()
+{
+    $user = auth()->user();
+
+    $startedDiscussions = $user->discussions()->with('group')->latest()->get();
+
+    $repliedDiscussionIds = $user->replies()->pluck('discussion_id')->unique();
+    $repliedDiscussions = Discussion::whereIn('id', $repliedDiscussionIds)
+        ->where('user_id', '!=', $user->id) // avoid duplicating ones they started themselves
+        ->with('group')
+        ->latest()
+        ->get();
+
+    return view('student.my-discussions', compact('startedDiscussions', 'repliedDiscussions'));
+}
+
     public function store(Request $request, Group $group)
     {
         $request->validate([

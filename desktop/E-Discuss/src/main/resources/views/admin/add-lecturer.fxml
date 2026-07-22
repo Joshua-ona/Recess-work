@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.edudiscuss.controllers.AddLecturerController"
+            styleClass="main-root">
+
+    <!-- ── Sidebar ── -->
+    <left>
+        <VBox styleClass="sidebar" prefWidth="210" spacing="4">
+            <padding><Insets top="24" right="0" bottom="24" left="0"/></padding>
+
+            <VBox alignment="CENTER" spacing="6" style="-fx-padding: 0 16 24 16;">
+                <Label text="💬" style="-fx-font-size:28; -fx-text-fill:white;"/>
+                <Label text="EduDiscuss" styleClass="sidebar-logo"/>
+                <Label text="Admin Panel" styleClass="sidebar-role"/>
+            </VBox>
+
+            <Button text="📊  Dashboard"   onAction="#goDashboard"   styleClass="sidebar-btn"/>
+            <Button text="👥  Manage Users" onAction="#goManageUsers" styleClass="sidebar-btn"/>
+            <Button text="✉  Add Lecturer" onAction="#handleSend"    styleClass="sidebar-btn-active"/>
+
+            <Region VBox.vgrow="ALWAYS"/>
+            <Label fx:id="userNameLabel" styleClass="sidebar-username" wrapText="true"
+                   style="-fx-padding: 0 16 8 16;"/>
+            <Button text="🚪  Log out" onAction="#handleLogout" styleClass="sidebar-btn-danger"/>
+        </VBox>
+    </left>
+
+    <!-- ── Main content ── -->
+    <center>
+        <VBox styleClass="main-content" spacing="0">
+            <padding><Insets top="32" right="32" bottom="32" left="32"/></padding>
+
+            <Label text="Add a Lecturer" styleClass="page-title"/>
+            <Label text="Creates the account and sends an activation email to the lecturer."
+                   styleClass="page-subtitle"/>
+
+            <Region prefHeight="28"/>
+
+            <!-- Card -->
+            <VBox styleClass="form-card" spacing="18" maxWidth="480">
+                <padding><Insets top="28" right="28" bottom="28" left="28"/></padding>
+
+                <HBox spacing="14">
+                    <VBox spacing="5" HBox.hgrow="ALWAYS">
+                        <Label text="First name" styleClass="form-label"/>
+                        <TextField fx:id="firstNameField" promptText="e.g. Sarah" styleClass="form-input"/>
+                    </VBox>
+                    <VBox spacing="5" HBox.hgrow="ALWAYS">
+                        <Label text="Last name" styleClass="form-label"/>
+                        <TextField fx:id="lastNameField" promptText="e.g. Nakato" styleClass="form-input"/>
+                    </VBox>
+                </HBox>
+
+                <VBox spacing="5">
+                    <Label text="Email address" styleClass="form-label"/>
+                    <TextField fx:id="emailField" promptText="lecturer@university.ac.ug" styleClass="form-input"/>
+                </VBox>
+
+                <Label fx:id="statusLabel" wrapText="true" visible="false"/>
+
+                <Button fx:id="sendButton" text="Send invitation"
+                        onAction="#handleSend" styleClass="btn-primary" maxWidth="Infinity"/>
+            </VBox>
+        </VBox>
+    </center>
+</BorderPane>

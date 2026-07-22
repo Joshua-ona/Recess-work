@@ -8,6 +8,9 @@ public class User {
     private String email;
     private String role;
     private int unread_count;
+    private String status;
+    private int warning_count;
+
 
     public User() {
     }
@@ -27,6 +30,7 @@ public class User {
     public String getLast_name() {
         return last_name;
     }
+    
 
     public String getEmail() {
         return email;
@@ -48,4 +52,18 @@ public class User {
 
         return getFullName();
     }
+    
+    /** Display-friendly role label */
+    public String getRoleLabel() {
+        return switch (getRole()) {
+            case "admin"    -> "Admin";
+            case "lecturer" -> "Lecturer";
+            case "student"  -> "Student";
+            default         -> getRole();
+        };
+    }
+    public boolean isBlacklisted() { return "blacklisted".equals(status); }
+    public int    getWarningCount(){ return warning_count; }
+     public String getStatus()      { return status == null ? "active" : status; }
+    public boolean isPending()     { return "pending".equals(status); }
 }

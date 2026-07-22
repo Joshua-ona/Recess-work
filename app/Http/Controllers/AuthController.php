@@ -1,52 +1,33 @@
 <?php
-
-namespace App\Http\Controllers;
-
-use App\Models\User;
+namespace App\Http\Controllers\Api;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-
+use Illuminate\Support\Facades\Auth;
 class AuthController extends Controller
 {
-
-    public function showRegistrationForm()
+    public function login(Request $request)
     {
-        return view('auth.register');
-    }
-
-
-    public function register(Request $request)
-    {
-
-        $request->validate([
-            'first_name' => 'required|string',
-            'last_name' => 'required|string',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-            'role' => '',
-            'agreed_rules' => 'accepted',
+        $credentials = $request->validate([
+            'email'=>'required|email',
+            'password'=>'required'
         ]);
-
-
-        $user = User::create([
-
-            'first_name' => $request->first_name,
-            'last_name' => $request->last_name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => $request->role,
-            'is_enabled' => false,
-
-        ]);
-
-
+        if(!Auth::attempt($credentials)){
+            return response()->json([
+                'message'=>'Invalid email or password'
+            ],401);
+        }
+        $user = Auth::user();
+        $token = $user->createToken('javafx-desktop')->plainTextToken;
         return response()->json([
-
-            'message' => 'Registered successfully',
-            'user' => $user
-
-        ], 201);
-
+            'message'=>'Login successful',
+            'token'=>$token,
+            'user'=>[
+    'id'=>$user->id,
+    'first_name'=>$user->first_name,
+    'last_name'=>$user->last_name,
+    'email'=>$user->email,
+    'role'=>$user->role
+]
+        ]);
     }
-
 }

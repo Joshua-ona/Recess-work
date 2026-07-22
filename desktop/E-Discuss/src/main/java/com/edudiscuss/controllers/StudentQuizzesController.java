@@ -1,6 +1,11 @@
 package com.edudiscuss.controllers;
 
 import com.edudiscuss.services.ApiService;
+import com.edudiscuss.models.StudentDashboard;
+import com.edudiscuss.models.User;
+import com.edudiscuss.services.ApiService;
+import com.edudiscuss.utils.Session;
+import com.edudiscuss.utils.QuizLockService;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.collections.FXCollections;

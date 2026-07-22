@@ -6,20 +6,25 @@ public class Session {
 
     private static User user;
     private static String token;
-    private static int userId;
+     private static Session instance;
 
     public static int getUserId() {
-        return userId;
-    }
+    return user != null ? user.getId() : 0;
+}
 
-    public static void setUserId(int id) {
-        userId = id;
+  
+    public static Session getInstance() {
+        if (instance == null) {
+            instance = new Session();
+        }
+        return instance;
     }
 
     public static void setUser(User user) {
         Session.user = user;
     }
 
+     public User   getCurrentUser() { return user; }
 
     public static User getUser() {
         return user;
@@ -40,4 +45,5 @@ public class Session {
         user = null;
         token = null;
     }
+        public boolean isLoggedIn()  { return token != null && user != null; }
 }

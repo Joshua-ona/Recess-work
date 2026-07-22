@@ -68,8 +68,14 @@ loadConversation();
 
         startAutoRefresh();
     }
+ private HBox createMessageBubble(Message message) {
 
-    private HBox createMessageBubble(Message message) {
+    System.out.println(
+        "Message ID: " + message.getId()
+        + " | Sender: " + message.getSender_id()
+        + " | Receiver: " + message.getReceiver_id()
+        + " | Logged in: " + Session.getUserId()
+    );
 
     Label text = new Label(message.getContent());
     text.setWrapText(true);
@@ -83,6 +89,8 @@ loadConversation();
 
     if (message.getSender_id() == Session.getUserId()) {
 
+        System.out.println(">>> MY MESSAGE");
+
         row.setAlignment(Pos.CENTER_RIGHT);
 
         bubble.setStyle("""
@@ -91,6 +99,8 @@ loadConversation();
             """);
 
     } else {
+
+        System.out.println(">>> OTHER USER");
 
         row.setAlignment(Pos.CENTER_LEFT);
 
@@ -104,7 +114,6 @@ loadConversation();
 
     return row;
 }
-  
    private void loadUsers() {
 
     try {

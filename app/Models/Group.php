@@ -16,10 +16,12 @@ class Group extends Model
         return $this->belongsTo(User::class, 'admin_id');
     }
 
-    public function users(): BelongsToMany
-    {
-        return $this->belongsToMany(User::class, 'group_members')->withPivot('role')->withTimestamps();
-    }
+    public function users()
+{
+    return $this->belongsToMany(User::class, 'group_members')
+        ->withPivot('role', 'agreed_terms')
+        ->withTimestamps();
+}
 
     public function messages(): HasMany
     {

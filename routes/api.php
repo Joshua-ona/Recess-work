@@ -10,10 +10,15 @@ use App\Http\Controllers\Api\LecturerQuizController;
 use App\Http\Controllers\Api\PrivateCommController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\StudentDashboardController;
+use App\Http\Controllers\Api\LecturerDashboardApiController;
 
 Route::get(
     '/student/dashboard',
     [StudentDashboardController::class, 'index']
+);
+Route::get(
+    '/lecturer/dashboard',
+    [LecturerDashboardApiController::class, 'index']
 );
 Route::post('/login',[AuthController::class,'login']);
 Route::middleware('auth:sanctum')->get('/profile', function(Request $request){
@@ -36,6 +41,21 @@ Route::middleware('auth:sanctum')->group(function(){
         'discussions',
         DiscussionController::class
     );
+
+    Route::get(
+    '/groups/{group}/discussions',
+    [DiscussionController::class, 'index']
+);
+
+Route::get(
+    '/my-discussions',
+    [DiscussionController::class, 'myDiscussions']
+);
+
+Route::post(
+    '/groups/{group}/discussions',
+    [DiscussionController::class, 'store']
+);
 
 });
 Route::middleware('auth:sanctum')->group(function(){
@@ -65,6 +85,11 @@ Route::post(
     '/groups/{group}/join',
     [GroupController::class,'join']
 );
+
+Route::post(
+    '/discussions/{discussion}/replies', 
+    [DiscussionController::class, 'addReply']
+    );
 
 Route::get(
     '/groups/{group}/members',
@@ -136,13 +161,19 @@ Route::post(
     [PrivateCommController::class,'send']
 );
 });
+
+
+
 Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/notifications',
-        [NotificationController::class,'index']);
+        [NotificationController::class, 'index']);
 
     Route::get('/notifications/count',
-        [NotificationController::class,'count']);
+        [NotificationController::class, 'count']);
+
+    Route::put('/notifications/{id}/read',
+        [NotificationController::class, 'markRead']);
 
 });
 

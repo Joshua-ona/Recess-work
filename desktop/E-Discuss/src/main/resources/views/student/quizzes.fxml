@@ -41,10 +41,6 @@
                                  text="Duration"
                                  prefWidth="150"/>
 
-                    <TableColumn fx:id="actionColumn"
-                                 text="Action"
-                                 prefWidth="150"/>
-
                 </columns>
 
             </TableView>

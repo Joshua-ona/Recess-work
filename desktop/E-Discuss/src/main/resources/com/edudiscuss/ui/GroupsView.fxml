@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/11"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.edudiscuss.controllers.GroupsController">
+
+    <top>
+        <VBox spacing="10">
+            <padding><Insets top="20" right="30" bottom="10" left="30"/></padding>
+            <Label text="📚 Discussion Groups"/>
+            <Label text="Join a group to start discussing"/>
+            <HBox spacing="15">
+                <TextField fx:id="searchField" promptText="🔍 Search groups..." HBox.hgrow="ALWAYS"/>
+                <Button text="+ Create Group" onAction="#handleCreateGroup"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <TabPane>
+            <Tab text="📌 My Groups">
+                <ListView fx:id="myGroupsList"/>
+            </Tab>
+            <Tab text="🔥 Available Groups">
+                <ListView fx:id="availableGroupsList"/>
+            </Tab>
+        </TabPane>
+    </center>
+
+    <bottom>
+        <HBox spacing="15">
+            <padding><Insets top="8" right="30" bottom="8" left="30"/></padding>
+            <Label fx:id="statusLabel" text="✅ Online"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="🔄 Sync" onAction="#handleSync"/>
+        </HBox>
+    </bottom>
+</BorderPane>

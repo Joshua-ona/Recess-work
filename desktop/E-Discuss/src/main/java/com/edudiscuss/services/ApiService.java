@@ -71,4 +71,17 @@ return gson.fromJson(response.body, type);
         return parsed.getQuizzes() != null ? parsed.getQuizzes() : List.of();
 
     }
+    public List<Quiz> getQuizzes() throws Exception {
+
+
+  
+    Type type =
+            new TypeToken<List<Quiz>>(){}.getType();
+
+ApiClient.ApiResponse response =
+        ApiClient.authGet("quizzes");
+
+return gson.fromJson(response.body, type);
+
+}
 }

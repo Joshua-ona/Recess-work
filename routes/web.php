@@ -7,6 +7,9 @@ use App\Http\Controllers\Auth\RegisterController;
 
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminUserController;
+use Illuminate\Support\Facades\Auth;
+use App\Models\UserScore;
+
 
 use App\Http\Controllers\Lecturer\LecturerDashboardController;
 use App\Http\Controllers\Lecturer\LecturerDiscussionController;
@@ -148,6 +151,7 @@ Route::prefix('student')->name('student.')->middleware(['auth','role:student','r
     Route::get('/courses/browse',   [StudentDashboardController::class, 'browseCourses'])->name('courses.browse');
     Route::get('/courses/{course}', [StudentDashboardController::class, 'course'])->name('course');
     Route::resource('/discussions', DiscussionController::class)->names('discussions');
+    Route::get('/my-discussions', [DiscussionController::class, 'myDiscussions'])->name('my-discussions');
     Route::get('/categories', [StudentDashboardController::class, 'categories'])->name('categories');
     Route::get('/reports', [StudentDashboardController::class, 'reports'])
     ->name('reports');
@@ -190,6 +194,17 @@ Route::middleware('auth')->group(function () {
 Route::get('/groups/{group}/discussions/{discussion}/pdf', [DiscussionController::class, 'exportPdf']);
 
 Route::get('/groups/{group}/stats', [GroupController::class, 'stats']);
+
+Route::get('/student/score', function () {
+
+    $score = UserScore::where('user_id', Auth::id())
+        ->value('score') ?? 0;
+
+    return response()->json([
+        'score' => $score
+    ]);
+
+})->middleware('auth');
 
    
  
