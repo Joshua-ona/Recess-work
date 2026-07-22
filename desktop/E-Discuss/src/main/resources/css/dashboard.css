@@ -27,3 +27,20 @@
             rgba(0,0,0,0.08),
             10,0,0,2);
 }
+.stat-card {
+    -fx-background-color: white;
+    -fx-background-radius: 15;
+    -fx-padding: 20;
+    -fx-effect: dropshadow(gaussian,
+            rgba(0,0,0,0.08),
+            10,0,0,2);
+}
+
+.panel {
+    -fx-background-color: white;
+    -fx-background-radius: 15;
+    -fx-padding: 20;
+    -fx-effect: dropshadow(gaussian,
+            rgba(0,0,0,0.08),
+            10,0,0,2);
+}

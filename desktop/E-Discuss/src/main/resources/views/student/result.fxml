@@ -1,75 +1,59 @@
-int<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.Text?>
 
 <AnchorPane xmlns="http://javafx.com/javafx/17"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.yourcollege.quizapp.controllers.QuizController"
-            stylesheets="@../css/style.css">
+            fx:controller="com.edudiscuss.controllers.QuizResultController"
+            stylesheets="@../../css/style.css">
 
     <!-- Top Navigation -->
-    <VBox styleClass="top-nav" AnchorPane.topAnchor="0"
-          AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
+    <VBox styleClass="top-nav"
+          AnchorPane.topAnchor="0"
+          AnchorPane.leftAnchor="0"
+          AnchorPane.rightAnchor="0">
         <HBox alignment="CENTER_LEFT" spacing="20">
-            <Button text="← Back" styleClass="secondary-button"
+            <Button text="← Back"
+                    styleClass="secondary-button"
                     onAction="#handleBack"/>
-            <Text styleClass="brand-text" fx:id="quizTitleLabel" text="Quiz"/>
-            <Region HBox.hgrow="ALWAYS"/>
-
-            <!-- Timer -->
-            <HBox spacing="10" alignment="CENTER">
-                <Text text="⏱️" style="-fx-font-size: 18px;"/>
-                <Text fx:id="timerLabel" text="00:00"
-                      style="-fx-font-weight: 600; -fx-font-size: 16px; -fx-text-fill: #4a90e2;"/>
-            </HBox>
+            <Label styleClass="brand-text" text="Quiz Result"/>
         </HBox>
     </VBox>
 
     <!-- Main Content -->
-    <VBox spacing="30" style="-fx-padding: 30 30 30 30;"
-          AnchorPane.topAnchor="70" AnchorPane.bottomAnchor="0"
-          AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
+    <VBox spacing="25"
+          alignment="CENTER"
+          style="-fx-padding:60 30 30 30;"
+          AnchorPane.topAnchor="70"
+          AnchorPane.bottomAnchor="0"
+          AnchorPane.leftAnchor="0"
+          AnchorPane.rightAnchor="0">
 
-        <!-- Progress -->
-        <VBox spacing="10">
-            <HBox alignment="CENTER_LEFT" spacing="10">
-                <Text fx:id="questionNumberLabel" style="-fx-font-weight: 600; -fx-text-fill: #4a90e2;"/>
-                <Region HBox.hgrow="ALWAYS"/>
-                <Text fx:id="progressText" style="-fx-text-fill: #a0aec0;"/>
-            </HBox>
-            <ProgressBar fx:id="progressBar" styleClass="web-progress"
-                         prefWidth="INFINITY" prefHeight="8"/>
+        <VBox styleClass="card" spacing="20" alignment="CENTER"
+              style="-fx-padding:40; -fx-max-width:480;">
+
+            <Label fx:id="quizTitleLabel"
+                   text="Quiz"
+                   style="-fx-font-size:20px; -fx-font-weight:600; -fx-text-fill:#1a2332;"/>
+
+            <Label fx:id="scoreLabel"
+                   text="— / —"
+                   style="-fx-font-size:42px; -fx-font-weight:700; -fx-text-fill:#4a90e2;"/>
+
+            <Label fx:id="autoSubmittedBadge"
+                   text="Auto-submitted (time expired)"
+                   visible="false"
+                   managed="false"
+                   style="-fx-text-fill:#e07b39; -fx-font-weight:600;"/>
+
+            <Button text="Back to Quizzes"
+                    styleClass="primary-button"
+                    onAction="#handleBack"/>
+
         </VBox>
 
-        <!-- Question Card -->
-        <VBox styleClass="card" spacing="30">
-            <!-- Question -->
-            <VBox spacing="15">
-                <Text style="-fx-font-size: 18px; -fx-font-weight: 600; -fx-text-fill: #1a2332;"
-                      fx:id="questionTextLabel"/>
-            </VBox>
-
-            <!-- Options -->
-            <VBox fx:id="optionsVBox" spacing="12">
-                <!-- Options will be dynamically added -->
-            </VBox>
-        </VBox>
-
-        <!-- Navigation Buttons -->
-        <HBox alignment="CENTER_RIGHT" spacing="15">
-            <Button fx:id="prevButton" text="Previous" styleClass="secondary-button"
-                    onAction="#handlePrevious" visible="false"/>
-
-            <Region HBox.hgrow="ALWAYS"/>
-
-            <Button fx:id="nextButton" text="Next Question →" styleClass="primary-button"
-                    onAction="#handleNext"/>
-
-            <Button fx:id="submitButton" text="Submit Quiz" styleClass="success-button"
-                    onAction="#handleSubmit" visible="false"/>
-        </HBox>
     </VBox>
+
 </AnchorPane>

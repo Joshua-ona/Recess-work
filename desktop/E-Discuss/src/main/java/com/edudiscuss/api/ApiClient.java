@@ -81,8 +81,10 @@ public class ApiClient {
         return response.body();
     }
 
-    public static String post(String endpoint,
-                              String json)
+    /**
+     * Public POST (used for login)
+     */
+    public static String post(String endpoint, String json)
             throws IOException, InterruptedException {
 
         HttpRequest.Builder builder =

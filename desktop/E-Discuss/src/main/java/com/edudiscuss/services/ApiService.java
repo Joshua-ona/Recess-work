@@ -62,6 +62,17 @@ return gson.fromJson(response.body, type);
     }
     public List<Quiz> getQuizzes() throws Exception {
 
+        ApiClient.ApiResponse response =
+                ApiClient.authGet("quizzes");
+
+        com.edudiscuss.models.QuizListResponse parsed =
+                gson.fromJson(response.body, com.edudiscuss.models.QuizListResponse.class);
+
+        return parsed.getQuizzes() != null ? parsed.getQuizzes() : List.of();
+
+    }
+    public List<Quiz> getQuizzes() throws Exception {
+
 
   
     Type type =

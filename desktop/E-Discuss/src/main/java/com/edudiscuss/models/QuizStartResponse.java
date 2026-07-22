@@ -1,21 +1,37 @@
 package com.edudiscuss.models;
 
+import com.google.gson.annotations.SerializedName;
 import java.util.List;
 import java.util.Map;
 
 public class QuizStartResponse {
-
     private Quiz quiz;
     private List<Question> questions;
-    private String deadline;
-    private int remaining_seconds;
-    private Map<String, String> saved_answers;
-    private String message; // populated on error responses (403/409/410)
+
+    @SerializedName("saved_answers")
+    private Map<String, String> savedAnswers;
+
+    @SerializedName("remaining_seconds")
+    private double remainingSeconds;
+
+    public QuizStartResponse() {}
+
+    public QuizStartResponse(Quiz quiz, List<Question> questions, Map<String, String> savedAnswers, double remainingSeconds) {
+        this.quiz = quiz;
+        this.questions = questions;
+        this.savedAnswers = savedAnswers;
+        this.remainingSeconds = remainingSeconds;
+    }
 
     public Quiz getQuiz() { return quiz; }
+    public void setQuiz(Quiz quiz) { this.quiz = quiz; }
+
     public List<Question> getQuestions() { return questions; }
-    public String getDeadline() { return deadline; }
-    public int getRemainingSeconds() { return remaining_seconds; }
-    public Map<String, String> getSavedAnswers() { return saved_answers; }
-    public String getMessage() { return message; }
+    public void setQuestions(List<Question> questions) { this.questions = questions; }
+
+    public Map<String, String> getSavedAnswers() { return savedAnswers; }
+    public void setSavedAnswers(Map<String, String> savedAnswers) { this.savedAnswers = savedAnswers; }
+
+    public double getRemainingSeconds() { return remainingSeconds; }
+    public void setRemainingSeconds(double remainingSeconds) { this.remainingSeconds = remainingSeconds; }
 }

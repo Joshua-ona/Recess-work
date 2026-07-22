@@ -42,8 +42,8 @@ public class QuizResultController {
     }
 
     @FXML
-    public void backToQuizzes(javafx.event.ActionEvent event) {
+    public void handleBack(javafx.event.ActionEvent event) {
         Button source = (Button) event.getSource();
-        Navigator.goTo(source, "/views/student/quiz-list.fxml");
+        Navigator.goTo(source, "/views/student/quizzes.fxml");
     }
 }
