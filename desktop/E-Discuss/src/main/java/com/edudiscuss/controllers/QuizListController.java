@@ -1,20 +1,24 @@
 package com.edudiscuss.controllers;
 
-import com.edudiscuss.api.QuizApi;
+import com.edudiscuss.api.LecturerQuizApi;
 import com.edudiscuss.models.Quiz;
 import com.edudiscuss.models.QuizListResponse;
 import com.edudiscuss.utils.Navigator;
-import com.edudiscuss.utils.QuizLockService;
 import com.google.gson.Gson;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 
+/**
+ * Lecturer's "my quizzes" screen — lists quizzes THIS lecturer created
+ * (draft or published), with Edit / Publish actions.
+ *
+ * Not to be confused with the student-facing quiz list, which lives in
+ * StudentQuizzesController / student/quizzes.fxml.
+ */
 public class QuizListController {
 
     @FXML private Label subLabel;
@@ -23,27 +27,35 @@ public class QuizListController {
     @FXML private TableColumn<Quiz, String> titleCol;
     @FXML private TableColumn<Quiz, String> startCol;
     @FXML private TableColumn<Quiz, String> durationCol;
+    @FXML private TableColumn<Quiz, String> statusCol;
     @FXML private TableColumn<Quiz, Void> actionCol;
 
     private static final Gson gson = new Gson();
     private static final DateTimeFormatter DISPLAY_FORMAT = DateTimeFormatter.ofPattern("MMM d, yyyy h:mm a");
 
     @FXML
-    public void initialize() {
-        // Same rule as the web app: if this student is locked into a
-        // quiz, they shouldn't be looking at the list at all.
-        if (QuizLockService.enforceLock(quizTable)) {
-            return;
-        }
+    public void goToCreate() {
+        Navigator.goTo(quizTable, "/views/lecturer/quiz-create.fxml");
+    }
 
+    @FXML
+    public void initialize() {
         titleCol.setCellValueFactory(new PropertyValueFactory<>("title"));
         durationCol.setCellValueFactory(data ->
                 new javafx.beans.property.SimpleStringProperty(data.getValue().getDurationMins() + " mins"));
         startCol.setCellValueFactory(data ->
                 new javafx.beans.property.SimpleStringProperty(formatStart(data.getValue().getStartTime())));
 
+        if (statusCol != null) {
+            statusCol.setCellValueFactory(data ->
+                    new javafx.beans.property.SimpleStringProperty(
+                            data.getValue().isPublished() ? "Published" : "Draft"));
+        }
+
         actionCol.setCellFactory(col -> new TableCell<>() {
-            private final Button startBtn = new Button();
+            private final Button editBtn = new Button("Edit");
+            private final Button publishBtn = new Button("Publish");
+            private final javafx.scene.layout.HBox box = new javafx.scene.layout.HBox(6, editBtn, publishBtn);
 
             @Override
             protected void updateItem(Void item, boolean empty) {
@@ -53,13 +65,14 @@ public class QuizListController {
                     return;
                 }
                 Quiz quiz = getTableView().getItems().get(getIndex());
-                boolean locked = isBeforeStart(quiz.getStartTime());
 
-                startBtn.setText(locked ? "Opens soon" : "Start quiz");
-                startBtn.setDisable(locked);
-                startBtn.getStyleClass().setAll(locked ? "btn-locked" : "btn-primary");
-                startBtn.setOnAction(e -> startQuiz(quiz));
-                setGraphic(startBtn);
+                editBtn.setOnAction(e -> editQuiz(quiz));
+
+                publishBtn.setText(quiz.isPublished() ? "Published" : "Publish");
+                publishBtn.setDisable(quiz.isPublished());
+                publishBtn.setOnAction(e -> publishQuiz(quiz));
+
+                setGraphic(box);
             }
         });
 
@@ -68,7 +81,7 @@ public class QuizListController {
 
     private void loadQuizzes() {
         try {
-            var response = QuizApi.available();
+            var response = LecturerQuizApi.list();
             if (!response.isOk()) {
                 showError("Couldn't load quizzes. Please try again.");
                 return;
@@ -78,36 +91,32 @@ public class QuizListController {
             var quizzes = parsed.getQuizzes() != null ? parsed.getQuizzes() : java.util.List.<Quiz>of();
 
             quizTable.setItems(FXCollections.observableArrayList(quizzes));
-            subLabel.setText(quizzes.size() + " quiz" + (quizzes.size() == 1 ? "" : "zes") + " published");
+            subLabel.setText(quizzes.size() + " quiz" + (quizzes.size() == 1 ? "" : "zes") + " created");
         } catch (Exception e) {
             e.printStackTrace();
             showError("Network error loading quizzes.");
         }
     }
 
-    private void startQuiz(Quiz quiz) {
+    private void editQuiz(Quiz quiz) {
+        LecturerQuizEditController controller = Navigator.goToWithController(
+                quizTable, "/views/lecturer/quiz-edit.fxml");
+        if (controller != null) {
+            controller.loadQuiz(quiz.getQuizId());
+        }
+    }
+
+    private void publishQuiz(Quiz quiz) {
         try {
-            var response = QuizApi.start(quiz.getQuizId());
-
+            var response = LecturerQuizApi.publish(quiz.getQuizId());
             if (response.isOk()) {
-                var startData = gson.fromJson(response.body, com.edudiscuss.models.QuizStartResponse.class);
-                QuizAttemptController controller = Navigator.goToWithController(
-                        quizTable, "/views/student/quiz-attempt.fxml");
-                if (controller != null) {
-                    controller.loadAttempt(quiz.getQuizId(), startData);
-                }
-                return;
+                loadQuizzes();
+            } else {
+                showError("Couldn't publish this quiz. Make sure it has questions first.");
             }
-
-            // 403 (not open yet / window closed), 409 (already submitted /
-            // another quiz in progress), 410 (time already ran out) — show
-            // the server's message the same way the web app's flash error does.
-            var errorBody = gson.fromJson(response.body, com.edudiscuss.models.QuizStartResponse.class);
-            showError(errorBody.getMessage() != null ? errorBody.getMessage() : "Couldn't start this quiz.");
-            loadQuizzes();
         } catch (Exception e) {
             e.printStackTrace();
-            showError("Network error starting quiz.");
+            showError("Network error publishing quiz.");
         }
     }
 
@@ -124,15 +133,6 @@ public class QuizListController {
                     .format(DISPLAY_FORMAT);
         } catch (Exception e) {
             return isoStart;
-        }
-    }
-
-    private boolean isBeforeStart(String isoStart) {
-        try {
-            java.time.Instant start = java.time.Instant.parse(isoStart);
-            return java.time.Instant.now().isBefore(start);
-        } catch (Exception e) {
-            return false;
         }
     }
 }

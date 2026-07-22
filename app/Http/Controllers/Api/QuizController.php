@@ -143,9 +143,9 @@ class QuizController extends Controller
             ['deadline' => $windowEnd, 'answers' => []]
         );
 
-        $remainingSeconds = max(0, now()->diffInSeconds($progress->deadline, false));
+        $remaining_seconds = max(0, now()->diffInSeconds($progress->deadline, false));
 
-        if ($remainingSeconds <= 0) {
+        if ($remaining_seconds <= 0) {
             $this->finalizeSubmission($progress, true);
             return response()->json(['message' => 'Time already ran out for this quiz.'], 410);
         }
@@ -154,7 +154,7 @@ class QuizController extends Controller
             'quiz' => $quiz,
             'questions' => $quiz->questions,
             'deadline' => $progress->deadline->toIso8601String(),
-            'remaining_seconds' => $remainingSeconds,
+            'remaining_seconds' => $remaining_seconds,
             'saved_answers' => $progress->answers ?: [],
         ]);
     }
@@ -218,9 +218,7 @@ class QuizController extends Controller
             );
         }
 
-        // No progress row (e.g. client never called /start, or it already
-        // expired) — still allow a one-shot submit using whatever the
-        // client sent, same as the original controller's behavior.
+       
         $quiz = Quiz::with('questions')->findOrFail($id);
 
         if (QuizSubmission::where('quiz_id', $id)->where('user_id', $userId)->exists()) {

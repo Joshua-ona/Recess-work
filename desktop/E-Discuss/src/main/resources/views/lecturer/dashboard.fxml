@@ -1,48 +1,187 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.edudiscuss.controllers.StudentDashboardController">
+            fx:controller="com.edudiscuss.controllers.LecturerDashboardController">
 
+    <!-- Sidebar -->
     <left>
         <fx:include source="../components/sidebar.fxml"/>
     </left>
 
+    <!-- Main Content -->
     <center>
 
         <VBox spacing="20"
-              style="-fx-padding:20;">
+              style="-fx-background-color:#f5f7fb;"
+              BorderPane.alignment="CENTER">
 
-            <Label text="Lecturer Dashboard"
-                   style="-fx-font-size:24;" />
+            <padding>
+                <Insets top="20" right="25" bottom="20" left="25"/>
+            </padding>
 
+            <!-- Header -->
+            <HBox alignment="CENTER_LEFT" spacing="20">
+
+                <VBox HBox.hgrow="ALWAYS">
+                    <Label fx:id="greetingLabel"
+                           text="Welcome"
+                           style="-fx-font-size:24px;
+                                  -fx-font-weight:bold;"/>
+
+                    <Label text="All clear — no flagged posts"
+                           style="-fx-text-fill:#777;"/>
+                </VBox>
+
+                <Button text="Post Announcement"/>
+            </HBox>
+
+            <!-- Statistics Cards -->
+            <GridPane hgap="20" vgap="20">
+
+                <columnConstraints>
+                    <ColumnConstraints percentWidth="25"/>
+                    <ColumnConstraints percentWidth="25"/>
+                    <ColumnConstraints percentWidth="25"/>
+                    <ColumnConstraints percentWidth="25"/>
+                </columnConstraints>
+
+                <!-- Students -->
+                <VBox GridPane.columnIndex="0"
+                      spacing="10"
+                      styleClass="stat-card">
+
+                    <Label text="My Students"/>
+                    <Label fx:id="studentCountLabel"
+                           text="0"
+                           style="-fx-font-size:28px;
+                                  -fx-font-weight:bold;"/>
+                    <Label text="Across 0 courses"/>
+                </VBox>
+
+                <!-- Threads -->
+                <VBox GridPane.columnIndex="1"
+                      spacing="10"
+                      styleClass="stat-card">
+
+                    <Label text="Threads This Week"/>
+                    <Label fx:id="threadsThisWeekLabel"
+                           text="0"
+                           style="-fx-font-size:28px;
+                                  -fx-font-weight:bold;"/>
+                    <Label text="↑ 0 vs last week"/>
+                </VBox>
+
+                <!-- Unanswered -->
+                <VBox GridPane.columnIndex="2"
+                      spacing="10"
+                      styleClass="stat-card">
+
+                    <Label text="Unanswered"/>
+                    <Label fx:id="unansweredLabel"
+                           text="0"
+                           style="-fx-font-size:28px;
+                                  -fx-font-weight:bold;"/>
+                    <Label text="Needs response"/>
+                </VBox>
+
+                <!-- Satisfaction -->
+                <VBox GridPane.columnIndex="3"
+                      spacing="10"
+                      styleClass="stat-card">
+
+                    <Label text="Avg Satisfaction"/>
+                    <Label fx:id="satisfactionLabel"
+                           text="0.0"
+                           style="-fx-font-size:28px;
+                                  -fx-font-weight:bold;"/>
+                    <Label text="Student feedback"/>
+                </VBox>
+
+            </GridPane>
+
+            <!-- Middle Panels -->
             <HBox spacing="20">
 
-                <VBox styleClass="card">
-                    <Label text="Total Groups"/>
-                    <Label fx:id="groupsLabel"/>
+                <!-- Unanswered Questions -->
+                <VBox spacing="15"
+                      prefWidth="450"
+                      styleClass="panel">
+
+                    <HBox alignment="CENTER_LEFT">
+                        <Label text="Unanswered Questions"
+                               HBox.hgrow="ALWAYS"
+                               style="-fx-font-size:16px;
+                                      -fx-font-weight:bold;"/>
+                        <Hyperlink text="Reply to all"/>
+                    </HBox>
+
+                    <VBox fx:id="unansweredContainer"
+                          spacing="10"/>
                 </VBox>
 
-                <VBox styleClass="card">
-                    <Label text="Discussions Created"/>
-                    <Label fx:id="quizLabel"/>
-                </VBox>
+                <!-- Engagement -->
+                <VBox spacing="15"
+                      prefWidth="450"
+                      styleClass="panel">
 
-                <VBox styleClass="card">
-                    <Label text="Notifications"/>
-                    <Label fx:id="notificationLabel"/>
+                    <Label text="Student Engagement"
+                           style="-fx-font-size:16px;
+                                  -fx-font-weight:bold;"/>
 
-                </VBox>
-                <VBox styleClass="card">
-                    <Label text="Quizzes"/>
-                    <Label fx:id="qizzesLabel"/>
-
+                    <VBox fx:id="engagementContainer"
+                          spacing="10"/>
                 </VBox>
 
             </HBox>
+
+            <!-- Discussion Threads -->
+            <VBox spacing="15"
+                  styleClass="panel">
+
+                <HBox alignment="CENTER_LEFT">
+
+                    <Label text="Discussion Threads"
+                           HBox.hgrow="ALWAYS"
+                           style="-fx-font-size:16px;
+                                  -fx-font-weight:bold;"/>
+
+                    <Button text="Create Thread"/>
+                </HBox>
+
+                <TableView fx:id="threadsTable">
+
+                    <columns>
+
+                        <TableColumn fx:id="topicColumn"
+                                     text="Topic"
+                                     prefWidth="250"/>
+
+                        <TableColumn fx:id="courseColumn"
+                                     text="Course"
+                                     prefWidth="120"/>
+
+                        <TableColumn fx:id="studentsColumn"
+                                     text="Students"
+                                     prefWidth="120"/>
+
+                        <TableColumn fx:id="repliesColumn"
+                                     text="Replies"
+                                     prefWidth="100"/>
+
+                        <TableColumn fx:id="statusColumn"
+                                     text="Status"
+                                     prefWidth="120"/>
+
+                    </columns>
+
+                </TableView>
+
+            </VBox>
 
         </VBox>
 
