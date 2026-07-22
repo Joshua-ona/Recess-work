@@ -11,7 +11,7 @@
       prefWidth="250"
       style="-fx-background-color:#1E293B; -fx-padding:20;">
 
-    <Button fx:id="dashboardButton" text="Dashboard" onAction="#handleDashboard"/>
+    <Button fx:id="dashboardButton" text="Dashboard" onAction="#goToDashboard"/>
     <Button fx:id="groupsButton" text="Groups" onAction="#handleGroups"/>
     <Button fx:id="discussionsButton" text="Discussions" onAction="#handleDiscussions"/>
     <Button fx:id="quizzesButton" text="Quizzes" onAction="#handleQuizzes"/>

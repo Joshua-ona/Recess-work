@@ -23,12 +23,7 @@ class AuthController extends Controller
 
         $user = Auth::user();
 
-<<<<<<< HEAD
         $token = $user->createToken('desktop-app')->plainTextToken;
-=======
-
-        $token = $user->createToken('javafx-desktop')->plainTextToken;
->>>>>>> 3930dd6f892868253f8de36e2aaa384a143c5beb
 
         return response()->json([
             'message'=>'Login successful',

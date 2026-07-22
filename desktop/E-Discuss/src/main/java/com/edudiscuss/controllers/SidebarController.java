@@ -5,6 +5,10 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
+import com.edudiscuss.api.NotificationService;
+import com.edudiscuss.utils.Navigator;
+import com.edudiscuss.utils.Session;
+import javafx.scene.control.Label;
 
 import java.io.IOException;
 
@@ -31,24 +35,27 @@ public class SidebarController {
     @FXML
     private Button logoutButton;
 
+     @FXML private Label lockBanner;
+
     @FXML
     public void initialize() {
         System.out.println("✅ Sidebar loaded successfully!");
-    }
-
-    @FXML
-    private void handleDashboard() {
-        try {
-            FXMLLoader loader = new FXMLLoader(
-                getClass().getResource("/views/student/dashboard.fxml")
-            );
-            Scene scene = new Scene(loader.load());
-            Stage stage = (Stage) dashboardButton.getScene().getWindow();
-            stage.setScene(scene);
-            stage.show();
-        } catch (IOException e) {
-            e.printStackTrace();
+        // Hide groups for lecturers
+        if (isLecturer() && groupsButton != null) {
+            groupsButton.setVisible(false);
+            groupsButton.setManaged(false);
         }
+        updateNotificationBadge();
+    }
+    
+
+       @FXML
+    public void goToDashboard() {
+
+        Navigator.goTo(
+                dashboardButton,
+                "/views/" + roleFolder() + "/dashboard.fxml"
+        );
     }
 
     @FXML
@@ -83,17 +90,31 @@ public class SidebarController {
 
     @FXML
     private void handleQuizzes() {
-        System.out.println("Quizzes button clicked");
+        String path;
+
+    if (isLecturer()) {
+        path = "/views/lecturer/quiz-list.fxml";
+    } else {
+        path = "/views/student/quizzes.fxml"; // your student fxml
+    }
+
+    Navigator.goTo(quizzesButton, path);
     }
 
     @FXML
     private void handleNotifications() {
-        System.out.println("Notifications button clicked");
+         Navigator.goTo(
+                notificationsButton,
+                "/views/" + roleFolder() + "/notifications.fxml"
+        );
     }
 
     @FXML
     private void handleMessages() {
-        System.out.println("Messages button clicked");
+       Navigator.goTo(
+                messagesButton,
+                "/views/messages.fxml"
+        );
     }
 
     @FXML
@@ -112,4 +133,38 @@ public class SidebarController {
             e.printStackTrace();
         }
     }
+      private boolean isLecturer() {
+
+        return Session.getUser() != null
+                && "lecturer".equalsIgnoreCase(
+                        Session.getUser().getRole()
+                );
+    }
+
+
+    private String roleFolder() {
+
+        return isLecturer()
+                ? "lecturer"
+                : "student";
+    }
+    private void updateNotificationBadge() {
+
+    try {
+
+        int unread = NotificationService.getUnreadCount();
+
+        if (unread > 0) {
+            notificationsButton.setText("Notifications (" + unread + ")");
+        } else {
+            notificationsButton.setText("Notifications");
+        }
+
+    } catch (Exception e) {
+
+        e.printStackTrace();
+        notificationsButton.setText("Notifications");
+
+    }
+}
 }

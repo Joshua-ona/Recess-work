@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.edudiscuss.controllers.ManageUsersController"
+            styleClass="main-root">
+
+    <!-- ── Sidebar ── -->
+    <left>
+        <VBox styleClass="sidebar" prefWidth="210" spacing="4">
+            <padding><Insets top="24" right="0" bottom="24" left="0"/></padding>
+
+            <VBox alignment="CENTER" spacing="6" style="-fx-padding: 0 16 24 16;">
+                <Label text="💬" style="-fx-font-size:28; -fx-text-fill:white;"/>
+                <Label text="EduDiscuss" styleClass="sidebar-logo"/>
+                <Label text="Admin Panel" styleClass="sidebar-role"/>
+            </VBox>
+
+            <Button text="📊  Dashboard"   onAction="#goDashboard"    styleClass="sidebar-btn"/>
+            <Button text="👥  Manage Users" onAction="#handleRefresh"  styleClass="sidebar-btn-active"/>
+            <Button text="✉  Add Lecturer" onAction="#goAddLecturer"  styleClass="sidebar-btn"/>
+
+            <Region VBox.vgrow="ALWAYS"/>
+            <Label fx:id="userNameLabel" styleClass="sidebar-username" wrapText="true"
+                   style="-fx-padding: 0 16 8 16;"/>
+            <Button text="🚪  Log out" onAction="#handleLogout" styleClass="sidebar-btn-danger"/>
+        </VBox>
+    </left>
+
+    <!-- ── Main content ── -->
+    <center>
+        <VBox styleClass="main-content" spacing="0">
+            <padding><Insets top="24" right="24" bottom="24" left="24"/></padding>
+
+            <Label text="Manage Users" styleClass="page-title"/>
+            <Region prefHeight="16"/>
+
+            <!-- Search bar -->
+            <HBox spacing="8" alignment="CENTER_LEFT">
+                <TextField fx:id="searchField" promptText="Search by name or email…"
+                           styleClass="search-field" prefWidth="300"
+                           onAction="#handleSearch"/>
+                <Button text="Search"  onAction="#handleSearch"  styleClass="btn-secondary"/>
+                <Button text="↺ Refresh" onAction="#handleRefresh" styleClass="btn-outline"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="statusLabel" styleClass="status-label"/>
+            </HBox>
+
+            <Region prefHeight="12"/>
+
+            <!-- Table -->
+            <TableView fx:id="usersTable" VBox.vgrow="ALWAYS" styleClass="user-table">
+                <columns>
+                    <TableColumn fx:id="colName"     text="Name"     prefWidth="160"/>
+                    <TableColumn fx:id="colEmail"    text="Email"    prefWidth="200"/>
+                    <TableColumn fx:id="colRole"     text="Role"     prefWidth="90"/>
+                    <TableColumn fx:id="colStatus"   text="Status"   prefWidth="90"/>
+                    <TableColumn fx:id="colWarnings" text="Warnings" prefWidth="80"/>
+                    <TableColumn fx:id="colActions"  text="Actions"  prefWidth="240"/>
+                </columns>
+                <placeholder>
+                    <Label text="No users found." styleClass="table-placeholder"/>
+                </placeholder>
+            </TableView>
+        </VBox>
+    </center>
+</BorderPane>

@@ -1,16 +1,18 @@
 package com.edudiscuss.controllers;
 
+import java.util.Objects;
+
 import com.edudiscuss.api.ApiClient;
 import com.edudiscuss.models.LoginResponse;
 import com.google.gson.Gson;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import com.edudiscuss.api.ApiResult;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
 import com.edudiscuss.utils.Session;
 
 public class LoginController {
@@ -18,6 +20,11 @@ public class LoginController {
     @FXML
     private TextField emailField;
 
+    @FXML private Button        loginButton;
+
+     @FXML private Label         errorLabel;
+      @FXML
+    private Button logoutButton;
     @FXML
     private PasswordField passwordField;
 
@@ -111,10 +118,30 @@ public class LoginController {
                 return;
             }
 
-            Scene scene = new Scene(loader.load());
-            scene.getStylesheets().add(
-                getClass().getResource("/css/dashboard.css").toExternalForm()
-            );
+           Scene scene = new Scene(loader.load());
+
+String css;
+
+switch (role.toLowerCase()) {
+    case "admin":
+        css = "/css/style.css";
+        break;
+
+    case "lecturer":
+    case "student":
+        css = "/css/dashboard.css";
+        break;
+
+    default:
+        css = "/css/style.css";
+}
+
+scene.getStylesheets().add(
+    Objects.requireNonNull(
+        getClass().getResource(css)
+    ).toExternalForm()
+);
+
 
             Stage stage = (Stage) emailField.getScene().getWindow();
             stage.setScene(scene);
@@ -134,4 +161,11 @@ public class LoginController {
         alert.setContentText(message);
         alert.showAndWait();
     }
+
+        private void setLoading(boolean loading) {
+        loginButton.setDisable(loading);
+        loginButton.setText(loading ? "Signing in…" : "Sign in");
+        errorLabel.setVisible(false);
+    }
 }
+

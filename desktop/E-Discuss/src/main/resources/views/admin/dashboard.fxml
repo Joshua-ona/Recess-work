@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.edudiscuss.controllers.AdminDashboardController"
+            styleClass="main-root">
+
+    <!-- ── Sidebar ── -->
+    <left>
+        <VBox styleClass="sidebar" prefWidth="210" spacing="4">
+            <padding><Insets top="24" right="0" bottom="24" left="0"/></padding>
+
+            <VBox alignment="CENTER" spacing="6" style="-fx-padding: 0 16 24 16;">
+                <Label text="💬" style="-fx-font-size:28; -fx-text-fill:white;"/>
+                <Label text="EduDiscuss" styleClass="sidebar-logo"/>
+                <Label text="Admin Panel" styleClass="sidebar-role"/>
+            </VBox>
+
+            <Button text="📊  Dashboard"   onAction="#refreshDashboard" styleClass="sidebar-btn-active"/>
+            <Button text="👥  Manage Users" onAction="#goToManageUsers"  styleClass="sidebar-btn"/>
+            <Button text="✉  Add Lecturer" onAction="#goToAddLecturer"  styleClass="sidebar-btn"/>
+
+            <Region VBox.vgrow="ALWAYS"/>
+            <Label fx:id="userNameLabel" styleClass="sidebar-username" wrapText="true"
+                   style="-fx-padding: 0 16 8 16;"/>
+            <Button fx:id="logoutButton" text="🚪  Log out" onAction="#handleLogout" styleClass="sidebar-btn-danger"/>
+        </VBox>
+    </left>
+
+    <!-- ── Main content ── -->
+    <center>
+        <VBox styleClass="main-content" spacing="0">
+            <padding><Insets top="32" right="32" bottom="32" left="32"/></padding>
+
+            <!-- Header -->
+            <Label text="Dashboard" styleClass="page-title"/>
+            <Label fx:id="statusLabel" styleClass="status-label"/>
+
+            <Region prefHeight="24"/>
+
+            <!-- Stat cards -->
+            <HBox spacing="16">
+                <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                    <Label text="Total Members" styleClass="stat-label"/>
+                    <Label fx:id="totalMembersLabel" text="—" styleClass="stat-value"/>
+                </VBox>
+                <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                    <Label text="Active Today" styleClass="stat-label"/>
+                    <Label fx:id="activeTodayLabel" text="—" styleClass="stat-value stat-green"/>
+                </VBox>
+                <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                    <Label text="Pending Approvals" styleClass="stat-label"/>
+                    <Label fx:id="pendingLabel" text="—" styleClass="stat-value stat-orange"/>
+                </VBox>
+                <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                    <Label text="Blacklisted" styleClass="stat-label"/>
+                    <Label fx:id="blacklistedLabel" text="—" styleClass="stat-value stat-red"/>
+                </VBox>
+            </HBox>
+
+            <Region prefHeight="32"/>
+
+            <!-- Quick actions -->
+            <Label text="Quick actions" styleClass="section-title"/>
+            <Region prefHeight="12"/>
+            <HBox spacing="12">
+                <Button text="👥 View all users"   onAction="#goToManageUsers" styleClass="btn-secondary"/>
+                <Button text="✉ Invite a lecturer" onAction="#goToAddLecturer" styleClass="btn-secondary"/>
+                <Button text="↺ Refresh"           onAction="#refreshDashboard" styleClass="btn-outline"/>
+            </HBox>
+        </VBox>
+    </center>
+</BorderPane>

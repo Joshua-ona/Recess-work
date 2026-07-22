@@ -1,70 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.text.*?>
 
-<StackPane xmlns:fx="http://javafx.com/fxml"
+<StackPane xmlns="http://javafx.com/javafx/21"
+           xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="com.edudiscuss.controllers.LoginController"
-           styleClass="root">
+           styleClass="login-root">
 
-    <VBox spacing="18"
-          maxWidth="430"
-          styleClass="login-card"
-          alignment="CENTER_LEFT">
+    <VBox styleClass="login-card" alignment="CENTER" spacing="0" maxWidth="400" maxHeight="480">
+        <padding><Insets top="40" right="40" bottom="40" left="40"/></padding>
 
-        <HBox spacing="12" alignment="CENTER_LEFT">
+        <!-- Logo / title -->
+        <VBox alignment="CENTER" spacing="6">
+            <Label text="💬" style="-fx-font-size: 40;"/>
+            <Label text="EduDiscuss" styleClass="login-title"/>
+            <Label text="Academic Discussion Platform" styleClass="login-subtitle"/>
+        </VBox>
 
-            <StackPane prefWidth="45"
-                       prefHeight="45"
-                       styleClass="logo-box">
-                <Label text="💬" style="-fx-font-size:18;"/>
-            </StackPane>
+        <Region prefHeight="30"/>
 
-            <VBox spacing="2">
-                <Label text="EduDiscuss"
-                       styleClass="logo-title"/>
-                <Label text="Academic discussion platform"
-                       styleClass="logo-sub"/>
+        <!-- Error banner -->
+        <Label fx:id="errorLabel" styleClass="error-banner" wrapText="true" maxWidth="320" visible="false"/>
+
+        <Region prefHeight="8"/>
+
+        <!-- Form -->
+        <VBox fx:id="formBox" spacing="14">
+            <VBox spacing="5">
+                <Label text="Email address" styleClass="form-label"/>
+                <TextField fx:id="emailField" promptText="admin@mak.ac.ug" styleClass="form-input"/>
             </VBox>
-
-        </HBox>
-
-        <VBox spacing="5">
-            <Label text="Welcome back"
-                   styleClass="title"/>
-            <Label text="Sign in to continue your discussions"
-                   styleClass="subtitle"/>
+            <VBox spacing="5">
+                <Label text="Password" styleClass="form-label"/>
+                <PasswordField fx:id="passwordField" promptText="••••••••" styleClass="form-input"/>
+            </VBox>
         </VBox>
 
-        <VBox spacing="8">
-            <Label text="Email address"/>
-            <TextField fx:id="emailField"
-                       promptText="Email"/>
-        </VBox>
+        <Region prefHeight="20"/>
 
-        <VBox spacing="8">
-            <Label text="Password"/>
-            <PasswordField fx:id="passwordField"
-                           promptText="Password"/>
-        </VBox>
+        <Button fx:id="loginButton" text="Sign in" onAction="#login"
+                styleClass="btn-primary" maxWidth="Infinity"/>
 
-        <HBox alignment="CENTER_LEFT">
-            <CheckBox text="Remember me"/>
-            <Region HBox.hgrow="ALWAYS"/>
-            <Hyperlink text="Forgot password?"/>
-        </HBox>
-
-        <Button text="Sign in"
-                onAction="#login"
-                maxWidth="Infinity"
-                styleClass="login-button"/>
-
-        <HBox alignment="CENTER">
-            <Label text="No account? "/>
-            <Hyperlink text="Create one"/>
-        </HBox>
-
+        <Region prefHeight="16"/>
+        <Label fx:id="serverLabel" styleClass="server-label"/>
     </VBox>
-
 </StackPane>
