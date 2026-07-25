@@ -88,19 +88,9 @@ public class Quiz {
 
     public StringProperty formattedStartTimeProperty() {
 
-        if (start_time == null) {
-            return new SimpleStringProperty("");
-        }
-        try {
-            java.time.format.DateTimeFormatter displayFormat =
-                    java.time.format.DateTimeFormatter.ofPattern("MMM d, yyyy h:mm a");
-            String formatted = java.time.Instant.parse(start_time)
-                    .atZone(java.time.ZoneId.of("Africa/Kampala"))
-                    .format(displayFormat);
-            return new SimpleStringProperty(formatted);
-        } catch (Exception e) {
-            return new SimpleStringProperty(start_time);
-        }
+        return new SimpleStringProperty(
+                start_time == null ? "" : start_time
+        );
 
     }
 

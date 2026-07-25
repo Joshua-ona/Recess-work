@@ -17,34 +17,16 @@ public class SidebarController {
     @FXML
     private Button dashboardButton;
 
+    @FXML
+    private Button groupsButton;
 
     @FXML
-    public void initialize() {
-
-        // Hide groups for lecturers
-        if (isLecturer() && groupsBtn != null) {
-            groupsBtn.setVisible(false);
-            groupsBtn.setManaged(false);
-        }
-    }
-
+    private Button discussionsButton;
 
     @FXML
-    public void goToDashboard() {
-
-        Navigator.goTo(
-                dashboardBtn,
-                "/views/" + roleFolder() + "/dashboard.fxml"
-        );
-    }
-
+    private Button quizzesButton;
 
     @FXML
-    public void goToGroups() {
-
-        // Lecturers don't access groups
-        if (isLecturer()) {
-            return;
     private Button notificationsButton;
 
     @FXML
@@ -168,6 +150,7 @@ public class SidebarController {
     }
     private void updateNotificationBadge() {
 
+    try {
 
         int unread = NotificationService.getUnreadCount();
 
@@ -183,4 +166,5 @@ public class SidebarController {
         notificationsButton.setText("Notifications");
 
     }
+}
 }

@@ -1,6 +1,5 @@
 package com.edudiscuss.controllers;
 
-import com.edudiscuss.services.ApiService;
 import com.edudiscuss.models.StudentDashboard;
 import com.edudiscuss.models.User;
 import com.edudiscuss.services.ApiService;
@@ -20,7 +19,7 @@ public class StudentQuizzesController {
     @FXML private TableColumn<Quiz, String> titleColumn;
     @FXML private TableColumn<Quiz, String> startTimeColumn;
     @FXML private TableColumn<Quiz, String> durationColumn;
-    @FXML private TableColumn<Quiz, Void> actionColumn;
+    @FXML private Button startQuizBtn;
     @FXML private Label availableQuizzesLabel;
 
     private ObservableList<Quiz> quizList = FXCollections.observableArrayList();
@@ -29,8 +28,8 @@ public class StudentQuizzesController {
     @FXML
     public void initialize() {
         setupTableColumns();
-        setupActionColumn();
         loadQuizzes();
+        setupTableSelection();
     }
 
     private void setupTableColumns() {
@@ -39,98 +38,67 @@ public class StudentQuizzesController {
         durationColumn.setCellValueFactory(cellData -> cellData.getValue().durationProperty());
     }
 
-    private void setupActionColumn() {
-        actionColumn.setCellFactory(col -> new TableCell<>() {
-            private final Button startBtn = new Button("Start Quiz");
-
-            {
-                startBtn.setStyle(
-                        "-fx-background-color: #2563eb;" +
-                        "-fx-text-fill: white;" +
-                        "-fx-font-weight: bold;"
-                );
-                startBtn.setOnAction(e -> {
-                    Quiz quiz = getTableView().getItems().get(getIndex());
-                    loadQuizAttempt(quiz);
-                });
-            }
-
-            @Override
-            protected void updateItem(Void item, boolean empty) {
-                super.updateItem(item, empty);
-                setGraphic(empty ? null : startBtn);
-            }
-        });
-    }
-
     private void loadQuizzes(){
 
-        try {
+    try {
 
-            List<Quiz> quizzes = apiService.getQuizzes();
+        List<Quiz> quizzes =
+                apiService.getQuizzes();
 
-            quizList.setAll(quizzes);
 
-            quizTable.setItems(quizList);
+        quizList.setAll(quizzes);
 
-            availableQuizzesLabel.setText(
-                    quizList.size() + " quizzes published"
-            );
+        quizTable.setItems(quizList);
 
-        } catch(Exception e){
 
-            e.printStackTrace();
+        availableQuizzesLabel.setText(
+                quizList.size() + " quizzes published"
+        );
 
-            showAlert(
-                    "Error",
-                    "Failed to load quizzes"
-            );
 
-        }
+    } catch(Exception e){
+
+        e.printStackTrace();
+
+        showAlert(
+                "Error",
+                "Failed to load quizzes"
+        );
 
     }
 
-    private void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-
-    private void loadQuizAttempt(Quiz quiz) {
-        try {
-            var response = com.edudiscuss.api.QuizApi.start(quiz.getQuizId());
-
-            if (!response.isOk()) {
-                String serverMessage = extractMessage(response.body);
-                showAlert("Error", serverMessage != null ? serverMessage : "Couldn't start this quiz. Please try again.");
-                return;
-            }
-
-            com.google.gson.Gson gson = new com.google.gson.Gson();
-            com.edudiscuss.models.QuizStartResponse data =
-                    gson.fromJson(response.body, com.edudiscuss.models.QuizStartResponse.class);
-
-            QuizAttemptController controller = com.edudiscuss.utils.Navigator.goToWithController(
-                    quizTable, "/views/student/quiz.fxml");
-
-            if (controller != null) {
-                controller.loadAttempt(quiz.getQuizId(), data);
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            showAlert("Error", "Network error starting quiz.");
-        }
-    }
-
-    private String extractMessage(String responseBody) {
-        try {
-            com.google.gson.JsonObject obj = com.google.gson.JsonParser.parseString(responseBody).getAsJsonObject();
-            return obj.has("message") ? obj.get("message").getAsString() : null;
-        } catch (Exception e) {
-            return null;
-        }
-    }
 }
+
+    private void setupTableSelection() {
+        quizTable.getSelectionModel().selectedItemProperty().addListener(
+            (obs, oldSelection, newSelection) -> {
+                startQuizBtn.setDisable(newSelection == null);
+            }
+        );
+    }
+
+    @FXML
+    private void startQuiz() {
+        Quiz selected = quizTable.getSelectionModel().getSelectedItem();
+        if (selected != null) {
+            // Navigate to quiz taking view
+            loadQuizAttempt(selected);
+        }
+    }
+    private void showAlert(String title, String message) {
+    Alert alert = new Alert(Alert.AlertType.ERROR);
+    alert.setTitle(title);
+    alert.setHeaderText(null);
+    alert.setContentText(message);
+    alert.showAndWait();
+}
+
+private void loadQuizAttempt(Quiz quiz) {
+    System.out.println("Starting quiz: " + quiz.getTitle());
+
+    // later:
+    // Navigator.goTo(startQuizBtn,
+    //      "/views/student/quiz-attempt.fxml");
+}
+}
+

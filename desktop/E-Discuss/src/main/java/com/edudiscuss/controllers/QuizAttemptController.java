@@ -38,16 +38,15 @@ public class QuizAttemptController {
 
     private int currentPage = 1;
     private int totalPages = 1;
-    private double remainingSeconds; // Changed from int to double
+    private int remainingSeconds;
     private Timeline timer;
-
     private boolean submitted = false;
 
     /** Called by QuizListController right after a fresh /start call. */
     public void loadAttempt(int quizId, QuizStartResponse data) {
         this.quizId = quizId;
         this.allQuestions = data.getQuestions();
-        this.remainingSeconds = data.getRemainingSeconds(); // Now accepts double
+        this.remainingSeconds = data.getRemainingSeconds();
         this.totalPages = (int) Math.ceil(allQuestions.size() / (double) PER_PAGE);
 
         if (data.getSavedAnswers() != null) {
@@ -65,7 +64,7 @@ public class QuizAttemptController {
      * navigate away, etc). Re-fetches the question set via /start, which
      * is safe to call again — it just resumes the existing progress row.
      */
-    public void resumeLockedQuiz(int quizId, double remainingSeconds) {
+    public void resumeLockedQuiz(int quizId, int remainingSeconds) {
         try {
             var response = QuizApi.start(quizId);
             if (response.isOk()) {
@@ -95,7 +94,7 @@ public class QuizAttemptController {
     }
 
     private void renderTimer() {
-        int s = (int) Math.ceil(Math.max(0, remainingSeconds)); // Round up for display
+        int s = Math.max(0, remainingSeconds);
         timerLabel.setText(String.format("%02d:%02d:%02d", s / 3600, (s % 3600) / 60, s % 60));
         timerLabel.getStyleClass().removeAll("timer-low");
         if (s <= 300) {
@@ -178,37 +177,6 @@ public class QuizAttemptController {
         }
     }
 
-    /**
-     * Handles the back button click - navigates back to the quizzes list
-     * with confirmation if the quiz is still in progress.
-     */
-    @FXML
-    public void handleBack() {
-        // If quiz hasn't been submitted yet and there's time remaining
-        if (!submitted && remainingSeconds > 0) {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Exit Quiz");
-            alert.setHeaderText("Are you sure you want to exit?");
-            alert.setContentText("Your progress will not be saved if you exit now. The quiz will still be available to resume until the time runs out.");
-            
-            ButtonType result = alert.showAndWait().orElse(ButtonType.CANCEL);
-            if (result == ButtonType.OK) {
-                // Stop the timer
-                if (timer != null) {
-                    timer.stop();
-                }
-                // Navigate back to quizzes list
-                Navigator.goTo(questionsBox, "/views/student/quizzes.fxml");
-            }
-        } else {
-            // Quiz is already submitted or time is up - just go back
-            if (timer != null) {
-                timer.stop();
-            }
-            Navigator.goTo(questionsBox, "/views/student/quizzes.fxml");
-        }
-    }
-
     /** Fire-and-forget autosave — same role as the web app's /answer POST on each page. */
     private void autosave() {
         try {
@@ -233,7 +201,7 @@ public class QuizAttemptController {
         try {
             var response = QuizApi.submit(quizId, answers, autoSubmitted);
             QuizResultController controller = Navigator.goToWithController(
-                    questionsBox, "/views/student/result.fxml");
+                    questionsBox, "/views/student/quiz-result.fxml");
             if (controller != null) {
                 controller.loadResults(quizId);
             }

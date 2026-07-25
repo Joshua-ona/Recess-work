@@ -17,15 +17,6 @@ class QuizSubmission extends Model
         'submitted_at',
     ];
 
-    protected $fillable = [
-        'quiz_id',
-        'user_id',
-        'score',
-        'review_answers',
-        'auto_submitted',
-        'submitted_at',
-    ];
-
     protected $casts = [
         'review_answers' => 'array',
         'auto_submitted' => 'boolean',

@@ -29,12 +29,12 @@ class AuthController extends Controller
             'message'=>'Login successful',
             'token'=>$token,
             'user'=>[
-                'id'=>$user->id,
-                'first_name'=>$user->first_name,
-                'last_name'=>$user->last_name,
-                'email'=>$user->email,
-                'role'=>$user->role
-            ]
+    'id'=>$user->id,
+    'first_name'=>$user->first_name,
+    'last_name'=>$user->last_name,
+    'email'=>$user->email,
+    'role'=>$user->role
+]
         ]);
     }
 }

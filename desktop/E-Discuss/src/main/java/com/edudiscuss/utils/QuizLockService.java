@@ -37,7 +37,6 @@ public class QuizLockService {
                 QuizAttemptController controller = Navigator.goToWithController(
                         fromNode, "/views/student/quiz-attempt.fxml");
                 if (controller != null) {
-                    // Now passing the double value to resumeLockedQuiz
                     controller.resumeLockedQuiz(active.getQuizId(), active.getRemainingSeconds());
                 }
                 return true;

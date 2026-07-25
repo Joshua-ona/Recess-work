@@ -45,6 +45,16 @@
 
             </TableView>
 
+            <HBox alignment="CENTER_RIGHT">
+                <Button fx:id="startQuizBtn"
+                        text="Start Quiz"
+                        disable="true"
+                        onAction="#startQuiz"
+                        style="-fx-background-color: #2563eb;
+                               -fx-text-fill: white;
+                               -fx-font-weight: bold;"/>
+            </HBox>
+
         </VBox>
     </center>
 
