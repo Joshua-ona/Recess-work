@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.edudiscuss.controllers.StudentQuizzesController">
+
+    <!-- Sidebar -->
+    <left>
+        <fx:include source="../components/sidebar.fxml"/>
+    </left>
+
+    <!-- Main Content -->
+    <center>
+        <VBox spacing="20" style="-fx-padding: 25;">
+
+            <Label text="Available Quizzes"
+                   style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+
+            <Label fx:id="availableQuizzesLabel"
+                   text="0 quizzes published"
+                   style="-fx-font-size: 14px;"/>
+
+            <TableView fx:id="quizTable"
+                       VBox.vgrow="ALWAYS">
+
+                <columns>
+
+                    <TableColumn fx:id="titleColumn"
+                                 text="Quiz Title"
+                                 prefWidth="300"/>
+
+                    <TableColumn fx:id="startTimeColumn"
+                                 text="Start Time"
+                                 prefWidth="250"/>
+
+                    <TableColumn fx:id="durationColumn"
+                                 text="Duration"
+                                 prefWidth="150"/>
+
+                </columns>
+
+            </TableView>
+
+            <HBox alignment="CENTER_RIGHT">
+                <Button fx:id="startQuizBtn"
+                        text="Start Quiz"
+                        disable="true"
+                        onAction="#startQuiz"
+                        style="-fx-background-color: #2563eb;
+                               -fx-text-fill: white;
+                               -fx-font-weight: bold;"/>
+            </HBox>
+
+        </VBox>
+    </center>
+
+</BorderPane>

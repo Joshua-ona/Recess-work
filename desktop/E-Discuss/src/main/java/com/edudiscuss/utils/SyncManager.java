@@ -2,6 +2,7 @@ package com.edudiscuss.utils;
 
 import com.edudiscuss.api.ApiClient;
 import com.edudiscuss.database.DatabaseHelper;
+import com.edudiscuss.sync.MessageSynchronizer;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -9,6 +10,7 @@ import java.sql.ResultSet;
 
 public class SyncManager {
     private DatabaseHelper db;
+    private final MessageSynchronizer messageSynchronizer = new MessageSynchronizer();
 
     public SyncManager() {
         db = DatabaseHelper.getInstance();
@@ -23,6 +25,7 @@ public class SyncManager {
 
         System.out.println("🔄 Starting sync...");
         syncReplies();
+        messageSynchronizer.sync();
         System.out.println("✅ Sync complete!");
     }
 

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.edudiscuss.controllers.LecturerQuizEditController">
+
+    <left>
+        <fx:include source="../components/sidebar.fxml"/>
+    </left>
+
+    <center>
+        <VBox spacing="16" style="-fx-padding:24; -fx-max-width:520;" maxWidth="520">
+
+            <Label fx:id="titleLabel" styleClass="main-title"/>
+            <Label fx:id="statusLabel" styleClass="main-sub"/>
+
+            <Label fx:id="messageLabel" styleClass="error-label" visible="false" managed="false"/>
+
+            <VBox spacing="4">
+                <Label text="Title" styleClass="form-label"/>
+                <TextField fx:id="titleField"/>
+            </VBox>
+
+            <VBox spacing="4">
+                <Label text="Target category" styleClass="form-label"/>
+                <ComboBox fx:id="categoryCombo" editable="true" maxWidth="Infinity"/>
+            </VBox>
+
+            <HBox spacing="16">
+                <VBox spacing="4" HBox.hgrow="ALWAYS">
+                    <Label text="Start date/time" styleClass="form-label"/>
+                    <DatePicker fx:id="startDatePicker" maxWidth="Infinity"/>
+                </VBox>
+                <VBox spacing="4">
+                    <Label text="Hour" styleClass="form-label"/>
+                    <Spinner fx:id="startHourSpinner" prefWidth="80"/>
+                </VBox>
+                <VBox spacing="4">
+                    <Label text="Min" styleClass="form-label"/>
+                    <Spinner fx:id="startMinuteSpinner" prefWidth="80"/>
+                </VBox>
+            </HBox>
+
+            <VBox spacing="4">
+                <Label text="Duration (minutes)" styleClass="form-label"/>
+                <Spinner fx:id="durationSpinner" editable="true"/>
+            </VBox>
+
+            <Button text="Save changes" styleClass="btn-primary" onAction="#saveChanges"/>
+
+            <Separator/>
+
+            <Label text="Questions" styleClass="form-label"/>
+            <Label fx:id="questionCountLabel" styleClass="main-sub"/>
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Button text="Choose CSV…" onAction="#chooseCsv"/>
+                <Label fx:id="csvFileLabel" styleClass="main-sub"/>
+            </HBox>
+            <Button fx:id="uploadBtn" text="Upload questions" onAction="#uploadCsv" disable="true"/>
+
+            <Separator/>
+
+            <Button fx:id="publishBtn" text="Publish quiz" styleClass="btn-primary" onAction="#publish"/>
+
+        </VBox>
+    </center>
+
+</BorderPane>

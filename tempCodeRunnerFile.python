@@ -1,0 +1,10 @@
+import pandas as pd
+import os
+
+print(os.getcwd())
+
+
+df = pd.read_csv("app/recommendation_engine/stackoverflow_combined.csv")
+
+print(df.columns)
+print(df.head())

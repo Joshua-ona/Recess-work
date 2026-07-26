@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.edudiscuss.controllers.GroupsController">
+
+    <left>
+        <fx:include source="../components/sidebar.fxml"/>
+    </left>
+
+    <center>
+        <VBox spacing="16" style="-fx-padding:20;">
+
+            <Label text="Discussion Groups" style="-fx-font-size:22; -fx-font-weight:bold;"/>
+
+            <HBox spacing="10">
+                <TextField fx:id="searchField" promptText="Search groups..." onKeyReleased="#filterGroups" HBox.hgrow="ALWAYS"/>
+                <Button text="🔄 Sync" onAction="#handleSync"/>
+            </HBox>
+
+            <Label text="My Groups" style="-fx-font-size:16; -fx-font-weight:bold;"/>
+            <ListView fx:id="myGroupsList" prefHeight="200"/>
+
+            <Label text="Available Groups" style="-fx-font-size:16; -fx-font-weight:bold;"/>
+            <ListView fx:id="availableGroupsList" prefHeight="200"/>
+
+            <HBox spacing="10">
+                <Button text="➕ Create Group" onAction="#handleCreateGroup"
+                        style="-fx-background-color:#4f46e5; -fx-text-fill:white; -fx-padding:8 16;"/>
+                <Button text="✅ Join Selected Group" onAction="#joinGroup"
+                        style="-fx-background-color:#059669; -fx-text-fill:white; -fx-padding:8 16;"/>
+            </HBox>
+
+        </VBox>
+    </center>
+
+</BorderPane>

@@ -25,9 +25,10 @@ public function index()
 
     // 1. BROWSE ALL: Show ALL approved groups. No filter
     $browseGroups = Group::where('status', 'approved')
-        ->distinct()
-        ->orderBy('name')
-        ->get();
+    ->withCount('discussions')
+    ->distinct()
+    ->orderBy('name')
+    ->get();
 
     $discoverGroups = $this->groupService->getDiscoverableGroupsFor($user);
 
@@ -35,9 +36,19 @@ public function index()
     $response = Http::get('http://127.0.0.1:5001/recommendations/' . $user->id);
     $recommendations = $response->successful() ? $response->json() : [];
 
-    // 3. NEW: Recommended Groups from Python - this already excludes joined groups
+    // 3. Recommended Groups from Python
     $responseGroups = Http::get('http://127.0.0.1:5001/recommend-groups/' . $user->id);
-    $recommendedGroups = $responseGroups->successful() ? $responseGroups->json() : [];
+    $recommendedGroups = [];
+
+    if ($responseGroups->successful()) {
+        $data = $responseGroups->json();
+        $recommendedGroups = $data['recommendations'] ?? [];
+
+        foreach ($recommendedGroups as &$group) {
+            $groupModel = Group::find($group['id']);
+            $group['discussions_count'] = $groupModel ? $groupModel->discussions()->count() : 0;
+        }
+    }
 
     $userScore = UserScore::where('user_id', $user->id)->first();
     $score = $userScore ? round($userScore->score) : 0;
@@ -46,50 +57,28 @@ public function index()
     ->whereNull('read_at')
     ->count();
 
+    // Stat counts
+    $postCount = \App\Models\Discussion::where('user_id', $user->id)->count(); // Adjust model if your posts are named differently
+    $quizCount = 0; // Update with your actual quiz count logic if available
+    $groupCount = count($myGroupIds);
+
     return view('student.dashboard', [
         'myGroups' => $myGroups,
-        'browseGroups' => $browseGroups, // now shows ALL
+        'browseGroups' => $browseGroups,
         'joinedGroups' => $myGroupIds,
-        'recommendations' =>  $recommendations,
-        'recommendedGroups' => $recommendedGroups, // AI picks, not joined
-        'discoverGroups' =>  $discoverGroups, 
+        'recommendations' => $recommendations,
+        'recommendedGroups' => $recommendedGroups,
+        'discoverGroups' => $discoverGroups,
         'score' => $score,
         'user' => $user,
+        'postCount' => $postCount,
+        'quizCount' => $quizCount,
+        'groupCount' => $groupCount,
         'activeGroup' => null,
         'admin' => null,
     ]);
 }
 
-    //  public function show(Group $group)
-    //  {
-    //     $user = auth()->user();
-    //     //$this->authorize('view',$group);
-
-    //     $admin = $group->admin;
-    //     $members = $group->users()->where('user_id', '!=', $admin->id)->get();
-    //     $messages = $group->messages()->with('user')->latest()->get();
-
-    //     $browseGroups = Group::where('status','approved')
-    //                         ->whereNotIn('id',$user->groups()->pluck('groups.id'))
-    //                         ->latest('id')
-    //                         ->get();
-
-    //     return view('student.dashboard', [
-    //         'activeGroup' => $group,
-    //         'admin' => $admin,
-    //         'members' => $members,
-    //         'messages' => $messages,
-    //         'role' => 'student',
-    //         'browseGroups' => $browseGroups,
-    //         'user' => $user,
-    //         'discover' => $this->groupService->getDiscoverableGroupsFor($user),
-    //         'myGroups' => $this->groupService->getMyGroups($user),
-    //         'enrolledCourses' => collect(),
-    //         'unreadCount' => 0,
-    //         'notifCount' => 0,
-
-    //     ]);
-    // }
 
 
     public function show(Group $group)
@@ -109,7 +98,22 @@ public function index()
     $score = $userScore ? round($userScore->score) : 0;
     
     $responseGroups = Http::get('http://127.0.0.1:5001/recommend-groups/' . $user->id);
-    $recommendedGroups = $responseGroups->successful() ? $responseGroups->json() : [];
+    $recommendedGroups = [];
+
+
+    if ($responseGroups->successful()) {
+    $data = $responseGroups->json();
+    $recommendedGroups = $data['recommendations'] ?? [];
+
+
+    foreach ($recommendedGroups as &$group) {
+        $groupModel = Group::find($group['id']);
+
+        $group['discussions_count'] = $groupModel
+            ? $groupModel->discussions()->count()
+            : 0;
+    }
+}
 
 
     return view('student.dashboard', [

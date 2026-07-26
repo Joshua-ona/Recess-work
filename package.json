@@ -5,7 +5,7 @@
     "scripts": {
         "build": "vite build",
         "dev": "vite",
-        "dev:all": "concurrently \"php artisan serve --port=8000\" \"cd app/recommendation_engine && py api.py\""
+        "dev:all": "concurrently \"php artisan serve --port=8000\" \"cd app/recommendation_engine/deployment && py api.py\""
     },
     "devDependencies": {
         "@laravel/echo-vue": "^2.3.7",

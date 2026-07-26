@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.edudiscuss.controllers.QuizListController">
+
+    <left>
+        <fx:include source="../components/sidebar.fxml"/>
+    </left>
+
+    <center>
+        <VBox spacing="16" style="-fx-padding:24;">
+
+            <HBox spacing="12" alignment="CENTER_LEFT">
+                <VBox HBox.hgrow="ALWAYS">
+                    <Label text="My Quizzes" styleClass="main-title"/>
+                    <Label fx:id="subLabel" styleClass="main-sub"/>
+                </VBox>
+                <Button text="+ Create Quiz" styleClass="btn-primary" onAction="#goToCreate"/>
+            </HBox>
+
+            <Label fx:id="errorLabel" styleClass="error-label" visible="false" managed="false"/>
+
+            <TableView fx:id="quizTable" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="titleCol" text="Title" prefWidth="220"/>
+                    <TableColumn fx:id="startCol" text="Start time" prefWidth="170"/>
+                    <TableColumn fx:id="durationCol" text="Duration" prefWidth="90"/>
+                    <TableColumn fx:id="statusCol" text="Status" prefWidth="110"/>
+                    <TableColumn fx:id="actionCol" text="" prefWidth="180"/>
+                </columns>
+            </TableView>
+
+        </VBox>
+    </center>
+
+</BorderPane>
