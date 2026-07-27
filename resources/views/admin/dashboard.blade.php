@@ -1,285 +1,421 @@
-@extends('layouts.admin')
+@extends('layouts.app')
 @section('title', 'Admin dashboard')
-@section('content')
-<<<<<<< HEAD
-<div class="flex items-center justify-between border-b pb-3 mb-6">
-    <div class="flex items-center gap-3">
-        <span class="font-medium text-lg">Admin dashboard</span>
-        <span class="text-sm text-gray-500">{{ auth()->user()->full_name }}</span>
-=======
+@section('body')
 
-    <div class="flex items-center justify-between border-b pb-3 mb-6">
-        <div class="flex items-center gap-3">
-            <span class="font-medium text-lg">Admin dashboard</span>
-            <span class="text-sm text-gray-500">{{ auth()->user()->full_name }}</span>
-        </div>
-        <a href="{{ route('admin.Users.index') }}" class="text-sm border rounded px-3 py-1.5 hover:bg-gray-50">
-            Manage all users
-        </a>
->>>>>>> 44d2470e921153fee253e0c93f4c5d1009eeb50f
-    </div>
-
-    {{--
-        <a href="{{ route('admin.Users.index') }}" class="text-sm border rounded-lg-lg px-3 py-1.5 hover:bg-gray-50">
-    Manage all users
-    </a>
-    --}}
-</div>
-<div class="grid grid-cols-4 gap-4 mb-8">
-    <div class="bg-gray-50 rounded-lg-lg p-4">
-        <p class="text-sm text-gray-500 mb-1">Total members</p>
-        <p class="text-2xl font-semibold">{{ $totalMembers }}</p>
-    </div>
-    <div class="bg-gray-50 rounded-lg-lg p-4">
-        <p class="text-sm text-gray-500 mb-1">Active today</p>
-        <p class="text-2xl font-semibold">{{ $activeToday }}</p>
-    </div>
-    <div class="bg-gray-50 rounded-lg-lg p-4">
-        <p class="text-sm text-gray-500 mb-1">Pending approvals</p>
-
-        {{--
-            <p class="text-2xl font-semibold text-amber-600">
-                {{ $pendingApprovals->count() + $pendingGroups->count() }}
-        </p>
-
-        <p class="text-xs text-gray-500 mt-1">
-            {{ $pendingApprovals->count() }}
-            users, {{ $pendingGroups->count() }} groups
-        </p>
-        --}}
-    </div>
-    <div class="bg-gray-50 rounded-lg-lg p-4">
-        <p class="text-sm text-gray-500 mb-1">Blacklisted</p>
-        <p class="text-2xl font-semibold text-red-600">{{ $blacklistedCount }}</p>
-    </div>
-</div>
-<div class="grid grid-cols-3 gap-6">
-    <div class="col-span-2 space-y-6">
-        <div class="bg-white border rounded-lg-lg p-5">
-            <p class="font-semibold mb-3">Top
-                contributors this month</p>
-            <div class="space-y-2">
-                @foreach ($topContributors as $c)
-                <div>
-                    <div class="flex justify-between text-sm mb-1">
-                        <span>{{ $c['name'] }}</ span>
-                            <span class="text-gray-500">{{ $c['posts'] }}
-                                posts</span>
-                    </div>
-                    <div class="h-1.5 bg-gray-50 rounded-lg-lg">
-                        <div class="h-1.5 bg-green-600 rounded-lg" style="width: {{ min(100, $c['posts'] * 2.5) }}%">
-                        </div>
-                    </div>
-                </div>
-                @endforeach
-            </div>
-            <p class="text-xs text-gray-400 mt-3">Placeholder data — wire up once the
-                forum/post tables exist.</p>
-        </div>
-        <div class="bg-white border rounded-lg-lg p-5">
-            <p class="font-medium mb-3">Flagged content</p>
-            <div class="divide-y">
-                @forelse ($flaggedContent as $f)
-                <div class="flex justify-between items-center py-2">
-                    <div>
-                        <p class="text-sm">{{ $f['title'] }}</p>
-                        <p class="text-xs text-gray-500">{{ $f['meta'] }}</p>
-                    </div>
-                    <button class="text-xs border rounded-lg px-2 py-1">Review</button>
-                </div>
-                @empty
-                <p class="text-sm text-gray-500 py-2">Nothing flagged right
-                    now.</p>
-                @endforelse
-            </div>
-        </div>
-        <div class="bg-white border rounded-lg-lg p-5">
-            <p class="font-medium mb-3">Upcoming quiz configurations</p>
-            <table class="w-full text-sm">
-                <tr class="text-gray-500">
-                    <td class="py-1">Quiz</td>
-                    <td>Category</td>
-                    <td class="text-right">Opens</ td>
-                </tr>
-                @foreach ($upcomingQuizzes as $q)
-                <tr class="border-t">
-                    <td class="py-2">{{ $q['name'] }}</td>
-                    <td>{{ $q['category'] }}</td>
-                    <td class="text-right">{{ $q['opens'] }}</td>
-                </tr>
-                @endforeach
-            </table>
-        </div>
-    </div>
-    <div class="space-y-6">
-        <div class="bg-white border rounded-lg-lg p-5">
-            <p class="font-medium mb-3">Pending member approvals</p>
-            <div class="space-y-3">
-                @forelse ($pendingApprovals as $user)
-                <div class="flex items-center justify-between">
-                    <span class="text-sm">{{ $user->full_name }}</ span>
-                        <div class="flex gap-1">
-                            <form method="POST" action="{{ route('admin.Users.approve', $user) }}">
-                                @csrf
-                                <button class="text-green-600 text-xs border rounded-lg px-2 py-1">Approve</button>
-                            </form>
-                            <form method="POST" action="{{ route('admin.Users.decline', $user) }}">
-                                @csrf
-                                <button class="text-red-600 text-xs border rounded-lg px-2 py-1">Decline</button>
-                            </form>
-                        </div>
-                </div>
-                @empty
-                <p class="text-sm text-gray-500">No pending approvals.</p>
-                @endforelse
+<div class="dash-wrap">
+    @include('layouts.sidebar', [
+    'role' => 'system_admin',
+    'user' => auth()->user(),
+    'userCount' => $totalMembers ?? 0,
+    ])
+    <div class="dash-main">
+        <div class="dash-header">
+            <div>
+                <div class="dash-header-title">Admin dashboard</div>
+                <div class="dash-header-sub">{{ auth()->user()->full_name }}</div>
             </div>
         </div>
 
-        <div class="bg-white border rounded-lg p-5">
-            <div class="flex items-center justify-between mb-3">
-                {{--
-                <p class="font-medium">Pending group approvals</p>
-                 <a href="{{ route('admin.groups.index') }}" class="text-xs text-blue-600 hover:underline">View
-                all</a>
-                --}}
-            </div>
-<<<<<<< HEAD
-            <div class="space-y-3">
-                @forelse($groups as $g)
-                <div class="border-b py-3 flex justify-between items-center">
-                    <div>
-                        <p class="font-semibold">{{ $g->name }}</p>
-                        <p class="text-sm text-gray-500">By: {{ $g->admin->name ?? 'Unknown' }} |{{ $g->description }}
-                        </p>
-                    </div>
-                    <div class="flex gap-2">
-                        <form method="POST" action="{{ route('admin.groups.approve',$g) }}">
-                            @csrf
-                            <button class="bg-green-600text-white px-3 py-1 rounded text-sm">Approve</button>
-                        </form>
-                        <form method="POST" action="{{ route('admin.groups.reject',$g) }}">
-                            @csrf
-                            <button class="bg-red-600text-white px-3 py-1 roundedtext-sm">Reject</button>
-                        </form>
-                    </div>
-=======
+        <div class="dash-body" style="flex-direction:column;">
 
-            <div class="bg-white border rounded-lg p-5">
-                <p class="font-medium mb-3">Inactivity warnings</p>
-                <div class="space-y-1">
-                    @forelse ($warnedMembers as $user)
-                        <div class="py-2 border-t first:border-t-0">
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="text-sm">{{ $user->full_name }}</span>
-                                @if ($user->status === 'blacklisted')
-                                    <span class="text-xs bg-red-50 text-red-700 px-2 py-0.5 rounded">Blacklisted</span>
-                                @else
-                                    <span class="text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded">Warning {{ $user->warning_count }} of 2</span>
-                                @endif
-                            </div>
-                            <div class="flex flex-col gap-2">
-                                @if ($user->status === 'blacklisted')
-                                    <form method="POST" action="{{ route('admin.Users.unblacklist', $user) }}" class="flex justify-end">
-                                        @csrf
-                                        <button class="text-xs border rounded px-2 py-1">Reinstate</button>
-                                    </form>
-                                @else
-                                    <details>
-                                        <summary class="text-xs border rounded px-2 py-1 inline-block cursor-pointer select-none">Warn</summary>
-                                        <form method="POST" action="{{ route('admin.Users.warn', $user) }}" class="mt-2 space-y-1">
-                                            @csrf
-                                            <textarea name="message" rows="2" required placeholder="Describe the rule violation…"
-                                                      class="w-full border rounded px-2 py-1 text-xs"></textarea>
-                                            <button class="text-xs border rounded px-2 py-1 w-full">Send warning</button>
-                                        </form>
-                                    </details>
-                                    <div class="flex gap-1 justify-end">
-                                        <form method="POST" action="{{ route('admin.Users.logout', $user) }}">
-                                            @csrf
-                                            <button class="text-xs border rounded px-2 py-1">Log out</button>
-                                        </form>
-                                        <form method="POST" action="{{ route('admin.Users.blacklist', $user) }}"
-                                              onsubmit="return confirm('Blacklist {{ $user->full_name }} immediately?');">
-                                            @csrf
-                                            <button class="text-xs border rounded px-2 py-1 text-red-600">Blacklist</button>
-                                        </form>
-                                    </div>
-                                @endif
-                            </div>
-                        </div>
-                    @empty
-                        <p class="text-sm text-gray-500 py-2">No members currently flagged for inactivity.</p>
-                    @endforelse
->>>>>>> 44d2470e921153fee253e0c93f4c5d1009eeb50f
+            @if (session('status'))
+            <div class="alert alert-success">{{ session('status') }}</div>
+            @endif
+
+            {{-- Stat cards --}}
+            <div class="stat-grid">
+                <div class="stat-card">
+                    <div class="stat-label">
+                        <span class="stat-icon" style="background:var(--purple-50);">
+                            <i class="ti ti-users" style="color:var(--purple-600)" aria-hidden="true"></i>
+                        </span>
+                        Total members
+                    </div>
+                    <div class="stat-value">{{ $totalMembers }}</div>
                 </div>
-                @empty
-                <p class="text-gray-500">No pending groups.</p>
-                @endforelse
-            </div>
-        </div>
-    </div>
-    <div class="bg-white border rounded-lg p-5">
-        <p class="font-medium mb-3">Inactivity warnings</p>
-        <div class="space-y-1">
-            @forelse ($warnedMembers as $user)
-            <div class="py-2 border-t first:border-t-0">
-                <div class="flex items-center justify-between mb-2">
-                    <span class="text-sm">{{ $user->full_name }}</ span>
-                        @if ($user->status ==='blacklisted')
-                        <span class="text-xs bg-red-50 text-red-700 px-2 py-0.5 rounded">Blacklisted</span>
-                        @else
-                        <span class="text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded">Warning
-                            {{ $user->warning_count }} of 2</span>
-                        @endif
-                </div>
-                <div class="flex flex-col gap-2">
-                    @if ($user->status ==='blacklisted')
-                    <form method="POST" action="{{ route('admin.Users.unblacklist',$user) }}" class="flex justify-end">
-                        @csrf
-                        <button class="text-xs border rounded px-2py-1">Reinstate</button>
-                    </form>
-                    @else
-                    <details>
-                        <summary class="text-xs border rounded px-2 py-1 inline-block cursor-pointer select-none">
-                            Warn
-                        </summary>
-                        <form method="POST" action="{{ route('admin.Users.warn',$user) }}" class="mt-2 space-y-1">
-                            @csrf
-                            <textarea name="message" rows="2" required placeholder="Describe the rule violation…"
-                                class="w-full border rounded px-2 py-1 text-xs"></textarea>
-                            <button class="text-xs border rounded px-2 py-1 w-full">Send warning</button>
-                        </form>
-                    </details>
-                    <div class="flex gap-1 justify-end">
-                        <form method="POST" action="{{ route('admin.Users.logout',$user) }}">
-                            @csrf
-                            <button class="text-xs border rounded px-2 py-1">Log out</button>
-                        </form>
-                        <form method="POST" action="{{ route('admin.Users.blacklist',$user) }}"
-                            onsubmit="return confirm('Blacklist {{ $user->full_name }}immediately?');">
-                            @csrf
-                            <button class="text-xs border rounded px-2 py-1 text-red-600">Blacklist</button>
-                        </form>
+                <div class="stat-card">
+                    <div class="stat-label">
+                        <span class="stat-icon" style="background:var(--teal-50);">
+                            <i class="ti ti-activity" style="color:var(--teal-400)" aria-hidden="true"></i>
+                        </span>
+                        Active today
+                    </div>
+                    <div class="stat-value">{{ $active_today }}</div>
+                    @if($active_change_pct !== null)
+                    <div class="stat-change {{ $active_change_pct >= 0 ? 'text-pos' : 'text-neg' }}">
+                        {{ $active_change_pct >= 0 ? '▲' : '▼' }} {{ abs($active_change_pct) }}% vs yesterday
                     </div>
                     @endif
                 </div>
+                <div class="stat-card">
+                    <div class="stat-label">
+                        <span class="stat-icon" style="background:var(--amber-50);">
+                            <i class="ti ti-hourglass" style="color:var(--amber-400)" aria-hidden="true"></i>
+                        </span>
+                        Pending approvals
+                    </div>
+                    <div class="stat-value" style="color:var(--amber-600);">{{ $pendingApprovals->count() }}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">
+                        <span class="stat-icon" style="background:var(--red-50);">
+                            <i class="ti ti-ban" style="color:var(--red-400)" aria-hidden="true"></i>
+                        </span>
+                        Blacklisted
+                    </div>
+                    <div class="stat-value" style="color:var(--red-600);">{{ $blacklistedCount }}</div>
+                </div>
             </div>
-            @empty
-            <p class="text-sm text-gray-500 py-2">No members currently flagged for inactivity.</p>
-            @endforelse
+
+            {{-- ============ ANALYTICS ============ --}}
+            <div class="panel-grid" style="margin-bottom:1rem;">
+                <div class="panel">
+                    <div class="panel-head">
+                        <span class="panel-title">Daily active users</span>
+                        <a href="{{ route('admin.analytics') }}" class="panel-action">Full analytics →</a>
+                    </div>
+                    <div class="panel-body">
+                        <canvas id="dashActiveChart" height="180"></canvas>
+                    </div>
+                </div>
+                <div class="panel">
+                    <div class="panel-head">
+                        <span class="panel-title">Content activity</span>
+                        <span class="panel-action"
+                            style="color:var(--muted); cursor:default; text-decoration:none;">posts, replies, quizzes,
+                            messages</span>
+                    </div>
+                    <div class="panel-body">
+                        <canvas id="dashContentChart" height="180"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-grid" style="grid-template-columns: 1fr 1fr 1fr; margin-bottom:1.5rem;">
+                <div class="panel">
+                    <div class="panel-head"><span class="panel-title">Users by role</span></div>
+                    <div class="panel-body"><canvas id="dashRoleChart" height="180"></canvas></div>
+                </div>
+                <div class="panel">
+                    <div class="panel-head"><span class="panel-title">Moderation status</span></div>
+                    <div class="panel-body"><canvas id="dashStatusChart" height="180"></canvas></div>
+                </div>
+                <div class="panel">
+                    <div class="panel-head"><span class="panel-title">Warned users</span></div>
+                    <div class="panel-body">
+                        <div class="stat-value" style="color:var(--amber-400);">{{ $total_warned }}</div>
+                        <p style="font-size:11px; color:var(--muted); margin:4px 0 12px;">{{ $total_warnings }} warnings
+                            issued total</p>
+                        <a href="{{ route('admin.analytics.overview') }}" class="panel-action">View student analytics
+                            →</a>
+                    </div>
+                </div>
+            </div>
+            {{-- ============ /ANALYTICS ============ --}}
+
+            <div style="display:grid; grid-template-columns: 2fr 1fr; gap: 1rem; align-items:start;">
+
+                {{-- Left column --}}
+                <div style="display:flex; flex-direction:column; gap:1rem;">
+
+                    <div class="panel">
+                        <div class="panel-head"><span class="panel-title">Top contributors this month</span></div>
+                        <div class="panel-body">
+                            @foreach ($topContributors as $c)
+                            <div class="progress-wrap">
+                                <div class="progress-label">
+                                    <span>{{ $c['name'] }}</span>
+                                    <span>{{ $c['posts'] }} posts</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill"
+                                        style="width: {{ min(100, $c['posts'] * 2.5) }}%; background: var(--green-600);">
+                                    </div>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <div class="panel">
+                        <div class="panel-head"><span class="panel-title">Flagged content</span></div>
+                        <div class="panel-body">
+                            @forelse ($flaggedContent ?? [] as $f)
+                            <div class="disc-item" style="align-items:center; justify-content:space-between;">
+                                <div>
+                                    <div class="disc-title" style="white-space:normal;">{{ $f['title'] }}</div>
+                                    <div class="disc-meta">{{ $f['meta'] }}</div>
+                                </div>
+                                <button class="btn btn-outline btn-sm">Review</button>
+                            </div>
+                            @empty
+                            <p style="font-size:13px;color:var(--muted);text-align:center;padding:1rem 0;">Nothing
+                                flagged right now.</p>
+                            @endforelse
+                        </div>
+                    </div>
+
+                    <div class="panel">
+                        <div class="panel-head"><span class="panel-title">Upcoming quiz configurations</span></div>
+                        <div class="panel-body">
+                            <div class="table-scroll">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Quiz</th>
+                                            <th>Category</th>
+                                            <th style="text-align:right;">Opens</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($upcomingQuizzes as $q)
+                                        <tr>
+                                            <td>{{ $q['name'] }}</td>
+                                            <td class="text-muted">{{ $q['category'] }}</td>
+                                            <td class="text-muted" style="text-align:right;">{{ $q['opens'] }}</td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                {{-- Right column --}}
+                <div style="display:flex; flex-direction:column; gap:1rem;">
+
+                    <div class="panel">
+                        <div class="panel-head"><span class="panel-title">Pending member approvals</span></div>
+                        <div class="panel-body">
+                            @forelse ($pendingApprovals as $user)
+                            <div class="disc-item" style="align-items:center; justify-content:space-between;">
+                                <span style="font-size:13px;">{{ $user->full_name }}</span>
+                                <div style="display:flex; gap:4px; flex-shrink:0;">
+                                    <form method="POST" action="{{ route('admin.users.approve', $user) }}">
+                                        @csrf
+                                        <button class="badge badge-teal"
+                                            style="border:none; cursor:pointer;">Approve</button>
+                                    </form>
+                                    <form method="POST" action="{{ route('admin.users.decline', $user) }}">
+                                        @csrf
+                                        <button class="badge badge-red"
+                                            style="border:none; cursor:pointer;">Decline</button>
+                                    </form>
+                                </div>
+                            </div>
+                            @empty
+                            <p style="font-size:13px;color:var(--muted);text-align:center;padding:1rem 0;">No pending
+                                approvals.</p>
+                            @endforelse
+                        </div>
+                    </div>
+
+                    <div class="panel">
+                        <div class="panel-head"><span class="panel-title">Pending group approvals</span></div>
+                        <div class="panel-body">
+                            @forelse($groups as $g)
+                            <div class="disc-item" style="align-items:center; justify-content:space-between;">
+                                <div>
+                                    <div class="disc-title" style="white-space:normal; font-weight:600;">{{ $g->name }}
+                                    </div>
+                                    <div class="disc-meta">By: {{ $g->admin->name ?? 'Unknown' }} ·
+                                        {{ $g->description }}</div>
+                                </div>
+                                <div style="display:flex; gap:6px; flex-shrink:0;">
+                                    <form method="POST" action="{{ route('admin.groups.approve', $g) }}">
+                                        @csrf
+                                        <button class="btn btn-sm"
+                                            style="background:var(--teal-400); color:#fff; border:none;">Approve</button>
+                                    </form>
+                                    <form method="POST" action="{{ route('admin.groups.reject', $g) }}">
+                                        @csrf
+                                        <button class="btn btn-sm"
+                                            style="background:var(--red-400); color:#fff; border:none;">Reject</button>
+                                    </form>
+                                </div>
+                            </div>
+                            @empty
+                            <p style="font-size:13px;color:var(--muted);text-align:center;padding:1rem 0;">No pending
+                                groups.</p>
+                            @endforelse
+                        </div>
+                    </div>
+
+                    <div class="panel">
+                        <div class="panel-head"><span class="panel-title">Inactivity warnings</span></div>
+                        <div class="panel-body">
+                            @forelse ($warnedMembers as $user)
+                            <div class="activity-item" style="flex-direction:column; align-items:stretch; gap:8px;">
+                                <div style="display:flex; align-items:center; justify-content:space-between;">
+                                    <span style="font-size:13px;">{{ $user->full_name }}</span>
+                                    @if ($user->status === 'blacklisted')
+                                    <span class="badge badge-red">Blacklisted</span>
+                                    @else
+                                    <span class="badge badge-amber">Warning {{ $user->warning_count }} of 2</span>
+                                    @endif
+                                </div>
+                                <div style="display:flex; flex-direction:column; gap:6px;">
+                                    @if ($user->status === 'blacklisted')
+                                    <form method="POST" action="{{ route('admin.Users.unblacklist', $user) }}"
+                                        style="align-self:flex-end;">
+                                        @csrf
+                                        <button class="btn btn-outline btn-sm">Reinstate</button>
+                                    </form>
+                                    @else
+                                    <details>
+                                        <summary class="btn btn-outline btn-sm"
+                                            style="display:inline-flex; cursor:pointer;">Warn</summary>
+                                        <form method="POST" action="{{ route('admin.Users.warn', $user) }}"
+                                            style="margin-top:8px; display:flex; flex-direction:column; gap:6px;">
+                                            @csrf
+                                            <textarea name="message" rows="2" required
+                                                placeholder="Describe the rule violation…" class="form-control"
+                                                style="font-size:12px;"></textarea>
+                                            <button class="btn btn-primary btn-sm" style="width:100%;">Send
+                                                warning</button>
+                                        </form>
+                                    </details>
+                                    <div style="display:flex; gap:6px; justify-content:flex-end;">
+                                        <form method="POST" action="{{ route('admin.Users.logout', $user) }}">
+                                            @csrf
+                                            <button class="btn btn-outline btn-sm">Log out</button>
+                                        </form>
+                                        <form method="POST" action="{{ route('admin.Users.blacklist', $user) }}"
+                                            onsubmit="return confirm('Blacklist {{ $user->full_name }} immediately?');">
+                                            @csrf
+                                            <button class="btn btn-danger-sm">Blacklist</button>
+                                        </form>
+                                    </div>
+                                    @endif
+                                </div>
+                            </div>
+                            @empty
+                            <p style="font-size:13px;color:var(--muted);text-align:center;padding:1rem 0;">No members
+                                currently flagged for inactivity.</p>
+                            @endforelse
+                        </div>
+                    </div>
+
+                    <div class="panel">
+                        <div class="panel-head"><span class="panel-title">ML-recommended trending topics</span></div>
+                        <div class="panel-body" style="display:flex; flex-wrap:wrap; gap:8px;">
+                            @foreach ($trendingTopics as $t)
+                            <span class="badge badge-blue">{{ $t }}</span>
+                            @endforeach
+                        </div>
+                    </div>
+
+                </div>
+            </div>
         </div>
     </div>
-    <div class="bg-white borderrounded-lg p-5">
-        <p class="font-medium mb-3">ML-recommended trending topics</p>
-        <div class="flex flex-wrap gap-2">
-            @foreach ($trendingTopics as $t)
-            <span class="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded">{{ $t }}</span>
-            @endforeach
-        </div>
-        <p class="text-xs text-gray-400 mt-3">Placeholder — swap in real output from the recommendation
-            microservice.
-        </p>
-    </div>
 </div>
-</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const lineOpts = {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    precision: 0
+                }
+            }
+        },
+        plugins: {
+            legend: {
+                display: false
+            }
+        }
+    };
+
+    new Chart(document.getElementById('dashActiveChart'), {
+        type: 'line',
+        data: {
+            labels: {
+                !!json_encode($active_trend['labels']) !!
+            },
+            datasets: [{
+                label: 'Active users',
+                data: {
+                    !!json_encode($active_trend['counts']) !!
+                },
+                borderColor: '#534AB7',
+                backgroundColor: 'rgba(83,74,183,0.12)',
+                tension: 0.3,
+                fill: true,
+            }],
+        },
+        options: lineOpts,
+    });
+
+    new Chart(document.getElementById('dashContentChart'), {
+        type: 'bar',
+        data: {
+            labels: {
+                !!json_encode($content_trend['labels']) !!
+            },
+            datasets: [{
+                label: 'Actions',
+                data: {
+                    !!json_encode($content_trend['counts']) !!
+                },
+                backgroundColor: '#378ADD',
+            }],
+        },
+        options: lineOpts,
+    });
+
+    new Chart(document.getElementById('dashRoleChart'), {
+        type: 'doughnut',
+        data: {
+            labels: {
+                !!json_encode($role_distribution['labels']) !!
+            },
+            datasets: [{
+                data: {
+                    !!json_encode($role_distribution['counts']) !!
+                },
+                backgroundColor: ['#534AB7', '#378ADD', '#BA7517'],
+            }],
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        },
+    });
+
+    new Chart(document.getElementById('dashStatusChart'), {
+        type: 'doughnut',
+        data: {
+            labels: {
+                !!json_encode($status_distribution['labels']) !!
+            },
+            datasets: [{
+                data: {
+                    !!json_encode($status_distribution['counts']) !!
+                },
+                backgroundColor: ['#1D9E75', '#BA7517', '#E24B4A', '#9b9a96'],
+            }],
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        },
+    });
+});
+</script>
+
 @endsection

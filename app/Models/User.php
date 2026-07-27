@@ -22,9 +22,11 @@ class User extends Authenticatable
      * @var list<string>
      */
 
-    protected $fillable = [
-        'first_name','last_name','email','password','role','is_enabled','warning_count','email_verified_at','last_warning_at','blacklisted_until',
-    ];
+  protected $fillable = [
+    'first_name','last_name','email','password','role','status','is_enabled',
+    'warning_count','email_verified_at','last_warning_at','blacklisted_until',
+    'invite_token','invite_token_expires_at',
+];
 
     /**
      * Get the attributes that should be cast.

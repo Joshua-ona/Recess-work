@@ -1,137 +1,153 @@
-@extends('layouts.admin')
-
+@extends('layouts.app')
 @section('title', 'Manage users')
+@section('body')
 
-@section('content')
-
-    <div class="flex items-center justify-between border-b pb-3 mb-6">
-        <div class="flex items-center gap-3">
-            <span class="font-medium text-lg">Manage users</span>
-            <span class="text-sm text-gray-500">{{ $users->total() }} total</span>
+<div class="dash-wrap">
+    @include('layouts.sidebar', [
+    'role' => 'system_admin',
+    'user' => auth()->user(),
+    'userCount' => $users->total() ?? 0,
+    ])
+    <div class="dash-main">
+        <div class="dash-header">
+            <div>
+                <div class="dash-header-title">Manage users</div>
+                <div class="dash-header-sub">{{ $users->total() }} total</div>
+            </div>
         </div>
-        <a href="{{ route('admin.dashboard') }}" class="text-sm border rounded px-3 py-1.5 hover:bg-gray-50">
-            ← Back to dashboard
-        </a>
-    </div>
 
-    <form method="GET" action="{{ route('admin.Users.index') }}" class="mb-4">
-        <input
-            type="text"
-            name="search"
-            value="{{ $search }}"
-            placeholder="Search by name or email…"
-            class="w-full max-w-sm border rounded px-3 py-2 text-sm"
-        >
-    </form>
+        <div class="dash-body" style="flex-direction:column;">
 
-    <div class="bg-white border rounded-lg overflow-hidden">
-        <table class="w-full text-sm">
-            <thead class="bg-gray-50 text-left text-gray-500">
-                <tr>
-                    <th class="px-4 py-2">Name</th>
-                    <th class="px-4 py-2">Email</th>
-                    <th class="px-4 py-2">Role</th>
-                    <th class="px-4 py-2">Status</th>
-                    <th class="px-4 py-2">Logged in</th>
-                    <th class="px-4 py-2">Warnings</th>
-                    <th class="px-4 py-2 text-right">Actions</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y">
-                @forelse ($users as $user)
-                    <tr>
-                        <td class="px-4 py-2">{{ $user->full_name }}</td>
-                        <td class="px-4 py-2 text-gray-500">{{ $user->email }}</td>
-                        <td class="px-4 py-2 capitalize">{{ $user->role }}</td>
-                        <td class="px-4 py-2">
-                            @if ($user->status === 'blacklisted')
-                                <span class="text-xs bg-red-50 text-red-700 px-2 py-0.5 rounded">Blacklisted</span>
-                            @elseif ($user->status === 'pending')
-                                <span class="text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded">Pending</span>
-                            @else
-                                <span class="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded">Active</span>
-                            @endif
-                        </td>
-                        <td class="px-4 py-2">
-                            @if (in_array($user->id, $onlineIds))
-                                <span class="inline-flex items-center gap-1 text-xs text-green-700">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Online
-                                </span>
-                            @else
-                                <span class="text-xs text-gray-400">Offline</span>
-                            @endif
-                        </td>
-                        <td class="px-4 py-2">
-                            @if ($user->warnings->isEmpty())
-                                <span class="text-xs text-gray-400">{{ $user->warning_count }} of 2</span>
-                            @else
-                                <details>
-                                    <summary class="text-xs text-amber-700 cursor-pointer select-none">
-                                        {{ $user->warning_count }} of 2 — view
-                                    </summary>
-                                    <div class="mt-2 space-y-2 max-w-xs">
-                                        @foreach ($user->warnings as $warning)
-                                            <div class="text-xs border rounded px-2 py-1.5 bg-amber-50">
-                                                <p>{{ $warning->message }}</p>
-                                                <p class="text-gray-400 mt-1">
+            <form method="GET" action="{{ route('admin.users.index') }}" style="margin-bottom:1rem; max-width:360px;">
+                <input type="text" name="search" value="{{ $search }}" placeholder="Search by name or email…"
+                    class="form-control">
+            </form>
+
+            <div class="full-panel">
+                <div class="table-scroll">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Logged in</th>
+                                <th>Warnings</th>
+                                <th style="text-align:right;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($users as $user)
+                            <tr>
+                                <td>{{ $user->full_name }}</td>
+                                <td class="text-muted">{{ $user->email }}</td>
+                                <td style="text-transform:capitalize;">{{ $user->role }}</td>
+                                <td>
+                                    @if ($user->status === 'blacklisted')
+                                    <span class="badge badge-red">Blacklisted</span>
+                                    @elseif ($user->status === 'pending')
+                                    <span class="badge badge-amber">Pending</span>
+                                    @else
+                                    <span class="badge badge-green">Active</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    @if (in_array($user->id, $onlineIds))
+                                    <span
+                                        style="display:inline-flex; align-items:center; gap:5px; font-size:12px; color:var(--teal-600);">
+                                        <span
+                                            style="width:7px;height:7px;border-radius:50%;background:var(--teal-400);display:inline-block;"></span>
+                                        Online
+                                    </span>
+                                    @else
+                                    <span class="text-muted" style="font-size:12px;">Offline</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    @if ($user->warnings->isEmpty())
+                                    <span class="text-muted" style="font-size:12px;">{{ $user->warning_count }} of
+                                        2</span>
+                                    @else
+                                    <details>
+                                        <summary style="font-size:12px; color:var(--amber-600); cursor:pointer;">
+                                            {{ $user->warning_count }} of 2 — view
+                                        </summary>
+                                        <div
+                                            style="margin-top:8px; display:flex; flex-direction:column; gap:6px; max-width:260px;">
+                                            @foreach ($user->warnings as $warning)
+                                            <div
+                                                style="font-size:12px; border-radius:var(--radius-sm); padding:6px 8px; background:var(--amber-50);">
+                                                <p style="margin:0;">{{ $warning->message }}</p>
+                                                <p style="margin:4px 0 0; color:var(--muted);">
                                                     {{ $warning->issuer?->full_name ?? 'Unknown admin' }} ·
                                                     {{ $warning->created_at->diffForHumans() }}
                                                 </p>
                                             </div>
-                                        @endforeach
-                                    </div>
-                                </details>
-                            @endif
-                        </td>
-                        <td class="px-4 py-2 text-right">
-                            @if ($user->id === auth()->id())
-                                <span class="text-xs text-gray-400">You</span>
-                            @else
-                                <div class="flex flex-col gap-2 items-end">
-                                    @if ($user->status === 'blacklisted')
+                                            @endforeach
+                                        </div>
+                                    </details>
+                                    @endif
+                                </td>
+                                <td style="text-align:right;">
+                                    @if ($user->id === auth()->id())
+                                    <span class="text-muted" style="font-size:12px;">You</span>
+                                    @else
+                                    <div style="display:flex; flex-direction:column; gap:6px; align-items:flex-end;">
+                                        @if ($user->status === 'blacklisted')
                                         <form method="POST" action="{{ route('admin.Users.unblacklist', $user) }}">
                                             @csrf
-                                            <button class="text-xs border rounded px-2 py-1">Reinstate</button>
+                                            <button class="btn btn-outline btn-sm">Reinstate</button>
                                         </form>
-                                    @else
+                                        @else
                                         <details>
-                                            <summary class="text-xs border rounded px-2 py-1 inline-block cursor-pointer select-none">Warn</summary>
-                                            <form method="POST" action="{{ route('admin.Users.warn', $user) }}" class="mt-2 space-y-1 w-48">
+                                            <summary class="btn btn-outline btn-sm"
+                                                style="display:inline-flex; cursor:pointer;">Warn</summary>
+                                            <form method="POST" action="{{ route('admin.users.warn', $user) }}"
+                                                style="margin-top:8px; display:flex; flex-direction:column; gap:6px; width:190px;">
                                                 @csrf
-                                                <textarea name="message" rows="2" required placeholder="Describe the rule violation…"
-                                                          class="w-full border rounded px-2 py-1 text-xs"></textarea>
-                                                <button class="text-xs border rounded px-2 py-1 w-full">Send warning</button>
+                                                <textarea name="message" rows="2" required
+                                                    placeholder="Describe the rule violation…" class="form-control"
+                                                    style="font-size:12px;"></textarea>
+                                                <button class="btn btn-primary btn-sm" style="width:100%;">Send
+                                                    warning</button>
                                             </form>
                                         </details>
-                                        <div class="flex gap-1">
+                                        <div style="display:flex; gap:6px;">
                                             @if (in_array($user->id, $onlineIds))
-                                                <form method="POST" action="{{ route('admin.Users.logout', $user) }}">
-                                                    @csrf
-                                                    <button class="text-xs border rounded px-2 py-1">Log out</button>
-                                                </form>
-                                            @endif
-                                            <form method="POST" action="{{ route('admin.Users.blacklist', $user) }}"
-                                                  onsubmit="return confirm('Blacklist {{ $user->full_name }} immediately?');">
+                                            <form method="POST" action="{{ route('admin.users.logout', $user) }}">
                                                 @csrf
-                                                <button class="text-xs border rounded px-2 py-1 text-red-600">Blacklist</button>
+                                                <button class="btn btn-outline btn-sm">Log out</button>
+                                            </form>
+                                            @endif
+                                            <form method="POST" action="{{ route('admin.users.blacklist', $user) }}"
+                                                onsubmit="return confirm('Blacklist {{ $user->full_name }} immediately?');">
+                                                @csrf
+                                                <button class="btn btn-danger-sm">Blacklist</button>
                                             </form>
                                         </div>
+                                        @endif
+                                    </div>
                                     @endif
-                                </div>
-                            @endif
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="7" class="px-4 py-6 text-center text-gray-500">No users found.</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="7" style="text-align:center; padding:2rem; color:var(--muted);">No users
+                                    found.</td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-    <div class="mt-4">
-        {{ $users->links() }}
+            <div style="margin-top:1rem;">
+                {{ $users->links() }}
+            </div>
+
+        </div>
     </div>
+</div>
 
 @endsection

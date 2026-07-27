@@ -522,12 +522,14 @@
         background: var(--bg);
     }
 
-    .dash-body {
-        padding: 1.5rem;
-        flex: 1;
-        overflow-y: auto;
-        display: flex;
-    }
+   .dash-body {
+    padding: 1.5rem;
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0; /* your existing margins on stat-grid/panel-grid already add spacing */
+}
 
     /* ── Stat cards ── */
     .stat-grid {

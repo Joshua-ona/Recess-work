@@ -9,8 +9,10 @@
         <span class="text-sm text-gray-500 ml-2">Performance & engagement across every student</span>
     </div>
     <div class="flex gap-2">
-        <a href="{{ route('admin.dashboard') }}" class="text-sm border rounded px-3 py-1.5 hover:bg-gray-50">Dashboard</a>
-        <a href="{{ route('admin.analytics') }}" class="text-sm border rounded px-3 py-1.5 hover:bg-gray-50">System analytics</a>
+        <a href="{{ route('admin.dashboard') }}"
+            class="text-sm border rounded px-3 py-1.5 hover:bg-gray-50">Dashboard</a>
+        <a href="{{ route('admin.analytics') }}" class="text-sm border rounded px-3 py-1.5 hover:bg-gray-50">System
+            analytics</a>
     </div>
 </div>
 
@@ -38,46 +40,51 @@
     <div class="bg-white border rounded-lg p-5">
         <p class="font-semibold mb-3">Top performers</p>
         @if($top_performers->isEmpty())
-            <p class="text-sm text-gray-400">No quiz data yet.</p>
+        <p class="text-sm text-gray-400">No quiz data yet.</p>
         @else
-            <div class="space-y-2">
-                @foreach($top_performers as $s)
-                <a href="{{ route('admin.analytics.student', $s['id']) }}" class="flex items-center justify-between text-sm hover:bg-gray-50 rounded px-1 py-1">
-                    <span>{{ $s['name'] }}</span>
-                    <span class="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded">{{ $s['avg_pct'] }}%</span>
-                </a>
-                @endforeach
-            </div>
+        <div class="space-y-2">
+            @foreach($top_performers as $s)
+            <a href="{{ route('admin.analytics.student', $s['id']) }}"
+                class="flex items-center justify-between text-sm hover:bg-gray-50 rounded px-1 py-1">
+                <span>{{ $s['name'] }}</span>
+                <span class="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded">{{ $s['avg_pct'] }}%</span>
+            </a>
+            @endforeach
+        </div>
         @endif
     </div>
     <div class="bg-white border rounded-lg p-5">
         <p class="font-semibold mb-3">Needs attention</p>
         @if($needs_attention->isEmpty())
-            <p class="text-sm text-gray-400">No quiz data yet.</p>
+        <p class="text-sm text-gray-400">No quiz data yet.</p>
         @else
-            <div class="space-y-2">
-                @foreach($needs_attention as $s)
-                <a href="{{ route('admin.analytics.student', $s['id']) }}" class="flex items-center justify-between text-sm hover:bg-gray-50 rounded px-1 py-1">
-                    <span>{{ $s['name'] }}</span>
-                    <span class="text-xs bg-red-50 text-red-700 px-2 py-0.5 rounded">{{ $s['avg_pct'] }}%</span>
-                </a>
-                @endforeach
-            </div>
+        <div class="space-y-2">
+            @foreach($needs_attention as $s)
+            <a href="{{ route('admin.analytics.student', $s['id']) }}"
+                class="flex items-center justify-between text-sm hover:bg-gray-50 rounded px-1 py-1">
+                <span>{{ $s['name'] }}</span>
+                <span class="text-xs bg-red-50 text-red-700 px-2 py-0.5 rounded">{{ $s['avg_pct'] }}%</span>
+            </a>
+            @endforeach
+        </div>
         @endif
     </div>
     <div class="bg-white border rounded-lg p-5">
         <p class="font-semibold mb-3">Most active in discussions</p>
         @if($most_active->isEmpty())
-            <p class="text-sm text-gray-400">No discussion activity yet.</p>
+        <p class="text-sm text-gray-400">No discussion activity yet.</p>
         @else
-            <div class="space-y-2">
-                @foreach($most_active as $s)
-                <a href="{{ route('admin.analytics.student', $s['id']) }}" class="flex items-center justify-between text-sm hover:bg-gray-50 rounded px-1 py-1">
-                    <span>{{ $s['name'] }}</span>
-                    <span class="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded">{{ $s['discussions'] + $s['replies'] }} posts</span>
-                </a>
-                @endforeach
-            </div>
+        <div class="space-y-2">
+            @foreach($most_active as $s)
+            <a href="{{ route('admin.analytics.student', $s['id']) }}"
+                class="flex items-center justify-between text-sm hover:bg-gray-50 rounded px-1 py-1">
+                <span>{{ $s['name'] }}</span>
+                <span
+                    class="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded">{{ $s['discussions'] + $s['replies'] }}
+                    posts</span>
+            </a>
+            @endforeach
+        </div>
         @endif
     </div>
 </div>
@@ -109,11 +116,14 @@
                     <td class="py-2 text-gray-500">{{ $s['discussions'] }}</td>
                     <td class="py-2 text-gray-500">{{ $s['replies'] }}</td>
                     <td class="py-2 text-right">
-                        <a href="{{ route('admin.analytics.student', $s['id']) }}" class="text-indigo-600 text-xs">View →</a>
+                        <a href="{{ route('admin.analytics.student', $s['id']) }}" class="text-indigo-600 text-xs">View
+                            →</a>
                     </td>
                 </tr>
                 @empty
-                <tr><td colspan="8" class="py-4 text-center text-gray-400">No students yet.</td></tr>
+                <tr>
+                    <td colspan="8" class="py-4 text-center text-gray-400">No students yet.</td>
+                </tr>
                 @endforelse
             </tbody>
         </table>
@@ -122,21 +132,36 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function() {
     new Chart(document.getElementById('submissionChart'), {
         type: 'bar',
         data: {
-            labels: {!! json_encode($submission_trend['labels']) !!},
+            labels: {
+                !!json_encode($submission_trend['labels']) !!
+            },
             datasets: [{
                 label: 'Submissions',
-                data: {!! json_encode($submission_trend['counts']) !!},
+                data: {
+                    !!json_encode($submission_trend['counts']) !!
+                },
                 backgroundColor: '#534AB7',
             }],
         },
         options: {
             responsive: true,
-            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
-            plugins: { legend: { display: false } },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        precision: 0
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
         },
     });
 });

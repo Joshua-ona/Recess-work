@@ -8,11 +8,11 @@
 
     {{-- Sidebar --}}
     @include('layouts.sidebar', [
-        'role'            => 'student',
-        'user'            => auth()->user(),
-        'enrolledCourses' => $enrolledCourses ?? collect(),
-        'unreadCount'     => $unreadCount ?? 0,
-        'notifCount'      => $notifCount ?? 0,
+    'role' => 'student',
+    'user' => auth()->user(),
+    'enrolledCourses' => $enrolledCourses ?? collect(),
+    'unreadCount' => $unreadCount ?? 0,
+    'notifCount' => $notifCount ?? 0,
     ])
 
     {{-- Main --}}
@@ -39,11 +39,11 @@
             <div class="group-card" style="padding:35px;">
 
                 @if($errors->any())
-                    <div class="alert alert-danger">
-                        @foreach($errors->all() as $error)
-                            <p>{{ $error }}</p>
-                        @endforeach
-                    </div>
+                <div class="alert alert-danger">
+                    @foreach($errors->all() as $error)
+                    <p>{{ $error }}</p>
+                    @endforeach
+                </div>
                 @endif
 
                 <form method="POST" action="/groups/{{ $group->id }}/discussions">
@@ -54,13 +54,8 @@
                         <label style="font-weight:600; display:block; margin-bottom:8px;">
                             Discussion Title
                         </label>
-                        <input
-                            type="text"
-                            name="title"
-                            class="form-control"
-                            placeholder="Enter a clear discussion title..."
-                            value="{{ old('title') }}"
-                            required>
+                        <input type="text" name="title" class="form-control"
+                            placeholder="Enter a clear discussion title..." value="{{ old('title') }}" required>
                     </div>
 
                     {{-- Body --}}
@@ -68,16 +63,14 @@
                         <label style="font-weight:600; display:block; margin-bottom:8px;">
                             Discussion Content
                         </label>
-                        <textarea
-                            name="body"
-                            class="form-control"
-                            rows="8"
+                        <textarea name="body" class="form-control" rows="8"
                             placeholder="Describe your topic, ask a question or share your ideas..."
                             required>{{ old('body') }}</textarea>
                     </div>
 
                     {{-- Tips --}}
-                    <div class="group-card" style="background:#F8FAFC; margin-top:25px; padding:20px; border-left:5px solid var(--primary);">
+                    <div class="group-card"
+                        style="background:#F8FAFC; margin-top:25px; padding:20px; border-left:5px solid var(--primary);">
                         <strong>
                             <i class="ti ti-bulb"></i>
                             Tips for a good discussion

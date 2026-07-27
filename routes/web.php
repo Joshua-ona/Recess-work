@@ -9,6 +9,8 @@ use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminUserController;
 use Illuminate\Support\Facades\Auth;
 use App\Models\UserScore;
+use App\Http\Controllers\Admin\AdminLecturerController;
+use App\Http\Controllers\Analytics\StudentAnalyticsController;
 
 
 use App\Http\Controllers\Lecturer\LecturerDashboardController;
@@ -50,6 +52,10 @@ Route::get('/password/reset', fn() => view('auth.passwords.email'))->name('passw
 // ✅ Global logout – used by all dashboards
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
+Route::get('/lecturer/activate/{token}', [AdminLecturerController::class, 'activate'])->name('lecturer.activate');
+Route::post('/lecturer/activate/{token}', [AdminLecturerController::class, 'completeActivation'])->name('lecturer.activate.complete');
+
+
 // ── Admin routes ───────────────────────────────────────────
 Route::prefix('system_admin')->name('admin.')->middleware(['auth', 'role:system_admin'])->group(function () {
     Route::get('/',            [AdminDashboardController::class, 'index'])->name('dashboard');
@@ -59,33 +65,36 @@ Route::prefix('system_admin')->name('admin.')->middleware(['auth', 'role:system_
     Route::get('/reports',     [AdminDashboardController::class, 'reports'])->name('reports');
     Route::get('/settings',    [AdminDashboardController::class, 'settings'])->name('settings');
 
-    // Member actions
-    Route::get('/members', [AdminUserController::class, 'index'])
-        ->name('Users.index');
+    // Member management
+    Route::get('/members',                    [AdminUserController::class, 'index'])->name('users.index');
+    Route::post('/members/{user}/approve',    [AdminUserController::class, 'approve'])->name('users.approve');
+    Route::post('/members/{user}/decline',    [AdminUserController::class, 'decline'])->name('users.decline');
+    Route::post('/members/{user}/warn',       [AdminUserController::class, 'warn'])->name('users.warn');
+    Route::post('/members/{user}/blacklist',  [AdminUserController::class, 'blacklist'])->name('users.blacklist');
+    Route::post('/members/{user}/unblacklist',[AdminUserController::class, 'unblacklist'])->name('users.unblacklist');
+    Route::post('/members/{user}/logout',     [AdminUserController::class, 'logout'])->name('users.logout');
 
-    Route::post('/members/{user}/approve', [AdminUserController::class, 'approve'])
-        ->name('Users.approve');
+    // Lecturer invitations
+    Route::get('/lecturers/create',          [AdminLecturerController::class, 'create'])->name('lecturers.create');
+    Route::post('/lecturers',                [AdminLecturerController::class, 'store'])->name('lecturers.store');
+    Route::post('/lecturers/{user}/resend',  [AdminLecturerController::class, 'resend'])->name('lecturers.resend');
+    Route::post('/lecturer/activate/resend', [AdminLecturerController::class, 'resendSelf'])->name('lecturer.resend.self');
 
-    Route::post('/members/{user}/decline', [AdminUserController::class, 'decline'])
-        ->name('Users.decline');
+    // Analytics
+    Route::get('/analytics-students',                        [StudentAnalyticsController::class, 'adminOverview'])->name('analytics.overview');
+    Route::get('/analytics-students/{student}',              [StudentAnalyticsController::class, 'studentDetail'])->name('analytics.student');
 
-    Route::post('/members/{user}/warn', [AdminUserController::class, 'warn'])
-        ->name('Users.warn');
-
-    Route::post('/members/{user}/blacklist', [AdminUserController::class, 'blacklist'])
-        ->name('Users.blacklist');
-
-    Route::post('/members/{user}/unblacklist', [AdminUserController::class, 'unblacklist'])
-        ->name('Users.unblacklist');
-
-    Route::post('/members/{user}/logout', [AdminUserController::class, 'logout'])
-        ->name('Users.logout');
-
-    // GROUP ACTIONS
-    Route::get('/groups/pending',    [AdminGroupController::class, 'index'])->name('groups.index');
-    Route::post('/groups/{group}/approve',    [AdminGroupController::class, 'approve'])->name('groups.approve');
-    Route::post('/groups/{group}/reject',    [AdminGroupController::class, 'reject'])->name('groups.reject');
+    // Groups
+    Route::get('/groups/pending',           [AdminGroupController::class, 'index'])->name('groups.index');
+    Route::post('/groups/{group}/approve',  [AdminGroupController::class, 'approve'])->name('groups.approve');
+    Route::post('/groups/{group}/reject',   [AdminGroupController::class, 'reject'])->name('groups.reject');
 });
+
+// ── Analytics (student own view) ───────────────────────────
+Route::middleware(['auth'])->group(function () {
+    Route::get('/my/analytics', [StudentAnalyticsController::class, 'myAnalytics'])->name('analytics.mine');
+});
+
 
 // ── Lecturer routes ────────────────────────────────────────
 Route::prefix('lecturer')->name('lecturer.')->middleware(['auth','role:lecturer'])->group(function () {
@@ -99,21 +108,25 @@ Route::prefix('lecturer')->name('lecturer.')->middleware(['auth','role:lecturer'
     Route::get('/categories', [LecturerDashboardController::class, 'categories'])
         ->name('categories');
 
-    Route::get('/quizzes', [LecturerDashboardController::class, 'quizzes'])
-        ->name('quizzes');
-
+    
     Route::get('/quizzes/create', [LecturerDashboardController::class, 'createQuiz'])
         ->name('quizzes.create');
+
+    Route::post('/quizzes/{quiz}/upload', [QuizController::class, 'uploadQuiz'])
+    ->name('quizzes.upload');
 
         Route::get('/quizzes/{quiz}/upload', [QuizController::class, 'showUploadForm'])
     ->name('quizzes.upload.form');
 
-    Route::post('/quizzes/{quiz}/upload', [QuizController::class,'uploadQuiz'])
-        ->name('quizzes.upload');
+    Route::post('/quizzes/{quiz}/publish', [QuizController::class, 'publish'])
+    ->name('quizzes.publish'); 
 
     Route::get('/performance', [LecturerDashboardController::class, 'performance'])
         ->name('performance');
 
+    Route::get('/students/{student}', function (\App\Models\User $student) {
+    return "Student profile for: " . $student->first_name;
+})->name('students.show');
     Route::get('/messages', [LecturerDashboardController::class, 'messages'])
         ->name('messages');
 
@@ -136,8 +149,7 @@ Route::prefix('lecturer')->name('lecturer.')->middleware(['auth','role:lecturer'
         ->name('quizzes.edit');
     Route::put('/quizzes/{quiz}', [QuizController::class,'update'])
         ->name('quizzes.update');
-        Route::post('/quizzes/{quiz}/publish', [QuizController::class, 'publish'])
-        ->name('lecturer.quizzes.publish');
+    
         Route::delete('/quizzes/{quiz}', [QuizController::class,'destroy'])
         ->name('quizzes.destroy');
 });

@@ -1,79 +1,81 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8">
     <title>{{ $discussion->title }}</title>
     <style>
-        body{
-            font-family: DejaVu Sans, Arial, sans-serif;
-            font-size:13px;
-            color:#333;
-            margin:35px;
-            line-height:1.7;
-        }
+    body {
+        font-family: DejaVu Sans, Arial, sans-serif;
+        font-size: 13px;
+        color: #333;
+        margin: 35px;
+        line-height: 1.7;
+    }
 
-        .header{
-            border-bottom:3px solid #2563EB;
-            padding-bottom:15px;
-            margin-bottom:25px;
-        }
+    .header {
+        border-bottom: 3px solid #2563EB;
+        padding-bottom: 15px;
+        margin-bottom: 25px;
+    }
 
-        h1{
-            margin:0;
-            color:#1E3A8A;
-            font-size:24px;
-        }
+    h1 {
+        margin: 0;
+        color: #1E3A8A;
+        font-size: 24px;
+    }
 
-        .meta{
-            margin-top:8px;
-            color:#666;
-            font-size:11px;
-        }
+    .meta {
+        margin-top: 8px;
+        color: #666;
+        font-size: 11px;
+    }
 
-        .section-title{
-            font-size:18px;
-            color:#1E3A8A;
-            border-bottom:1px solid #ddd;
-            padding-bottom:8px;
-            margin-top:35px;
-            margin-bottom:18px;
-        }
+    .section-title {
+        font-size: 18px;
+        color: #1E3A8A;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 8px;
+        margin-top: 35px;
+        margin-bottom: 18px;
+    }
 
-        .discussion{
-            background:#F8FAFC;
-            border:1px solid #E2E8F0;
-            padding:18px;
-            border-radius:6px;
-        }
+    .discussion {
+        background: #F8FAFC;
+        border: 1px solid #E2E8F0;
+        padding: 18px;
+        border-radius: 6px;
+    }
 
-        .reply{
-            border-left:4px solid #2563EB;
-            padding:12px 15px;
-            margin-bottom:15px;
-            background:#FAFAFA;
-        }
+    .reply {
+        border-left: 4px solid #2563EB;
+        padding: 12px 15px;
+        margin-bottom: 15px;
+        background: #FAFAFA;
+    }
 
-        .reply-author{
-            font-weight:bold;
-            color:#1E3A8A;
-        }
+    .reply-author {
+        font-weight: bold;
+        color: #1E3A8A;
+    }
 
-        .reply-meta{
-            color:#777;
-            font-size:11px;
-            margin-bottom:8px;
-        }
+    .reply-meta {
+        color: #777;
+        font-size: 11px;
+        margin-bottom: 8px;
+    }
 
-        .footer{
-            margin-top:50px;
-            text-align:center;
-            font-size:11px;
-            color:#888;
-            border-top:1px solid #ddd;
-            padding-top:10px;
-        }
+    .footer {
+        margin-top: 50px;
+        text-align: center;
+        font-size: 11px;
+        color: #888;
+        border-top: 1px solid #ddd;
+        padding-top: 10px;
+    }
     </style>
 </head>
+
 <body>
 
     {{-- Header --}}
@@ -98,19 +100,19 @@
     <div class="section-title">Replies ({{ $discussion->replies->count() }})</div>
 
     @forelse($discussion->replies as $reply)
-        <div class="reply">
-            <div class="reply-author">
-                {{ $reply->user->first_name ?? 'Unknown' }}
-            </div>
-            <div class="reply-meta">
-                {{ $reply->created_at->format('d M Y, h:i A') }}
-            </div>
-            <div>
-                {{ $reply->body }}
-            </div>
+    <div class="reply">
+        <div class="reply-author">
+            {{ $reply->user->first_name ?? 'Unknown' }}
         </div>
+        <div class="reply-meta">
+            {{ $reply->created_at->format('d M Y, h:i A') }}
+        </div>
+        <div>
+            {{ $reply->body }}
+        </div>
+    </div>
     @empty
-        <p>No replies have been posted for this discussion.</p>
+    <p>No replies have been posted for this discussion.</p>
     @endforelse
 
     {{-- Footer --}}
@@ -121,4 +123,5 @@
     </div>
 
 </body>
+
 </html>

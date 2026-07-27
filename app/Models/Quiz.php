@@ -31,4 +31,9 @@ class Quiz extends Model
 {
     return $this->belongsTo(Group::class, 'group_id');
 }
+
+public function submissions()
+{
+    return $this->hasMany(QuizSubmission::class, 'quiz_id', 'quiz_id');
+}
 }

@@ -102,6 +102,10 @@ class AdminUserController extends Controller
 
         $user->save();
 
+        if ($user->status === 'blacklisted') {
+            $this->forceLogout($user);
+        }
+
         return back()->with('status', "Warning sent to {$user->full_name}.");
     }
 
@@ -120,7 +124,23 @@ class AdminUserController extends Controller
             'blacklisted_until' => now()->addDays(config('forum.blacklist_days', 7)),
         ]);
 
-        return back()->with('status', "{$user->full_name} blacklisted.");
+        $this->forceLogout($user);
+
+        return back()->with('status', "{$user->full_name} blacklisted and logged out.");
+    }
+
+    /**
+     * Shared helper: clear a user's active session rows so they're kicked
+     * out on their very next request (used by both the manual "Log out"
+     * action and whenever someone gets blacklisted).
+     */
+    private function forceLogout(User $user): void
+    {
+        if (config('session.driver') === 'database') {
+            DB::table(config('session.table', 'sessions'))
+                ->where('user_id', $user->id)
+                ->delete();
+        }
     }
 
     /**

@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use App\Models\Group;
-use Illuminate\Support\Carbon;
+use App\Models\Quiz;
+use App\Models\User;
+use App\Services\AnalyticsService;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class AdminDashboardController extends Controller
 {
@@ -13,59 +16,71 @@ class AdminDashboardController extends Controller
     {
         $totalMembers = User::count();
 
-        //$activeToday = User::where('last_active_at', '>=', Carbon::today())->count();
-
-
-        //testing the admin dashboard since table are non existant
+        // Active today — users who have a live session row
         $activeToday = 0;
-        $groups = Group::where('status','pending')->with('admin')->latest()
-                ->take(5)
-                ->get();
+        if (config('session.driver') === 'database') {
+            $activeToday = DB::table('sessions')
+                ->whereNotNull('user_id')
+                ->distinct('user_id')
+                ->count('user_id');
+        }
 
-        // $pendingApprovals = User::where('status', 'pending')
-        //     ->orderByDesc('created_at')
-        //     ->get();
+        // Pending lecturer approvals (self-registered, awaiting admin sign-off)
+        $pendingApprovals = User::where('status', 'pending')
+            ->orderByDesc('created_at')
+            ->get();
 
-        $pendingApprovals = User::where('is_enabled', 'false')->orderByDesc('created_at')->get();
+        // Blacklisted count
+        $blacklistedCount = User::where('status', 'blacklisted')->count();
 
-
-
-        // $blacklistedCount = User::where('status', 'blacklisted')->count();
-
-         $blacklistedCount = User::whereNotNull('blacklisted_until')
-         ->where('blacklisted_until', '>=', now())
-         ->count();
-                        
-
+        // Warned members (not yet blacklisted)
         $warnedMembers = User::where('warning_count', '>', 0)
-            ->whereNull('blacklisted_until')
+            ->where('status', '!=', 'blacklisted')
             ->orderByDesc('warning_count')
             ->limit(10)
             ->get();
 
-        // --- Placeholder data below ---
-        // These sections depend on the forum/quiz/recommendation modules,
-        // which per the SDD are scoped for later sprints. Swap these arrays
-        // for real Eloquent queries once those tables exist.
+        // Groups pending admin approval
+        $groups = Group::where('status', 'pending')
+            ->with('admin')
+            ->latest()
+            ->take(5)
+            ->get();
 
-        $topContributors = [
-            ['name' => 'Nina K.', 'posts' => 38],
-            ['name' => 'Brian O.', 'posts' => 31],
-            ['name' => 'Faith A.', 'posts' => 22],
-            ['name' => 'Tom M.', 'posts' => 9],
-        ];
+        // Top contributors from real discussions + replies tables
+        $topContributors = DB::table('users')
+            ->leftJoin('discussions', 'users.id', '=', 'discussions.user_id')
+            ->leftJoin('replies', 'users.id', '=', 'replies.user_id')
+            ->selectRaw("users.id, TRIM(users.first_name || ' ' || users.last_name) as name,
+                (COUNT(DISTINCT discussions.id) + COUNT(DISTINCT replies.id)) as posts")
+            ->groupBy('users.id', 'users.first_name', 'users.last_name')
+            ->orderByDesc('posts')
+            ->limit(5)
+            ->get()
+            ->map(fn($r) => ['name' => $r->name, 'posts' => $r->posts]);
 
-        $flaggedContent = [
-            ['title' => '"Check out my side hustle!!" in #databases', 'meta' => 'Flagged as off-topic · 3 reports'],
-            ['title' => 'Duplicate ad post in #general', 'meta' => 'Flagged as off-topic · 1 report'],
-        ];
+        // Upcoming quizzes
+        $upcomingQuizzes = Quiz::where('is_published', false)
+            ->orderBy('start_time')
+            ->limit(5)
+            ->get()
+            ->map(fn($q) => [
+                'name'     => $q->title,
+                'category' => $q->target_category ?? 'All',
+                'opens'    => $q->start_time
+                    ? \Carbon\Carbon::parse($q->start_time)->format('D H:i')
+                    : 'TBC',
+            ]);
 
-        $upcomingQuizzes = [
-            ['name' => 'SQL joins quiz', 'category' => 'Year 2 students', 'opens' => 'Mon 09:00'],
-            ['name' => 'Normalization quiz', 'category' => 'Year 2 students', 'opens' => 'Wed 14:00'],
-        ];
+        $trendingTopics = DB::table('topics')
+            ->where('status', 'active')
+            ->limit(5)
+            ->pluck('name')
+            ->toArray();
 
-        $trendingTopics = ['Normalization', 'Indexing', 'Group project tools'];
+        if (empty($trendingTopics)) {
+            $trendingTopics = ['Normalization', 'Indexing', 'Group project tools'];
+        }
 
         return view('admin.dashboard', compact(
             'totalMembers',
@@ -74,23 +89,18 @@ class AdminDashboardController extends Controller
             'blacklistedCount',
             'warnedMembers',
             'topContributors',
-            'flaggedContent',
             'upcomingQuizzes',
             'trendingTopics',
             'groups',
-        ));
+        ) + AnalyticsService::systemUsage(7));
     }
 
-    
-    public function approve(Group $group)
+    public function analytics()
     {
-        $this->groupService->approve($group);
-        return back()->with('success', 'Group Approved');
+        return view('admin.analytics', AnalyticsService::systemUsage());
     }
-
-    public function reject(Group $group)
-    {
-        $this->groupService->reject($group);
-        return back()->with('error', 'Group Rejected');
-    }
+    public function discussions() { return view('admin.discussions'); }
+    public function courses()     { return view('admin.courses'); }
+    public function reports()     { return view('admin.reports'); }
+    public function settings()    { return view('admin.settings'); }
 }

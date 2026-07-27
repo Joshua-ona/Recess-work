@@ -8,11 +8,11 @@
 
     {{-- Sidebar --}}
     @include('layouts.sidebar', [
-        'role'            => 'student',
-        'user'            => auth()->user(),
-        'enrolledCourses' => $enrolledCourses ?? collect(),
-        'unreadCount'     => $unreadCount ?? 0,
-        'notifCount'      => $notifCount ?? 0,
+    'role' => 'student',
+    'user' => auth()->user(),
+    'enrolledCourses' => $enrolledCourses ?? collect(),
+    'unreadCount' => $unreadCount ?? 0,
+    'notifCount' => $notifCount ?? 0,
     ])
 
     {{-- MAIN --}}
@@ -35,23 +35,23 @@
                     Back
                 </a>
                 <a href="https://wa.me/?text={{ urlencode($discussion->title . ' - ' . request()->url()) }}"
-                   target="_blank" class="group-share-btn group-share-btn-whatsapp">
+                    target="_blank" class="group-share-btn group-share-btn-whatsapp">
                     <i class="ti ti-brand-whatsapp"></i>
                 </a>
                 <a href="https://twitter.com/intent/tweet?text={{ urlencode($discussion->title) }}&url={{ urlencode(request()->url()) }}"
-                   target="_blank" class="group-share-btn group-share-btn-twitter">
+                    target="_blank" class="group-share-btn group-share-btn-twitter">
                     <i class="ti ti-brand-x"></i>
                 </a>
-                <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(request()->url()) }}"
-                   target="_blank" class="group-share-btn group-share-btn-facebook">
+                <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(request()->url()) }}" target="_blank"
+                    class="group-share-btn group-share-btn-facebook">
                     <i class="ti ti-brand-facebook"></i>
                 </a>
                 <a href="https://t.me/share/url?url={{ urlencode(request()->url()) }}&text={{ urlencode($discussion->title) }}"
-                   target="_blank" class="group-share-btn group-share-btn-telegram">
+                    target="_blank" class="group-share-btn group-share-btn-telegram">
                     <i class="ti ti-brand-telegram"></i>
                 </a>
                 <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ urlencode(request()->url()) }}"
-                   target="_blank" class="group-share-btn group-share-btn-linkedin">
+                    target="_blank" class="group-share-btn group-share-btn-linkedin">
                     <i class="ti ti-brand-linkedin"></i>
                 </a>
             </div>
@@ -61,7 +61,8 @@
 
             {{-- Discussion --}}
             <div class="group-card">
-                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
+                <div
+                    style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
                     <div>
                         <strong>
                             <i class="ti ti-user-circle"></i>
@@ -92,29 +93,30 @@
             {{-- Replies - VERTICAL STACK --}}
             <div class="group-reply-stack">
                 @forelse($discussion->replies as $reply)
-                    <div class="group-reply-item">
-                        <div class="reply-header">
-                            <div class="reply-author">
-                                <div class="avatar-sm">
-                                    {{ substr($reply->user->first_name ?? 'U', 0, 1) }}
-                                </div>
-                                {{ $reply->user->first_name ?? 'Unknown' }}
+                <div class="group-reply-item">
+                    <div class="reply-header">
+                        <div class="reply-author">
+                            <div class="avatar-sm">
+                                {{ substr($reply->user->first_name ?? 'U', 0, 1) }}
                             </div>
-                            <div class="reply-time">
-                                <i class="ti ti-clock"></i>
-                                {{ $reply->created_at->diffForHumans() }}
-                            </div>
+                            {{ $reply->user->first_name ?? 'Unknown' }}
                         </div>
-                        <div class="reply-body">
-                            {{ $reply->body }}
+                        <div class="reply-time">
+                            <i class="ti ti-clock"></i>
+                            {{ $reply->created_at->diffForHumans() }}
                         </div>
                     </div>
+                    <div class="reply-body">
+                        {{ $reply->body }}
+                    </div>
+                </div>
                 @empty
-                    <div class="group-reply-item" style="text-align:center; padding:40px; border-left-color: var(--gray-300);">
-                        <i class="ti ti-message-circle" style="font-size:36px; color:var(--gray-300);"></i>
-                        <h4 style="margin-top:12px;">No replies yet</h4>
-                        <p class="text-muted">Start the discussion by posting the first reply.</p>
-                    </div>
+                <div class="group-reply-item"
+                    style="text-align:center; padding:40px; border-left-color: var(--gray-300);">
+                    <i class="ti ti-message-circle" style="font-size:36px; color:var(--gray-300);"></i>
+                    <h4 style="margin-top:12px;">No replies yet</h4>
+                    <p class="text-muted">Start the discussion by posting the first reply.</p>
+                </div>
                 @endforelse
             </div>
 
@@ -126,22 +128,18 @@
                 </h3>
 
                 @if($errors->any())
-                    <div class="alert alert-danger">
-                        @foreach($errors->all() as $error)
-                            <p>{{ $error }}</p>
-                        @endforeach
-                    </div>
+                <div class="alert alert-danger">
+                    @foreach($errors->all() as $error)
+                    <p>{{ $error }}</p>
+                    @endforeach
+                </div>
                 @endif
 
                 <form method="POST" action="/groups/{{ $group->id }}/discussions/{{ $discussion->id }}/replies">
                     @csrf
 
                     <div class="form-group">
-                        <textarea
-                            name="body"
-                            class="form-control"
-                            rows="5"
-                            placeholder="Share your thoughts..."
+                        <textarea name="body" class="form-control" rows="5" placeholder="Share your thoughts..."
                             required>{{ old('body') }}</textarea>
                     </div>
 

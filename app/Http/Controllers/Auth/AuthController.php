@@ -54,40 +54,43 @@ class AuthController extends Controller
         ])->onlyInput('email');
     }
 
-    $request->session()->regenerate();
-    $user = Auth::user();
+   $request->session()->regenerate();
+$user = Auth::user();
 
-    // Blacklisting still actually stops someone from logging back in;
-    // there's just no pending-approval gate before that point anymore.
-    if ($user->status === 'blacklisted') {
-        Auth::logout();
-        $request->session()->invalidate();
+if ($user->status === 'pending') {
+    Auth::logout();
+    $request->session()->invalidate();
 
-        return back()->withErrors([
-            'email' => 'This account has been blacklisted.',
-        ])->onlyInput('email');
-    }
+    return back()->withErrors([
+        'email' => 'Please activate your account using the link sent to your email before logging in.',
+    ])->onlyInput('email');
+}
 
+if ($user->status === 'blacklisted') {
+    Auth::logout();
+    $request->session()->invalidate();
 
+    return back()->withErrors([
+        'email' => 'This account has been blacklisted.',
+    ])->onlyInput('email');
+}
 
+return match (true) {
+    $user->role === 'system_admin' => redirect()->route('admin.dashboard'),
+    $user->role === 'lecturer' => redirect()->route('lecturer.dashboard'),
+    $user->role === 'student' => redirect()->route('student.dashboard'),
+    default => abort(403),
 
-    return match (true) {
-        in_array($user->role, ['admin', 'admin']) => redirect()->route('admin.dashboard'),
-        $user->role === 'lecturer' => redirect()->route('lecturer.dashboard'),
-        default => redirect()->route('student.dashboard'),
-
-
-    };
+};
     
     
         
 }
 
-
-    public function register(Request $request)
-    {
-        \Log::info('Register parts');
-        $data = $request->validate([
+public function register(Request $request)
+{
+    \Log::info('Register parts');
+    $data = $request->validate([
         'first_name' => 'required|string|max:255',
         'last_name' => 'required|string|max:255',
         'email' => [
@@ -98,20 +101,14 @@ class AuthController extends Controller
             'unique:users',
         ],
         'password' => 'required|string|min:8|confirmed',
-        ]);
+    ]);
 
-        $user = $this->registrationService->execute($data);
+    $user = $this->registrationService->execute($data);
 
-        return redirect()->route('student.dashboard');
+    $request->session()->regenerate();
 
-         return match (true) {
-        in_array($user->role, ['admin', 'admin']) => redirect()->route('admin.dashboard'),
-        $user->role === 'lecturer' => redirect()->route('lecturer.dashboard'),
-        default => redirect()->route('student.dashboard'),
-    };
-
-
-    }
+    return redirect()->route('student.dashboard');
+}
   
 }
 

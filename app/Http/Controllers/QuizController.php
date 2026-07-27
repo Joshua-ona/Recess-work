@@ -80,36 +80,42 @@ class QuizController extends Controller
     /**
      * Update quiz.
      */
-public function update(Request $request, Quiz $quiz)
+
+    public function update(Request $request, Quiz $quiz)
 {
     $quiz->title = $request->title;
-    //$quiz->group_id = $request->group_id;
-    $quiz->group_id = 2;
+
+    if ($request->filled('group_id')) {
+        $quiz->group_id = $request->group_id;
+    }
+
     $quiz->target_category = $request->target_category;
     $quiz->duration_mins = $request->duration_mins;
-
-    
     $quiz->start_time = $request->start_time;
-
-    
     $quiz->is_published = 1;
 
     $quiz->save();
-   foreach ($quiz->group->users as $student) {
 
-    Notification::firstOrCreate(
-        [
-            'user_id'      => $student->id,
-            'type'         => 'quiz',
-            'reference_id' => $quiz->quiz_id,
-        ],
-        [
-            'message' => 'New quiz: ' . $quiz->title,
-            'sender'  => 'Course Quiz',
-        ]
-    );
+    $quiz->load('group.users');
 
-}
+    if ($quiz->group) {
+
+        foreach ($quiz->group->users as $student) {
+
+            Notification::firstOrCreate(
+                [
+                    'user_id' => $student->id,
+                    'type' => 'quiz',
+                    'reference_id' => $quiz->quiz_id,
+                ],
+                [
+                    'message' => 'New quiz: '.$quiz->title,
+                    'sender' => 'Course Quiz',
+                ]
+            );
+
+        }
+    }
 
     return back()->with('success', 'Quiz published successfully.');
 }

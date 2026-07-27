@@ -608,12 +608,20 @@
                                             <span class="status-badge-custom draft">Draft</span>
                                         @endif
                                     </td>
-                                    <td>
-                                        <a href="{{ route('lecturer.quizzes.edit', $quiz->quiz_id) }}"
-                                           class="action-btn">
-                                            <i class="ti ti-edit"></i>
-                                            Edit
-                                        </a>
+                                  <td>
+                                    <a href="{{ route('lecturer.quizzes.edit', $quiz->quiz_id) }}" class="action-btn">
+                                        <i class="ti ti-edit"></i>
+                                                Edit
+                                    </a>
+                                        @if(!$quiz->is_published)
+                                            <form action="{{ route('lecturer.quizzes.publish', $quiz->quiz_id) }}" method="POST" style="display:inline;">
+                                                @csrf
+                                                    <button type="submit" class="action-btn" style="background:#d1fae5;color:#065f46;">
+                                                        <i class="ti ti-send"></i>
+                                                            Publish
+                                                    </button>
+                                            </form>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach

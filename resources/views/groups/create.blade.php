@@ -8,11 +8,11 @@
 
     {{-- Sidebar --}}
     @include('layouts.sidebar', [
-        'role'            => 'student',
-        'user'            => auth()->user(),
-        'enrolledCourses' => $enrolledCourses ?? collect(),
-        'unreadCount'     => $unreadCount ?? 0,
-        'notifCount'      => $notifCount ?? 0,
+    'role' => 'student',
+    'user' => auth()->user(),
+    'enrolledCourses' => $enrolledCourses ?? collect(),
+    'unreadCount' => $unreadCount ?? 0,
+    'notifCount' => $notifCount ?? 0,
     ])
 
     {{-- Main --}}
@@ -39,11 +39,11 @@
             <div class="group-card" style="padding:35px;">
 
                 @if($errors->any())
-                    <div class="alert alert-danger">
-                        @foreach($errors->all() as $error)
-                            <p>{{ $error }}</p>
-                        @endforeach
-                    </div>
+                <div class="alert alert-danger">
+                    @foreach($errors->all() as $error)
+                    <p>{{ $error }}</p>
+                    @endforeach
+                </div>
                 @endif
 
                 <form method="POST" action="/groups">
@@ -54,13 +54,8 @@
                         <label style="font-weight:600; display:block; margin-bottom:8px;">
                             Group Name
                         </label>
-                        <input
-                            type="text"
-                            name="name"
-                            class="form-control"
-                            placeholder="Enter the group name..."
-                            value="{{ old('name') }}"
-                            required>
+                        <input type="text" name="name" class="form-control" placeholder="Enter the group name..."
+                            value="{{ old('name') }}" required>
                     </div>
 
                     {{-- Description --}}
@@ -68,15 +63,13 @@
                         <label style="font-weight:600; display:block; margin-bottom:8px;">
                             Description
                         </label>
-                        <textarea
-                            name="description"
-                            class="form-control"
-                            rows="6"
+                        <textarea name="description" class="form-control" rows="6"
                             placeholder="Describe the purpose of this group...">{{ old('description') }}</textarea>
                     </div>
 
                     {{-- Tips --}}
-                    <div class="group-card" style="background:#F8FAFC; margin-top:25px; padding:20px; border-left:5px solid var(--primary);">
+                    <div class="group-card"
+                        style="background:#F8FAFC; margin-top:25px; padding:20px; border-left:5px solid var(--primary);">
                         <strong>
                             <i class="ti ti-bulb"></i>
                             Tips for creating a good group
