@@ -92,6 +92,14 @@ class AdminUserController extends Controller
             'message' => $request->input('message'),
         ]);
 
+        \App\Models\Notification::create([
+            'user_id'      => $user->id,
+            'type'         => 'warning',
+            'reference_id' => null,
+            'message'      => $request->input('message'),
+            'sender'       => $request->user()->first_name . ' ' . $request->user()->last_name,
+        ]);
+
         $user->warning_count += 1;
         $user->last_warning_at = now();
 
