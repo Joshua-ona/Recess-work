@@ -6,13 +6,11 @@ export default defineConfig({
     plugins: [
         laravel({
             input: [
-
-                'resources/css/tailwind.css',
+                'resources/css/app.css',
                 'resources/js/app.js',
             ],
             refresh: true,
         }),
-
 
         vue({
             template: {
@@ -23,6 +21,7 @@ export default defineConfig({
             },
         }),
     ],
+
     resolve: {
         alias: {
             vue: 'vue/dist/vue.esm-bundler.js',
