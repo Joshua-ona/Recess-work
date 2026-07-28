@@ -13,10 +13,12 @@ echo "Starting Recommendation Engine..."
 
 cd /var/www/html/app/recommendation_engine/deployment
 
-python3 api.py > flask.log 2>&1 &
+python3 api.py &
+FLASK_PID=$!
 
-echo "Starting Laravel..."
+sleep 5
 
-cd /var/www/html
+echo "Checking Flask process..."
+ps aux | grep python
 
-php artisan serve --host=0.0.0.0 --port=$PORT
+echo "Flask startup check completed"
