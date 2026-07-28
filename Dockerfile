@@ -12,6 +12,14 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 COPY . .
 
+# Create Laravel required directories before composer runs
+RUN mkdir -p storage/framework/cache/data \
+    storage/framework/sessions \
+    storage/framework/views \
+    bootstrap/cache
+
+RUN chmod -R 775 storage bootstrap/cache
+
 RUN composer install --no-dev --optimize-autoloader
 
 RUN php artisan storage:link || true
