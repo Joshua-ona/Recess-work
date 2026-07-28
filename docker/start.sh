@@ -1,6 +1,5 @@
 #!/bin/sh
 
-
 php artisan migrate --force || true
 
 php artisan storage:link || true
@@ -13,7 +12,7 @@ php artisan view:cache
 
 echo "Starting Recommendation Engine..."
 
-cd recommendation_engine/deployment
+cd /var/www/html/app/recommendation_engine
 
 python3 api.py &
 

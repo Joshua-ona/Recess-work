@@ -42,7 +42,7 @@ RUN composer install --no-dev --optimize-autoloader
 # Python recommendation engine dependencies
 RUN pip3 install \
     --break-system-packages \
-    -r app/recommendation_engine/deployment/requirements.txt
+    -r app/recommendation_engine/requirements.txt
 
 
 # Frontend
