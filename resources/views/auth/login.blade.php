@@ -7,9 +7,9 @@
 
         {{-- Logo --}}
         <div class="auth-logo">
-            <div class="auth-logo-icon" aria-hidden="true">
-                <i class="ti ti-messages"></i>
-            </div>
+            <img src="{{ asset('images/logo.png') }}"
+             alt="EduDiscuss Logo"
+             width="60">
             <div>
                 <div class="auth-logo-name">EduDiscuss</div>
                 <div class="auth-logo-sub">Academic discussion platform</div>

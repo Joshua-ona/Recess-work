@@ -274,4 +274,37 @@ class StudentQuizController extends Controller
             'timedOut' => false
         ]);
     }
+
+    public function activeCheck()
+    {
+        $user = auth()->user();
+        $now  = now();
+
+        // Don't re-announce the quiz the student is already inside right now —
+        // this is what was causing the endless popup/redirect loop.
+        $activeQuizId = session('active_quiz_id');
+
+        // Don't announce quizzes they've already submitted.
+        $attemptedQuizIds = QuizSubmission::where('user_id', $user->id)->pluck('quiz_id');
+
+        $quiz = Quiz::query()
+            ->where('is_published', 1)
+            ->where('start_time', '<=', $now)
+            ->whereRaw('DATE_ADD(start_time, INTERVAL duration_mins MINUTE) > ?', [$now])
+            ->when($activeQuizId, fn ($q) => $q->where('quiz_id', '!=', $activeQuizId))
+            ->whereNotIn('quiz_id', $attemptedQuizIds)
+            ->first();
+
+        if (! $quiz) {
+            return response()->json(['active' => false]);
+        }
+
+        return response()->json([
+            'active'    => true,
+            'quiz_id'   => $quiz->quiz_id,
+            'title'     => $quiz->title,
+            'ends_at'   => optional($quiz->start_time)->addMinutes($quiz->duration_mins)->toIso8601String(),
+            'start_url' => route('student.quizzes.attempt', $quiz->quiz_id),
+        ]);
+    }
 }

@@ -1,7 +1,7 @@
 {{--
     Reusable sidebar partial.
     Props (passed via @include):
-      $role   — 'system_admin' | 'student' | 'lecturer'
+      $role   — 'admin' | 'student' | 'lecturer'
       $user   — Auth user object
 --}}
 
@@ -13,13 +13,15 @@
         {{-- Logo (visible on desktop) --}}
         <div class="sidebar-logo">
             <div class="sidebar-logo-row">
-                <div class="sidebar-logo-icon" aria-hidden="true">
-                    <i class="ti ti-messages"></i>
-                </div>
+                 <img src="{{ asset('images/logo.png') }}"
+             width="30"
+             height="30"
+             alt="EduDiscuss Logo">
+               
                 <div>
                     <div class="sidebar-logo-name">EduDiscuss</div>
                     <div class="sidebar-logo-sub">
-                        @if($role === 'system_admin') Administration
+                        @if($role === 'admin') Administration
                         @elseif($role === 'lecturer') Lecturer portal
                         @else Student portal
                         @endif
@@ -29,39 +31,54 @@
         </div>
 
         {{-- ── Admin nav ── --}}
-    @if($role === 'system_admin')
-        <div class="sidebar-section">
-            <div class="sidebar-section-label">Overview</div>
-            <a href="{{ route('admin.dashboard') }}"
-               class="sidebar-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
-                <i class="ti ti-layout-dashboard" aria-hidden="true"></i> Dashboard
-            </a>
-            <a href="{{ route('admin.analytics') }}"
-               class="sidebar-item {{ request()->routeIs('admin.analytics') || request()->routeIs('admin.analytics.*') ? 'active' : '' }}">
-                <i class="ti ti-chart-bar" aria-hidden="true"></i> Analytics
-            </a>
-        </div>
-        <div class="sidebar-section">
-            <div class="sidebar-section-label">Management</div>
-            <a href="{{ route('admin.users.index') }}"
-               class="sidebar-item {{ request()->routeIs('admin.users*') ? 'active' : '' }}">
-                <i class="ti ti-users" aria-hidden="true"></i> Manage users
-                <span class="sidebar-badge">{{ $userCount ?? 0 }}</span>
-            </a>
-            <a href="{{ route('admin.lecturers.create') }}"
-               class="sidebar-item {{ request()->routeIs('admin.lecturers.*') ? 'active' : '' }}">
-                <i class="ti ti-user-plus" aria-hidden="true"></i> Add lecturer
-            </a>
-        </div>
-        <div class="sidebar-section">
-            {{-- 🔐 Admin logout --}}
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button type="submit" class="sidebar-item logout-btn">
-                    <i class="ti ti-logout" aria-hidden="true"></i> Logout
-                </button>
-            </form>
-        </div>
+        @if($role === 'admin')
+            <div class="sidebar-section">
+                <div class="sidebar-section-label">Overview</div>
+                <a href="{{ route('admin.dashboard') }}"
+                   class="sidebar-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                    <i class="ti ti-layout-dashboard" aria-hidden="true"></i> <span>Dashboard</span>
+                </a>
+                <a href="{{ route('admin.analytics') }}"
+                   class="sidebar-item {{ request()->routeIs('admin.analytics') ? 'active' : '' }}">
+                    <i class="ti ti-chart-bar" aria-hidden="true"></i> <span>Analytics</span>
+                </a>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-section-label">Management</div>
+                <a href="{{ route('admin.users.index') }}"
+                   class="sidebar-item {{ request()->routeIs('admin.users*') ? 'active' : '' }}">
+                    <i class="ti ti-users" aria-hidden="true"></i> <span>Users</span>
+                    <span class="sidebar-badge">{{ $userCount ?? 0 }}</span>
+                </a>
+                <a href="{{ route('admin.discussions') }}"
+                   class="sidebar-item {{ request()->routeIs('admin.discussions*') ? 'active' : '' }}">
+                    <i class="ti ti-messages" aria-hidden="true"></i> <span>Discussions</span>
+                </a>
+                <a href="{{ route('admin.courses') }}"
+                   class="sidebar-item {{ request()->routeIs('admin.courses*') ? 'active' : '' }}">
+                    <i class="ti ti-books" aria-hidden="true"></i> <span>Courses</span>
+                </a>
+                <a href="{{ route('admin.reports') }}"
+                   class="sidebar-item {{ request()->routeIs('admin.reports*') ? 'active' : '' }}">
+                    <i class="ti ti-flag" aria-hidden="true"></i> <span>Reports</span>
+                    @if(($openReports ?? 0) > 0)
+                        <span class="sidebar-badge">{{ $openReports }}</span>
+                    @endif
+                </a>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-section-label">System</div>
+                <a href="{{ route('admin.settings') }}"
+                   class="sidebar-item {{ request()->routeIs('admin.settings') ? 'active' : '' }}">
+                    <i class="ti ti-settings" aria-hidden="true"></i> <span>Settings</span>
+                </a>
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="sidebar-item logout-btn">
+                        <i class="ti ti-logout" aria-hidden="true"></i> <span>Logout</span>
+                    </button>
+                </form>
+            </div>
 
         {{-- ── Lecturer nav ── --}}
         @elseif($role === 'lecturer')
@@ -71,7 +88,12 @@
                    class="sidebar-item {{ request()->routeIs('lecturer.dashboard') ? 'active' : '' }}">
                     <i class="ti ti-layout-dashboard" aria-hidden="true"></i> <span>Dashboard</span>
                 </a>
-              
+                <a href="{{ route('lecturer.discussions.index') }}" class="sidebar-item">
+                    <i class="ti ti-messages"></i> <span>Discussions</span>
+                </a>
+                <a href="{{ route('lecturer.categories') }}" class="sidebar-item">
+                    <i class="ti ti-category"></i> <span>Categories</span>
+                </a>
                 <a href="{{ route('lecturer.quizzes') }}" class="sidebar-item">
                     <i class="ti ti-clipboard-check"></i> <span>Quizzes</span>
                 </a>
@@ -86,7 +108,9 @@
                         </span>
                     @endif
                 </a>
-               
+                <a href="{{ route('lecturer.notifications') }}" class="sidebar-item">
+                    <i class="ti ti-bell"></i> <span>Notifications</span>
+                </a>
             </div>
             <div class="sidebar-section">
                 <form method="POST" action="{{ route('logout') }}">
@@ -181,7 +205,7 @@
             <a href="{{ route('student.my-discussions') }}"
                class="mobile-nav-item {{ request()->routeIs('student.my-discussions') ? 'active' : '' }}">
                 <i class="ti ti-messages" aria-hidden="true"></i>
-                <span>Disc</span>
+                <span>Discussions</span>
                 @if(($unreadCount ?? 0) > 0)
                     <span class="mobile-badge">{{ $unreadCount }}</span>
                 @endif
@@ -222,3 +246,55 @@
     </div>
 
 </nav>
+
+@if($role === 'student')
+<div id="live-quiz-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:2000; align-items:center; justify-content:center;">
+    <div style="background:#fff; border-radius:16px; padding:2rem; max-width:380px; width:90%; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,.3);">
+        <div style="font-size:38px; margin-bottom:.5rem;">⏰</div>
+        <h3 style="margin:0 0 .5rem; font-size:18px; font-weight:700;">A quiz is now live</h3>
+        <p id="live-quiz-title" style="color:#6b6a66; font-size:14px; margin-bottom:1.25rem;"></p>
+        <a id="live-quiz-start-btn" href="#" class="btn btn-primary" style="width:100%; justify-content:center;">
+            Start now
+        </a>
+    </div>
+</div>
+
+<script>
+(function () {
+    var checkUrl = "{{ route('student.quizzes.active-check') }}";
+    var modal = document.getElementById('live-quiz-modal');
+    var titleEl = document.getElementById('live-quiz-title');
+    var startBtn = document.getElementById('live-quiz-start-btn');
+    var AUTO_START_SECONDS = 15; // auto-redirects into the quiz if ignored
+    var shown = false;
+
+    function poll() {
+        if (shown) return; // already showing/handled one this session
+        fetch(checkUrl, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                if (data && data.active) {
+                    shown = true;
+                    titleEl.textContent = '"' + data.title + '" has started — you have limited time to begin.';
+                    startBtn.href = data.start_url;
+                    modal.style.display = 'flex';
+
+                    var remaining = AUTO_START_SECONDS;
+                    var iv = setInterval(function () {
+                        remaining--;
+                        startBtn.textContent = 'Start now (' + remaining + ')';
+                        if (remaining <= 0) {
+                            clearInterval(iv);
+                            window.location.href = data.start_url;
+                        }
+                    }, 1000);
+                }
+            })
+            .catch(function () { /* ignore transient errors, try again next poll */ });
+    }
+
+    poll();
+    setInterval(poll, 15000);
+})();
+</script>
+@endif
