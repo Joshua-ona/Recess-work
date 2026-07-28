@@ -11,7 +11,7 @@ class AdminUserController extends Controller
 {
     private function authorizeAdmin(Request $request)
     {
-        if ($request->user()->role !== 'admin') {
+        if (!in_array($request->user()->role, ['admin', 'system_admin'], true)) {
             abort(403, 'Unauthorized');
         }
     }
@@ -121,6 +121,14 @@ class AdminUserController extends Controller
 
             'message' =>
                 $request->message
+        ]);
+
+        \App\Models\Notification::create([
+            'user_id'      => $user->id,
+            'type'         => 'warning',
+            'reference_id' => null,
+            'message'      => $request->message,
+            'sender'       => $request->user()->first_name . ' ' . $request->user()->last_name,
         ]);
 
         $user->warning_count++;
