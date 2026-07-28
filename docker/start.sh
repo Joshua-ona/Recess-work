@@ -11,7 +11,7 @@ php artisan view:cache
 
 echo "Starting Recommendation Engine..."
 
-cd /var/www/html/app/recommendation_engine
+cd /var/www/html/app/recommendation_engine/deployment
 
 python3 api.py > flask.log 2>&1 &
 
