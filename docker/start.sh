@@ -14,7 +14,7 @@ echo "Starting Recommendation Engine..."
 
 cd /var/www/html/app/recommendation_engine/deployment
 
-python3 api.py 2>&1 &
+gunicorn --bind 0.0.0.0:5001 api:app &
 
 
 echo "Starting Laravel..."
