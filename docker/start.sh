@@ -9,13 +9,11 @@ php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 
-
 echo "Starting Recommendation Engine..."
 
 cd /var/www/html/app/recommendation_engine
 
-python3 api.py &
-
+python3 api.py > flask.log 2>&1 &
 
 echo "Starting Laravel..."
 
