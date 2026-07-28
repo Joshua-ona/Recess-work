@@ -145,16 +145,10 @@ def home():
 
 if __name__ == "__main__":
 
-    port = int(
-        os.environ.get(
-            "PORT",
-            5001
-        )
-    )
-
+    print("Starting Flask recommendation API...", flush=True)
 
     app.run(
         host="0.0.0.0",
-        port=port,
+        port=5001,
         debug=False
     )

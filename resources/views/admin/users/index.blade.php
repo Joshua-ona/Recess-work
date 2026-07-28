@@ -95,7 +95,7 @@
                                     @else
                                     <div style="display:flex; flex-direction:column; gap:6px; align-items:flex-end;">
                                         @if ($user->status === 'blacklisted')
-                                        <form method="POST" action="{{ route('admin.Users.unblacklist', $user) }}">
+                                        <form method="POST" action="{{ route('admin.users.unblacklist', $user) }}">
                                             @csrf
                                             <button class="btn btn-outline btn-sm">Reinstate</button>
                                         </form>

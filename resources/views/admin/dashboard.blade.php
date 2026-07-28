@@ -267,7 +267,7 @@
                                     <details>
                                         <summary class="btn btn-outline btn-sm"
                                             style="display:inline-flex; cursor:pointer;">Warn</summary>
-                                        <form method="POST" action="{{ route('admin.Users.warn', $user) }}"
+                                        <form method="POST" action="{{ route('admin.users.warn', $user) }}"
                                             style="margin-top:8px; display:flex; flex-direction:column; gap:6px;">
                                             @csrf
                                             <textarea name="message" rows="2" required
@@ -278,11 +278,11 @@
                                         </form>
                                     </details>
                                     <div style="display:flex; gap:6px; justify-content:flex-end;">
-                                        <form method="POST" action="{{ route('admin.Users.logout', $user) }}">
+                                        <form method="POST" action="{{ route('admin.users.logout', $user) }}">
                                             @csrf
                                             <button class="btn btn-outline btn-sm">Log out</button>
                                         </form>
-                                        <form method="POST" action="{{ route('admin.Users.blacklist', $user) }}"
+                                        <form method="POST" action="{{ route('admin.users.blacklist', $user) }}"
                                             onsubmit="return confirm('Blacklist {{ $user->full_name }} immediately?');">
                                             @csrf
                                             <button class="btn btn-danger-sm">Blacklist</button>
