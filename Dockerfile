@@ -6,13 +6,13 @@ RUN apt-get update && apt-get install -y \
     unzip \
     git \
     libzip-dev \
-    && docker-php-ext-install pdo_mysql zip
+    libpq-dev \
+    && docker-php-ext-install pdo_mysql pdo_pgsql zip
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 COPY . .
 
-# Create Laravel required directories before composer runs
 RUN mkdir -p storage/framework/cache/data \
     storage/framework/sessions \
     storage/framework/views \
@@ -23,6 +23,10 @@ RUN chmod -R 775 storage bootstrap/cache
 RUN composer install --no-dev --optimize-autoloader
 
 RUN php artisan storage:link || true
+
+RUN php artisan config:cache || true
+RUN php artisan route:cache || true
+RUN php artisan view:cache || true
 
 EXPOSE 8000
 
