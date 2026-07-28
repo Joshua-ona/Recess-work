@@ -267,7 +267,7 @@
                                     <details>
                                         <summary class="btn btn-outline btn-sm"
                                             style="display:inline-flex; cursor:pointer;">Warn</summary>
-                                        <form method="POST" action="{{ route('admin.Users.warn', $user) }}"
+                                        <form method="POST" action="{{ route('admin.users.warn', $user) }}"
                                             style="margin-top:8px; display:flex; flex-direction:column; gap:6px;">
                                             @csrf
                                             <textarea name="message" rows="2" required
