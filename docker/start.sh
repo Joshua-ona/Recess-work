@@ -9,16 +9,16 @@ php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 
+
 echo "Starting Recommendation Engine..."
 
 cd /var/www/html/app/recommendation_engine/deployment
 
-python3 api.py &
-FLASK_PID=$!
+python3 api.py 2>&1 &
 
-sleep 5
 
-echo "Checking Flask process..."
-ps aux | grep python
+echo "Starting Laravel..."
 
-echo "Flask startup check completed"
+cd /var/www/html
+
+php artisan serve --host=0.0.0.0 --port=$PORT
