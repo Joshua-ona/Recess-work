@@ -53,6 +53,16 @@ class User extends Authenticatable
     public function isGroupAdmin(): bool {return $this->role == 'group_admin';}
     public function isSystemAdmin(): bool {return $this->role == 'system_admin';}
 
+    /**
+     * "First Last" — used all over the views/controllers. There's no
+     * full_name column; this derives it from first_name/last_name so
+     * every existing $user->full_name reference works.
+     */
+    public function getFullNameAttribute(): string
+    {
+        return trim("{$this->first_name} {$this->last_name}");
+    }
+
  
 
     public function verification(): HasOne

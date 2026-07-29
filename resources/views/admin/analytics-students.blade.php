@@ -1,22 +1,33 @@
-@extends('layouts.admin')
+@extends('layouts.app')
 @section('title', 'Student Analytics')
 
-@section('content')
+@section('body')
 
-<div class="flex items-center justify-between border-b pb-3 mb-6">
-    <div>
-        <span class="font-semibold text-xl">Student analytics</span>
-        <span class="text-sm text-gray-500 ml-2">Performance & engagement across every student</span>
-    </div>
-    <div class="flex gap-2">
-        <a href="{{ route('admin.dashboard') }}"
-            class="text-sm border rounded px-3 py-1.5 hover:bg-gray-50">Dashboard</a>
-        <a href="{{ route('admin.analytics') }}" class="text-sm border rounded px-3 py-1.5 hover:bg-gray-50">System
-            analytics</a>
-    </div>
-</div>
+<div class="dash-wrap">
+    @include('layouts.sidebar', [
+        'role' => 'system_admin',
+        'user' => auth()->user(),
+    ])
+    <div class="dash-main">
+        <div class="dash-header">
+            <div>
+                <div class="dash-header-title">Student analytics</div>
+                <div class="dash-header-sub">Performance &amp; engagement across every student</div>
+            </div>
+        </div>
 
-<div class="grid grid-cols-3 gap-4 mb-8">
+        <div class="dash-body" style="flex-direction:column;">
+
+            <div style="display:flex; gap:8px; margin-bottom:1.5rem;">
+                <a href="{{ route('admin.analytics') }}"
+                    class="btn btn-sm {{ request()->routeIs('admin.analytics') ? 'btn-primary' : 'btn-outline' }}">System
+                    analytics</a>
+                <a href="{{ route('admin.analytics.overview') }}"
+                    class="btn btn-sm {{ request()->routeIs('admin.analytics.overview') ? 'btn-primary' : 'btn-outline' }}">Student
+                    analytics</a>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4 mb-8">
     <div class="bg-white border rounded-lg p-4">
         <p class="text-xs text-gray-500 uppercase tracking-wide mb-2">Total students</p>
         <p class="text-3xl font-bold">{{ $total_students }}</p>
@@ -127,6 +138,9 @@
                 @endforelse
             </tbody>
         </table>
+    </div>
+</div>
+        </div>
     </div>
 </div>
 

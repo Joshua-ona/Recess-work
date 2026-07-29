@@ -75,10 +75,11 @@ Route::prefix('system_admin')->name('admin.')->middleware(['auth', 'role:system_
     Route::post('/members/{user}/logout',     [AdminUserController::class, 'logout'])->name('users.logout');
 
     // Lecturer invitations
-    Route::get('/lecturers/create',          [AdminLecturerController::class, 'create'])->name('lecturers.create');
-    Route::post('/lecturers',                [AdminLecturerController::class, 'store'])->name('lecturers.store');
-    Route::post('/lecturers/{user}/resend',  [AdminLecturerController::class, 'resend'])->name('lecturers.resend');
-    Route::post('/lecturer/activate/resend', [AdminLecturerController::class, 'resendSelf'])->name('lecturer.resend.self');
+    Route::get('/lecturers/create',            [AdminLecturerController::class, 'create'])->name('lecturers.create');
+    Route::post('/lecturers',                  [AdminLecturerController::class, 'store'])->name('lecturers.store');
+    Route::post('/lecturers/{invite}/resend',  [AdminLecturerController::class, 'resend'])->name('lecturers.resend');
+    Route::post('/lecturers/{invite}/cancel',  [AdminLecturerController::class, 'cancel'])->name('lecturers.cancel');
+    Route::post('/lecturer/activate/resend',   [AdminLecturerController::class, 'resendSelf'])->name('lecturer.resend.self');
 
     // Analytics
     Route::get('/analytics-students',                        [StudentAnalyticsController::class, 'adminOverview'])->name('analytics.overview');

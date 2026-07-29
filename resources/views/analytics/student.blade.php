@@ -6,7 +6,7 @@
 <div class="dash-wrap">
 
     @include('layouts.sidebar', [
-    'role' => $role === 'system_admin' ? 'admin' : $role,
+    'role' => $role,
     'user' => auth()->user(),
     ])
 

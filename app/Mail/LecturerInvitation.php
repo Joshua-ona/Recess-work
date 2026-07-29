@@ -2,7 +2,7 @@
 
 namespace App\Mail;
 
-use App\Models\User;
+use App\Models\LecturerInvite;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
@@ -12,7 +12,7 @@ class LecturerInvitation extends Mailable
     use Queueable, SerializesModels;
 
     public function __construct(
-        public User $user,
+        public LecturerInvite $invite,
         public string $activationUrl,
     ) {
     }

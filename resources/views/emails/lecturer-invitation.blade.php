@@ -9,11 +9,11 @@
         <h2 style="margin:0 0 16px; font-size:20px;">You've been added as a lecturer</h2>
 
         <p style="font-size:14px; color:#333; line-height:1.5;">
-            Hi {{ $user->first_name }},
+            Hi {{ $invite->first_name }},
         </p>
         <p style="font-size:14px; color:#333; line-height:1.5;">
-            An administrator has created a lecturer account for you on EduDiscuss
-            using this email address ({{ $user->email }}). To activate your
+            An administrator has invited you to join EduDiscuss as a lecturer
+            using this email address ({{ $invite->email }}). To create your
             account, set a password using the button below.
         </p>
 

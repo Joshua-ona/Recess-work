@@ -18,6 +18,62 @@
 
         <div class="dash-body" style="flex-direction:column;">
 
+            @if (session('status'))
+            <div class="alert alert-success">{{ session('status') }}</div>
+            @endif
+
+            @if ($pendingInvites->isNotEmpty())
+            <div class="full-panel" style="margin-bottom:1.5rem;">
+                <div class="panel-body">
+                    <div style="font-weight:600; margin-bottom:0.75rem;">
+                        Pending lecturer invitations ({{ $pendingInvites->count() }})
+                    </div>
+                    <div class="table-scroll">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Sent</th>
+                                    <th>Expires</th>
+                                    <th style="text-align:right;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($pendingInvites as $invite)
+                                <tr>
+                                    <td>{{ $invite->first_name }} {{ $invite->last_name }}</td>
+                                    <td class="text-muted">{{ $invite->email }}</td>
+                                    <td>{{ $invite->created_at->diffForHumans() }}</td>
+                                    <td>
+                                        @if ($invite->isExpired())
+                                        <span class="badge badge-red">Expired</span>
+                                        @else
+                                        {{ $invite->expires_at->diffForHumans() }}
+                                        @endif
+                                    </td>
+                                    <td style="text-align:right;">
+                                        <div style="display:flex; gap:6px; justify-content:flex-end;">
+                                            <form method="POST" action="{{ route('admin.lecturers.resend', $invite) }}">
+                                                @csrf
+                                                <button class="btn btn-outline btn-sm">Resend</button>
+                                            </form>
+                                            <form method="POST" action="{{ route('admin.lecturers.cancel', $invite) }}"
+                                                onsubmit="return confirm('Cancel this invitation?');">
+                                                @csrf
+                                                <button class="btn btn-danger-sm">Cancel</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            @endif
+
             <form method="GET" action="{{ route('admin.users.index') }}" style="margin-bottom:1rem; max-width:360px;">
                 <input type="text" name="search" value="{{ $search }}" placeholder="Search by name or email…"
                     class="form-control">

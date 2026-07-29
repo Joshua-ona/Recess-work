@@ -1,7 +1,7 @@
 {{--
     Reusable sidebar partial.
     Props (passed via @include):
-      $role   — 'admin' | 'student' | 'lecturer'
+      $role   — 'system_admin' | 'student' | 'lecturer'
       $user   — Auth user object
 --}}
 
@@ -21,7 +21,7 @@
                 <div>
                     <div class="sidebar-logo-name">EduDiscuss</div>
                     <div class="sidebar-logo-sub">
-                        @if($role === 'admin') Administration
+                        @if($role === 'system_admin') Administration
                         @elseif($role === 'lecturer') Lecturer portal
                         @else Student portal
                         @endif
@@ -31,9 +31,8 @@
         </div>
 
         {{-- ── Admin nav ── --}}
-        @if($role === 'admin')
+        @if($role === 'system_admin')
             <div class="sidebar-section">
-                <div class="sidebar-section-label">Overview</div>
                 <a href="{{ route('admin.dashboard') }}"
                    class="sidebar-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                     <i class="ti ti-layout-dashboard" aria-hidden="true"></i> <span>Dashboard</span>
@@ -42,35 +41,14 @@
                    class="sidebar-item {{ request()->routeIs('admin.analytics') ? 'active' : '' }}">
                     <i class="ti ti-chart-bar" aria-hidden="true"></i> <span>Analytics</span>
                 </a>
-            </div>
-            <div class="sidebar-section">
-                <div class="sidebar-section-label">Management</div>
                 <a href="{{ route('admin.users.index') }}"
                    class="sidebar-item {{ request()->routeIs('admin.users*') ? 'active' : '' }}">
                     <i class="ti ti-users" aria-hidden="true"></i> <span>Users</span>
                     <span class="sidebar-badge">{{ $userCount ?? 0 }}</span>
                 </a>
-                <a href="{{ route('admin.discussions') }}"
-                   class="sidebar-item {{ request()->routeIs('admin.discussions*') ? 'active' : '' }}">
-                    <i class="ti ti-messages" aria-hidden="true"></i> <span>Discussions</span>
-                </a>
-                <a href="{{ route('admin.courses') }}"
-                   class="sidebar-item {{ request()->routeIs('admin.courses*') ? 'active' : '' }}">
-                    <i class="ti ti-books" aria-hidden="true"></i> <span>Courses</span>
-                </a>
-                <a href="{{ route('admin.reports') }}"
-                   class="sidebar-item {{ request()->routeIs('admin.reports*') ? 'active' : '' }}">
-                    <i class="ti ti-flag" aria-hidden="true"></i> <span>Reports</span>
-                    @if(($openReports ?? 0) > 0)
-                        <span class="sidebar-badge">{{ $openReports }}</span>
-                    @endif
-                </a>
-            </div>
-            <div class="sidebar-section">
-                <div class="sidebar-section-label">System</div>
-                <a href="{{ route('admin.settings') }}"
-                   class="sidebar-item {{ request()->routeIs('admin.settings') ? 'active' : '' }}">
-                    <i class="ti ti-settings" aria-hidden="true"></i> <span>Settings</span>
+                <a href="{{ route('admin.lecturers.create') }}"
+                   class="sidebar-item {{ request()->routeIs('admin.lecturers.*') ? 'active' : '' }}">
+                    <i class="ti ti-user-plus" aria-hidden="true"></i> <span>Add lecturer</span>
                 </a>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
@@ -136,11 +114,13 @@
                         <span class="sidebar-badge">{{ $unreadCount }}</span>
                     @endif
                 </a>
-                <a href="{{ route('student.saved') }}" class="sidebar-item">
-                    <i class="ti ti-bookmark" aria-hidden="true"></i> <span>Saved posts</span>
-                </a>
+                
                 <a href="{{ route('student.quizzes') }}" class="sidebar-item">
                     <i class="ti ti-clipboard-check"></i> <span>Quizzes</span>
+                </a>
+                <a href="{{ route('analytics.mine') }}"
+                   class="sidebar-item {{ request()->routeIs('analytics.mine') ? 'active' : '' }}">
+                    <i class="ti ti-chart-bar" aria-hidden="true"></i> <span>My analytics</span>
                 </a>
                 <a href="{{ route('chat') }}" class="sidebar-item">
                     <i class="ti ti-message-circle"></i> <span>Messages</span>

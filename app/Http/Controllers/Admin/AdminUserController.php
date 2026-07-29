@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\LecturerInvite;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -44,10 +45,13 @@ class AdminUserController extends Controller
                 ->all();
         }
 
+        $pendingInvites = LecturerInvite::orderByDesc('created_at')->get();
+
         return view('admin.users.index', [
             'users' => $users,
             'onlineIds' => $onlineIds,
             'search' => $search ?? '',
+            'pendingInvites' => $pendingInvites,
         ]);
     }
 

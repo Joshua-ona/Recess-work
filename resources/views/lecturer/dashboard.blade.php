@@ -52,6 +52,10 @@
                 <div class="alert alert-success">{{ session('success') }}</div>
             @endif
 
+            @if(session('status'))
+                <div class="alert alert-success">{{ session('status') }}</div>
+            @endif
+
             {{-- Stat cards --}}
             <div class="stat-grid">
                 <div class="stat-card">
