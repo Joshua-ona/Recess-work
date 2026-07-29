@@ -1,7 +1,7 @@
 {{--
     Reusable sidebar partial.
     Props (passed via @include):
-      $role   — 'admin' | 'student' | 'lecturer'
+      $role   — 'system_admin' | 'student' | 'lecturer'
       $user   — Auth user object
 --}}
 
@@ -21,7 +21,7 @@
                 <div>
                     <div class="sidebar-logo-name">EduDiscuss</div>
                     <div class="sidebar-logo-sub">
-                        @if($role === 'admin') Administration
+                        @if($role === 'system_admin') Administration
                         @elseif($role === 'lecturer') Lecturer portal
                         @else Student portal
                         @endif
@@ -31,7 +31,7 @@
         </div>
 
         {{-- ── Admin nav ── --}}
-        @if($role === 'admin')
+        @if($role === 'system_admin')
             <div class="sidebar-section">
                 <div class="sidebar-section-label">Overview</div>
                 <a href="{{ route('admin.dashboard') }}"
