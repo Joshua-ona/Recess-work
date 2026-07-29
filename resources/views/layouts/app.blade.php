@@ -532,11 +532,12 @@
 }
 
     /* ── Stat cards ── */
-    .stat-grid {
+.stat-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        grid-template-columns: repeat(4, 1fr);
         gap: 12px;
         margin-bottom: 1.5rem;
+        overflow: visible;
     }
 
     .stat-card {
@@ -545,6 +546,26 @@
         border-radius: var(--radius-lg);
         padding: 1rem;
         transition: box-shadow .15s, transform .15s;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        min-width: 0;
+    }
+
+    .stat-label {
+        flex-wrap: wrap;
+        width: 100%;
+    }
+
+    .stat-value {
+        white-space: nowrap;
+        width: 100%;
+    }
+
+    @media (max-width: 768px) {
+        .stat-grid {
+            grid-template-columns: 1fr 1fr;
+        }
     }
 
     .stat-card:hover {
