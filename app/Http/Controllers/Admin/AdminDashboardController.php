@@ -25,7 +25,7 @@ class AdminDashboardController extends Controller
                 ->count('user_id');
         }
 
-        // Pending lecturer approvals (self-registered, awaiting admin sign-off)
+        // Lecturers who were invited but haven't yet activated their account
         $pendingApprovals = User::where('status', 'pending')
             ->orderByDesc('created_at')
             ->get();

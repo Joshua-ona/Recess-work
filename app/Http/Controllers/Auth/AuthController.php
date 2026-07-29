@@ -40,9 +40,8 @@ class AuthController extends Controller
     }
 
 
-    public function login(Request $request)
-
-    {
+public function login(Request $request)
+{
     $credentials = $request->validate([
         'email' => ['required', 'email'],
         'password' => ['required'],
@@ -54,37 +53,33 @@ class AuthController extends Controller
         ])->onlyInput('email');
     }
 
-   $request->session()->regenerate();
-$user = Auth::user();
+    $request->session()->regenerate();
+    $user = Auth::user();
 
-if ($user->status === 'pending') {
-    Auth::logout();
-    $request->session()->invalidate();
+    if ($user->status === 'pending') {
+        Auth::logout();
+        $request->session()->invalidate();
 
-    return back()->withErrors([
-        'email' => 'Please activate your account using the link sent to your email before logging in.',
-    ])->onlyInput('email');
-}
+        return back()->withErrors([
+            'email' => 'Please activate your account using the link sent to your email before logging in.',
+        ])->onlyInput('email');
+    }
 
-if ($user->status === 'blacklisted') {
-    Auth::logout();
-    $request->session()->invalidate();
+    if ($user->status === 'blacklisted') {
+        Auth::logout();
+        $request->session()->invalidate();
 
-    return back()->withErrors([
-        'email' => 'This account has been blacklisted.',
-    ])->onlyInput('email');
-}
+        return back()->withErrors([
+            'email' => 'This account has been blacklisted.',
+        ])->onlyInput('email');
+    }
 
-return match (true) {
-    $user->role === 'system_admin' => redirect()->route('admin.dashboard'),
-    $user->role === 'lecturer' => redirect()->route('lecturer.dashboard'),
-    $user->role === 'student' => redirect()->route('student.dashboard'),
-    default => abort(403),
-
-};
-    
-    
-        
+    return match (true) {
+        $user->role === 'system_admin' => redirect()->route('admin.dashboard'),
+        $user->role === 'lecturer' => redirect()->route('lecturer.dashboard'),
+        $user->role === 'student' => redirect()->route('student.dashboard'),
+        default => abort(403),
+    };
 }
 
 public function register(Request $request)

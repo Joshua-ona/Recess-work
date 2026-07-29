@@ -336,14 +336,10 @@ document.addEventListener('DOMContentLoaded', function() {
     new Chart(document.getElementById('dashActiveChart'), {
         type: 'line',
         data: {
-            labels: {
-                !!json_encode($active_trend['labels']) !!
-            },
+            labels: {!! json_encode($active_trend['labels']) !!},
             datasets: [{
                 label: 'Active users',
-                data: {
-                    !!json_encode($active_trend['counts']) !!
-                },
+                data: {!! json_encode($active_trend['counts']) !!},
                 borderColor: '#534AB7',
                 backgroundColor: 'rgba(83,74,183,0.12)',
                 tension: 0.3,
@@ -356,14 +352,10 @@ document.addEventListener('DOMContentLoaded', function() {
     new Chart(document.getElementById('dashContentChart'), {
         type: 'bar',
         data: {
-            labels: {
-                !!json_encode($content_trend['labels']) !!
-            },
+            labels: {!! json_encode($content_trend['labels']) !!},
             datasets: [{
                 label: 'Actions',
-                data: {
-                    !!json_encode($content_trend['counts']) !!
-                },
+                data: {!! json_encode($content_trend['counts']) !!},
                 backgroundColor: '#378ADD',
             }],
         },
@@ -373,13 +365,9 @@ document.addEventListener('DOMContentLoaded', function() {
     new Chart(document.getElementById('dashRoleChart'), {
         type: 'doughnut',
         data: {
-            labels: {
-                !!json_encode($role_distribution['labels']) !!
-            },
+            labels: {!! json_encode($role_distribution['labels']) !!},
             datasets: [{
-                data: {
-                    !!json_encode($role_distribution['counts']) !!
-                },
+                data: {!! json_encode($role_distribution['counts']) !!},
                 backgroundColor: ['#534AB7', '#378ADD', '#BA7517'],
             }],
         },
@@ -396,13 +384,9 @@ document.addEventListener('DOMContentLoaded', function() {
     new Chart(document.getElementById('dashStatusChart'), {
         type: 'doughnut',
         data: {
-            labels: {
-                !!json_encode($status_distribution['labels']) !!
-            },
+            labels: {!! json_encode($status_distribution['labels']) !!},
             datasets: [{
-                data: {
-                    !!json_encode($status_distribution['counts']) !!
-                },
+                data: {!! json_encode($status_distribution['counts']) !!},
                 backgroundColor: ['#1D9E75', '#BA7517', '#E24B4A', '#9b9a96'],
             }],
         },
@@ -417,5 +401,3 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-
-@endsection
