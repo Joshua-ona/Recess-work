@@ -211,7 +211,7 @@ class LecturerDashboardController extends Controller
 
         auth()->user()->warnings()->whereNull('read_at')->update(['read_at' => now()]);
 
-        return view('lecturer.notifications', [
+        return view('lecturer.notification', [
             'warnings' => $warnings,
         ]);
     }

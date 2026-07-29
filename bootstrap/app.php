@@ -21,6 +21,14 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \App\Http\Middleware\RoleMiddleware::class,
             'redirect.active.quiz' => \App\Http\Middleware\RedirectToActiveQuiz::class,
         ]);
+
+        // Stamps last_active_at on every authenticated web request — this
+        // feeds the "Daily active users" charts on the admin dashboard and
+        // analytics page. It was defined but never actually registered
+        // anywhere, so last_active_at never updated.
+        $middleware->web(append: [
+            \App\Http\Middleware\TrackLastActive::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

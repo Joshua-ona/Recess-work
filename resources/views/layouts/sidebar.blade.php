@@ -66,12 +66,7 @@
                    class="sidebar-item {{ request()->routeIs('lecturer.dashboard') ? 'active' : '' }}">
                     <i class="ti ti-layout-dashboard" aria-hidden="true"></i> <span>Dashboard</span>
                 </a>
-                <a href="{{ route('lecturer.discussions.index') }}" class="sidebar-item">
-                    <i class="ti ti-messages"></i> <span>Discussions</span>
-                </a>
-                <a href="{{ route('lecturer.categories') }}" class="sidebar-item">
-                    <i class="ti ti-category"></i> <span>Categories</span>
-                </a>
+    
                 <a href="{{ route('lecturer.quizzes') }}" class="sidebar-item">
                     <i class="ti ti-clipboard-check"></i> <span>Quizzes</span>
                 </a>

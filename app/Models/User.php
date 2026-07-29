@@ -25,7 +25,7 @@ class User extends Authenticatable
   protected $fillable = [
     'first_name','last_name','email','password','role','status','is_enabled',
     'warning_count','email_verified_at','last_warning_at','blacklisted_until',
-    'invite_token','invite_token_expires_at',
+    'invite_token','invite_token_expires_at','last_active_at',
 ];
 
     /**
@@ -44,6 +44,7 @@ class User extends Authenticatable
         'email_verified_at' => 'timestamp',
         'last_warning_at' => 'timestamp',
         'blacklisted_until' => 'timestamp',
+        'last_active_at' => 'datetime',
         'password' => 'hashed',
         'is_enabled'=>'boolean',
     ];
