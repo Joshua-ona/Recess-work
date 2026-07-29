@@ -50,28 +50,9 @@
                     <i class="ti ti-users" aria-hidden="true"></i> <span>Users</span>
                     <span class="sidebar-badge">{{ $userCount ?? 0 }}</span>
                 </a>
-                <a href="{{ route('admin.discussions') }}"
-                   class="sidebar-item {{ request()->routeIs('admin.discussions*') ? 'active' : '' }}">
-                    <i class="ti ti-messages" aria-hidden="true"></i> <span>Discussions</span>
-                </a>
-                <a href="{{ route('admin.courses') }}"
-                   class="sidebar-item {{ request()->routeIs('admin.courses*') ? 'active' : '' }}">
-                    <i class="ti ti-books" aria-hidden="true"></i> <span>Courses</span>
-                </a>
-                <a href="{{ route('admin.reports') }}"
-                   class="sidebar-item {{ request()->routeIs('admin.reports*') ? 'active' : '' }}">
-                    <i class="ti ti-flag" aria-hidden="true"></i> <span>Reports</span>
-                    @if(($openReports ?? 0) > 0)
-                        <span class="sidebar-badge">{{ $openReports }}</span>
-                    @endif
-                </a>
             </div>
             <div class="sidebar-section">
                 <div class="sidebar-section-label">System</div>
-                <a href="{{ route('admin.settings') }}"
-                   class="sidebar-item {{ request()->routeIs('admin.settings') ? 'active' : '' }}">
-                    <i class="ti ti-settings" aria-hidden="true"></i> <span>Settings</span>
-                </a>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <button type="submit" class="sidebar-item logout-btn">
